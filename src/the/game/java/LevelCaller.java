@@ -3,6 +3,8 @@ package the.game.java;
 public class LevelCaller {
 	
 	private static int level=0;
+	private static int defaultX;
+	private static int defaultY;
 	
 	public LevelCaller(){
 		new LevelCreator();
@@ -24,19 +26,39 @@ public class LevelCaller {
 		}
 	}
 	
+	public static void setNextLevel() {
+		LevelCreator.resetItemMap();
+		Enemy.itemMapMonsterReset();
+		level++;
+		setLevel(level);
+		Player.resetPlayerPosition();
+	}
+	
 	public static int getLevelNumber() {
 		return level;
 	}
 	
-    public static void levelCompleted() {
-	    Runner.shutRunnerDown();
-	    //new WinWindow();    	
-    }
+	public static int getPlayerDefaultPosX() {
+		return defaultX;
+	}
+	
+	public static int getPlayerDefaultPosY() {
+		return defaultY;
+	}
+	
+	private static void setPlayerDefaultPos(int defX, int defY) {
+		defaultX = defX*20;
+		defaultY = defY*20;
+	}
 	
 	private static void setLevel1(){
+		// Default Player Position
+		setPlayerDefaultPos(0, 13);
 		// Monster
-		//Enemy en1 = new Enemy(10, 14);
+		new Enemy(30, 80);
 		//Enemy en2 = new Enemy(10, 16);
+		// Goal
+		LevelCreator.createGoal(47,12,1,2);
 		// Traps
 		LevelCreator.createTrap(10,10);
 		// Walls
@@ -51,7 +73,11 @@ public class LevelCaller {
 		LevelCreator.createWall(36,3,1,24);
 		LevelCreator.createWall(47,15,1,12);
 	}	
-	private static void setLevel2(){	
+	private static void setLevel2(){
+		// Default Player Position
+		setPlayerDefaultPos(0, 13);
+		// Goal
+		LevelCreator.createGoal(47, 11, 1, 2);
 		// Walls
 		LevelCreator.createWall(0, 0, 48, 1);
 		LevelCreator.createWall(0, 25, 48, 1);
@@ -77,6 +103,8 @@ public class LevelCaller {
 		LevelCreator.createWall(47, 14, 1, 11);
 	}	
 	private static void setLevel3(){	
+		// Default Player Position
+				setPlayerDefaultPos(0, 5);
 		// Walls
 		LevelCreator.createWall(0, 0, 48, 1);
 		LevelCreator.createWall(0, 25, 48, 1);

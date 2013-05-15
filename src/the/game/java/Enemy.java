@@ -6,16 +6,25 @@ public class Enemy {
 	private static int y;
 	private static int mx=0;
 	private static int my=0;
-	private static int counter=0;
+	//private static int counter=0;
 	
 	public Enemy(int posx, int posy) {
 		x=posx;
 		y=posy;
-		LevelCreator.createMonster(x, y);
 		mx=1;
 	}
+	public Enemy(int posx, int posy, int moveX, int moveY) {
+		x = posx;
+		y = posy;
+		mx = moveX;
+		my = moveY;
+	}
 	
-	private static void itemMapMonsteReset() {
+	//public static void createMonster(int pointX, int pointY){
+	//	Enemy[] en[counter] = new Enemy[5](pointX,pointY);
+	//}
+	
+	public static void itemMapMonsterReset() {
 		for(int a=0; a<(Runner.getWidthF()-(Runner.getWidthF()%20))/20; a++) {	// Spaltenweise
 			for(int b=0; b<(Runner.getHeightF()-(Runner.getHeightF()%20))/20; b++) {
 				if(LevelCreator.itemMap[a][b] == 3)
@@ -24,19 +33,21 @@ public class Enemy {
 		}
 	}
 	
-	public static void move() {
-		counter++;
-		if(counter>20) {
-				counter=0;
-			if(LevelCreator.itemMap[x+mx][y+my]<=0) {
-				x += mx;
-				y += my;
-				//itemMapMonsteReset();
-				itemMapMonsteReset();
-				LevelCreator.createMonster(x, y);
-			} else {
-				mx = mx * (-1);
-			}
+	public static int getX() {
+		return x;
+	}
+	
+	public static int getY() {
+		return y;
+	}
+	
+	public static void move() {	// CHECK ENVIRONMENT EINBINDEN!
+		int faktor=2;	// Setzt Geschwindigkeit
+		if(LevelCreator.itemMap[(x+mx-((x+mx)%20))/20][(y+my-((y+my)%20))/20]<=0) {
+			x += mx*faktor;
+			y += my*faktor;
+		} else {
+			mx = mx * (-1);
 		}
 	}
 	

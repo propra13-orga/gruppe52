@@ -11,8 +11,8 @@ public class Player {
 
     private int mx;		// move x
     private int my;		// move y
-    private int x;		// x position
-    private int y;		// y position
+    private static int x;		// x position
+    private static int y;		// y position
     private int imageSizeX=15;
     private int imageSizeY=15;
     private Image playerIcon;	// playericon
@@ -22,9 +22,14 @@ public class Player {
     public Player() {	// Ini: playericon, default position
         ii = new ImageIcon(this.getClass().getResource(playerIconPath));
         playerIcon = ii.getImage();
-        x = 50;		// default x position
-        y = 50;		// default y position
+        x = LevelCaller.getPlayerDefaultPosX();		// default x position
+        y = LevelCaller.getPlayerDefaultPosY();		// default y position
         alive = true;
+    }
+    
+    public static void resetPlayerPosition() {
+        x = LevelCaller.getPlayerDefaultPosX();		// default x position
+        y = LevelCaller.getPlayerDefaultPosY();		// default y position
     }
     
     // BILD ANIMATION
@@ -397,7 +402,7 @@ public class Player {
     		alive=false;
     		break;
     	case 4:
-    		LevelCaller.levelCompleted();
+    		LevelCaller.setNextLevel();
     		break;
     	}
     	checkLifeStatus();

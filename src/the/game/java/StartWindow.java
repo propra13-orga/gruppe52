@@ -81,7 +81,6 @@ public class StartWindow extends JFrame implements ActionListener {
 			//fenster.add(new LevelErstellen());
 			Runner runner = new Runner();
 			vendor = runner;
-			new Enemy(9, 16);
 			frame.dispose();
 		}
 		

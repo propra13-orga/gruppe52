@@ -12,16 +12,16 @@ public class LevelCreator {
     
     public static int getItemMapDimensions(int axis) {	// Set height and width of the itemMap
     	int value = 0;
-    	if(axis==0)
+    	if(axis==0)			// x-Achse
     		value = (Runner.getWidthF() - (Runner.getWidthF() % 20))/20;
-    	else if(axis==1)
+    	else if(axis==1)	// y-Achse
     		value = (Runner.getHeightF() - (Runner.getHeightF() % 20))/20;
     	return value;
     }
     
     public static void resetItemMap() { // ?!?!?!?!?
-		for(int a=Runner.getWidthF(); a<Runner.getWidthF(); a++) {	// Spaltenweise
-			for(int b=Runner.getHeightF(); b<Runner.getHeightF(); b++) {
+		for(int a=0; a<getItemMapDimensions(0); a++) {	// Spaltenweise
+			for(int b=0; b<getItemMapDimensions(1); b++) {
 				itemMap[a][b] = 0;
 			}
 		}
@@ -41,7 +41,16 @@ public class LevelCreator {
 	}
 	
 	public static void createMonster(int pointX, int pointY){
-		itemMap[pointX][pointY] = 3;
+		//itemMap[pointX][pointY] = 3;
+		new Enemy(pointX,pointY);
+	}
+	
+	public static void createGoal(int pointX, int pointY, int width, int height){
+		for(int a=pointX; a<width+pointX; a++) {	// Spaltenweise
+			for(int b=pointY; b<height+pointY; b++) {
+				itemMap[a][b] = 4;
+			}
+		}
 	}
 	
 	public static int getItemMapData(int x, int y) {

@@ -33,13 +33,14 @@ public class Setter extends JPanel implements ActionListener {
         setBackground(Color.GRAY);
         setDoubleBuffered(true);	// verhindert Flackern
 
+        new LevelCaller();
+        LevelCaller.setLevel(levelNumber);
+
         player = new Player();
 
         timer = new Timer(5, this);
         timer.start();
         
-        new LevelCaller();
-        LevelCaller.setLevel(levelNumber);
     }
 
 
@@ -62,12 +63,14 @@ public class Setter extends JPanel implements ActionListener {
 				if(LevelCreator.getItemMapData(a, b)==2) {
 					g2d.drawImage(trap, a*20, b*20, this);
 				}
-				if(LevelCreator.getItemMapData(a, b)==3) {
-					g2d.drawImage(monster, a*20, b*20, this);
-				}
+				//if(LevelCreator.getItemMapData(a, b)==3) {
+				//	g2d.drawImage(monster, a*20, b*20, this);
+				//}
 			}
 			//System.out.println("");
 		}
+        
+        g2d.drawImage(monster, Enemy.getX(), Enemy.getY(), this);
 
         Toolkit.getDefaultToolkit().sync();
         g.dispose();
