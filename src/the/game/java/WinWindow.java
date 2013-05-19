@@ -47,12 +47,15 @@ public class WinWindow extends JFrame implements ActionListener{
 		  public void actionPerformed (ActionEvent e){ //wenn eine Aktion passiert bekommt ActionListener das mit und löst methode aus
 				
 				if (e.getSource()==zurueck){
+					this.dispose();
 					StartWindow.main(null); //Hauptmenü
 				}
 				if (e.getSource()==nochmal){
+					this.dispose();
 					StartWindow.fenster(); //Spiel
 				}
-				if (e.getSource()==choose){  
+				if (e.getSource()==choose){ 
+					this.dispose();
 					LevChooWindow.main(null); //Levelwahl#
 				}
 		   }
@@ -66,7 +69,8 @@ public class WinWindow extends JFrame implements ActionListener{
 				
 				frame.setLayout(null); //Kein vorgefertigtes Layout vewenden
 				frame.setVisible(true); //Frame ist sichtbar
-
+				frame.setLocationRelativeTo(null);	// Fenster startet in der Mitte
+				frame.setResizable(false);							// Fenstergröße manuell nicht veränderbar
 			}
 
 }

@@ -15,11 +15,11 @@ public class LevelCreator {
     	if(axis==0)			// x-Achse
     		value = (Runner.getWidthF() - (Runner.getWidthF() % 20))/20;
     	else if(axis==1)	// y-Achse
-    		value = (Runner.getHeightF() - (Runner.getHeightF() % 20))/20;
+    		value = (Runner.getHeightF() - (Runner.getHeightF() % 20))/20+1;	// +1 für Menu oben
     	return value;
     }
     
-    public static void resetItemMap() { // ?!?!?!?!?
+    public static void resetItemMap() {
 		for(int a=0; a<getItemMapDimensions(0); a++) {	// Spaltenweise
 			for(int b=0; b<getItemMapDimensions(1); b++) {
 				itemMap[a][b] = 0;
@@ -40,15 +40,22 @@ public class LevelCreator {
 		itemMap[pointX][pointY] = 2;
 	}
 	
-	public static void createMonster(int pointX, int pointY){
-		//itemMap[pointX][pointY] = 3;
-		new Enemy(pointX,pointY);
+	public static void createHealthPoint(int pointX, int pointY){
+		itemMap[pointX][pointY] = 10;
 	}
 	
 	public static void createGoal(int pointX, int pointY, int width, int height){
 		for(int a=pointX; a<width+pointX; a++) {	// Spaltenweise
 			for(int b=pointY; b<height+pointY; b++) {
 				itemMap[a][b] = 4;
+			}
+		}
+	}
+	
+	public static void createFinalGoal(int pointX, int pointY, int width, int height){
+		for(int a=pointX; a<width+pointX; a++) {	// Spaltenweise
+			for(int b=pointY; b<height+pointY; b++) {
+				itemMap[a][b] = 5;
 			}
 		}
 	}

@@ -68,6 +68,7 @@ public class LevChooWindow extends JFrame implements ActionListener {
 		if (e.getSource()==start){
 			//Welches Level wurde ausgewählt?
 			if(eins.isSelected()==true){
+				this.dispose();
 				StartWindow.fenster(1);  //Level 1
 			}else if(zwei.isSelected()==true){
 				StartWindow.fenster(2);  //Level 2
@@ -78,6 +79,7 @@ public class LevChooWindow extends JFrame implements ActionListener {
 		}
 		//Wurde der HauptmenüButten gedrückt?
 		if (e.getSource()==zurueck){
+			this.dispose();
 			StartWindow.main(null); //Zurück zum Hauptmenü
 		}
 
@@ -88,8 +90,9 @@ public class LevChooWindow extends JFrame implements ActionListener {
 		frame.setSize(300, 120);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setVisible(true);
-		
+		frame.setLocationRelativeTo(null);	// Fenster startet in der Mitte
 	    frame.setLayout(new FlowLayout());
+	    frame.setResizable(false);							// Fenstergröße manuell nicht veränderbar
 		
 
 	}

@@ -116,7 +116,8 @@ public class StartWindow extends JFrame implements ActionListener {
 			
 			frame.setLayout(null); //Kein vorgefertigtes Layout vewenden
 			frame.setVisible(true); //Frame ist sichtbar
-
+			frame.setLocationRelativeTo(null);	// Fenster startet in der Mitte
+			frame.setResizable(false);							// Fenstergröße manuell nicht veränderbar
 		}
 
 	
