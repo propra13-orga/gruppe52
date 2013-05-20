@@ -34,6 +34,8 @@ public class Player {
     //private int defaultPosY;
     private int lives;
     public static boolean codeRunning=true;
+    public static boolean showYouDiedImage=false;
+    private boolean alreadyPunished;
 
     public Player(int posx, int posy) {		// Konstruktor mit Angabe der Startposition
         ii = new ImageIcon(this.getClass().getResource(playerIconPath));
@@ -43,6 +45,7 @@ public class Player {
         alive = true;	// Spielfigur ist lebendig
         lives = 3;		// setzt die Startanzahl der Leben fest
         codeRunning = true;	// true, solange noch Objekte der Klasse Player gibt
+        alreadyPunished = false; // Verhindert unnötiges Abziehen von Leben: true, sobald ein Spieler ein Leben verloren hat, wieder false, sobald das Level neugestartet wird
     }
     
     public static void createPlayer(int posx, int posy) {	// erstellt neuen Spieler
@@ -52,8 +55,8 @@ public class Player {
     
     public static void resetAllPlayerPositions() {
 		for(int a=0; a<Player.playerList.size(); a++) {			
-			playerList.get(a).x = LevelCaller.getPlayerDefaultPosX();		// default x position
-			playerList.get(a).y = LevelCaller.getPlayerDefaultPosY();		// default y position
+			playerList.get(a).x = LevelCaller.getPlayerDefaultPosX();				// default x position
+			playerList.get(a).y = LevelCaller.getPlayerDefaultPosY()+(a*(playerList.get(a).imageSizeY+1));		// default y position; +(a*16), um für verstzte Startpunkte zu sorgen, bei mehreren Spielern
 		}
     }
     
@@ -125,7 +128,7 @@ public class Player {
     public static void move() {	// Rechnung: (aktuelle Position + Bewegung für x- oder y-Achse) für jeden Aufruf
     	for(int a=0; a<playerList.size(); a++) {									// Für jedes Element der PlayerListe, von 0 bis Ende
     		index = a;
-    		if(playerList.get(index).alive = true) {								// Nur Bewegen, wenn Spieler lebendig
+    		if(playerList.get(index).alive) {								// Nur Bewegen, wenn Spieler lebendig
 		    	int permission = playerList.get(index).checkMovementPermission();	// Umgebung auf Hindernisse überprüfen und ErlaubnisID einholen
 		    	if(codeRunning) {
 		    		if(permission<2){													// ID >= 2: Bewegen nicht erlaubt
@@ -453,43 +456,62 @@ public class Player {
     public void setLifeStatus(boolean isAlive) {	// ändert 'alive' (vorallem für false) mit gegebenen Konsequenzen
     	alive = isAlive;
     	checkLifeStatus();
+    	setDisplayLives();
     }
     
-    private void checkLifeStatus() {	// ÜBERARBEITEN! (aufteilen für menu)
-    	if(alive==false) {				// Wenn alive=false, dann
-    		setPlayerIcon("dead.png");	// PlayerIcon für toten Spieler
-    		lives--;						// Leben: -1
-    		if(checkAllLivesGone()) {					// wenn alle Spieler tot sind, dann:
-    			codeRunning = false;			// Flag, die verhindert, dass Codereste ausgeführt werden, wenn bereits keine Objekte mehr existieren
-	    		Enemy.codeRunning = false;
-    			LevelCaller.shutdownLevel();	// Löschen aller Levelparameter
-	    		Runner.shutRunnerDown();
-    			LostWindow.main(null);
-    		} else {
-    			alive = true;
-    			LevelCaller.resetLevel();
-    			checkDirection(-2);			// zurücksetzen des PlayerIcons
-    		}
+    private void checkLifeStatus() {
+    	if(showYouDiedImage==false && alreadyPunished==false) {	// nur wenn das Spiel läuft überprüfen
+	    	if(alive==false) {				// Wenn alive=false, dann
+	    		setPlayerIcon("dead.png");	// PlayerIcon für toten Spieler
+	    		lives--;						// Leben: -1
+	    		alreadyPunished = true;
+	    		if(checkAllLivesGone()) {					// wenn alle Spieler tot sind, dann:
+	    			codeRunning = false;			// Flag, die verhindert, dass Codereste ausgeführt werden, wenn bereits keine Objekte mehr existieren
+		    		Enemy.codeRunning = false;
+	    			LevelCaller.shutdownLevel();	// Löschen aller Levelparameter
+		    		Runner.shutRunnerDown();
+	    			LostWindow.main(null);
+	    		} else {
+	    			if(checkAllDead()) {
+	    				showYouDiedImage = true;	// Meldung wird angezeigt und es wird angeboten das Level neu zu starten
+	    			}
+	    		}
+	    	}
     	}
     }
     
-    private static boolean checkAllLivesGone() {
-		boolean allLivesGones = true;		// Ausgangsposition
+    private void resetLevel() {
+		for(int a=0; a<Player.playerList.size(); a++) {	// setzt alle spielerrelevanten Laufvariablen zurück
+			if(playerList.get(a).lives>0) {				// nur zurücksetzen, wenn Spieler noch Leben hat
+				playerList.get(a).alive = true;
+				playerList.get(a).alreadyPunished = false;
+				playerList.get(a).checkDirection(-2);			// zurücksetzen des PlayerIcons
+			}
+		}
+		LevelCaller.resetLevel();
+		setDisplayLives();
+    }
+    
+    private static boolean checkAllDead() {	// überprüft ob alle Spieler tot sind
+		boolean allDead = true;		// Ausgangsposition
 		for(int a=0; a<Player.playerList.size(); a++) {	// Überprüfen ob alle Spieler tot sind
+			if(playerList.get(a).alive)			// wenn auch nur ein Spieler noch lebt, check=false
+				allDead = false;
+		}
+    	return allDead;
+    }
+    
+    private static boolean checkAllLivesGone() {	// überprüft ob alle Spieler ohne Leben sind
+		boolean allLivesGones = true;		// Ausgangsposition
+		for(int a=0; a<Player.playerList.size(); a++) {	// Überprüfen ob alle Spieler ohne Leben sind
 			if(playerList.get(a).lives>0)			// wenn auch nur ein Spieler noch lebt, check=false
 				allLivesGones = false;
 		}
     	return allLivesGones;
     }
     
-    // Außer Funktion, da es nun Leben gibt
-    //private static void resetAlive() {
-	//	for(int a=0; a<Player.playerList.size(); a++) {
-	//		playerList.get(a).alive=true;					// zurücksetzen von 'alive' für alle Spieler
-	//	}
-    //}
-    
     private static void setDisplayLives() {
+    	resetDisplayLine();
     	int c=0;
 		for(int a=0; a<Player.playerList.size(); a++) {
 			for(int b=0; b<playerList.get(a).lives; b++) {
@@ -497,7 +519,13 @@ public class Player {
 			}
 			c+=5;	// Rückt 5 Spalten weiter, um Abstand zu schaffen für Lebensanzeige eines weiteren Spielers
 		}
-    }    
+    }
+    
+    private static void resetDisplayLine() {		// Setzt die oberste Menuleiste zurück (leer)
+		for(int a=0; a<LevelCreator.getItemMapDimensions(0); a++) {
+			LevelCreator.itemMap[a][0] = 0;			// Setzt die Stellen in der IconMap auf 0 zurück
+		}
+    }
     // LIFE STATUS END
 
     // KEY BINDINGS
@@ -547,6 +575,13 @@ public class Player {
             my = 0;								// MoveVariable y-Achse ...
             if(alive)
         		checkDirection(-4);
+        }
+        if (key == KeyEvent.VK_SPACE) {
+            if(showYouDiedImage) {
+            	showYouDiedImage=false;
+            	resetLevel();
+            }
+            
         }
     }
     

@@ -14,16 +14,17 @@ import javax.swing.*;
 public class LevChooWindow extends JFrame implements ActionListener {
 	
 	/**
-	 * 
+	 *  Diese Klasse erstellt das Fenster, in welchem mit Hilfe von RadioButtons ein Level ausgewählt werden kann.
 	 */
-	private static final long serialVersionUID = 1L;
-	//RadioButtons werden zur Levelauswahl deklariert
-	private static JRadioButton eins;
-	private static JRadioButton zwei;
-	private static JRadioButton drei;
-	private static LevChooWindow frame = new LevChooWindow("Wähle ein Level"); //Neues Objekt der Klasse LevChooWindow wird erzeugt
-
 	
+	private static final long serialVersionUID = 1L;
+	
+	//RadioButtons werden zur Levelauswahl deklariert
+	private static JRadioButton eins;											// RadioButton Level 1
+	private static JRadioButton zwei;											// RadioButton Level 2 
+	private static JRadioButton drei;											// RadioButton Level 3
+	private static LevChooWindow frame = new LevChooWindow("Wähle ein Level"); 	//Neues Objekt der Klasse LevChooWindow wird erzeugt
+
 	//Buttons werden deklariert
 	private JButton start;
 	private JButton zurueck;
@@ -51,12 +52,12 @@ public class LevChooWindow extends JFrame implements ActionListener {
 		//Buttons werden hinzugefügt
 		start= new JButton("Los geht's");
 		//start.setBounds(100, 20, 400, 40); nicht nötig wegen Layout
-		start.addActionListener(this);
+		start.addActionListener(this);						// ActionListener wird mit Button verknüpft
 		add(start);
 		
 		zurueck=new JButton("Zum Hauptmenü");
 		//zurueck.setBounds(100, 200, 200, 40); nicht nötig wegen Layout
-		zurueck.addActionListener(this);
+		zurueck.addActionListener(this);					// Action Listener wird mit Button verknüpft
 		add(zurueck);
 		
 	}
@@ -66,35 +67,34 @@ public class LevChooWindow extends JFrame implements ActionListener {
 		
 		//Wurde der Los gehts Button gedrückt?
 		if (e.getSource()==start){
+			
 			//Welches Level wurde ausgewählt?
 			if(eins.isSelected()==true){
-				this.dispose();
-				StartWindow.fenster(1);  //Level 1
+				StartWindow.fenster(1);  				// Level 1
 			}else if(zwei.isSelected()==true){
-				StartWindow.fenster(2);  //Level 2
+				StartWindow.fenster(2);  				// Level 2
 			}else{
-				StartWindow.fenster(3);  //Level 3
+				StartWindow.fenster(3);  				// Level 3
 			}
-			frame.dispose();
+			frame.dispose();							// LevChooWindow wird geschlossen
 		}
+		
 		//Wurde der HauptmenüButten gedrückt?
 		if (e.getSource()==zurueck){
-			this.dispose();
-			StartWindow.main(null); //Zurück zum Hauptmenü
+			frame.dispose();							// LevChooWindow wird geschlossen
+			StartWindow.main(null); 					// Zurück zum Hauptmenü
 		}
 
-   }
+	}
 	
 	public static void main(String[] args) {
 			
-		frame.setSize(300, 120);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setVisible(true);
-		frame.setLocationRelativeTo(null);	// Fenster startet in der Mitte
-	    frame.setLayout(new FlowLayout());
-	    frame.setResizable(false);							// Fenstergröße manuell nicht veränderbar
-		
-
+		frame.setSize(300, 120);									// Fenstergröße wird festgelegt
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	// Fenster wird geschlossen durch X
+		frame.setVisible(true);				
+		frame.setLocationRelativeTo(null);							// Fenster startet in der Mitte
+	    frame.setLayout(new FlowLayout());							// Layout
+	    frame.setResizable(false);									// Fenstergröße manuell nicht veränderbar	
 	}
 
 }

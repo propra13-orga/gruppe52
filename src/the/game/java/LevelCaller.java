@@ -2,102 +2,109 @@ package the.game.java;
 
 public class LevelCaller {
 	
-	private static int level=0;
-	private static int defaultX;
-	private static int defaultY;
+	private static int level=0;		// Laufvariable für Level
+	private static int defaultX;	// Startposition (x) für Player
+	private static int defaultY;	// Startposition (y) für Player
 	
 	public LevelCaller(){
-		new LevelCreator();
+		// sobald ein Objekt der Klasse LevelCaller erstellt wird, wird auch ein Objekt der Klasse LevelCreator erstellt
+		// die beiden Klassen sind von einander abhängig und haben allein keinen Sinn
+		// sie lieben sich und werden viele kleine Methoden haben
+		new LevelCreator();	
 	}
 	
 	public static void setLevel(int levelnr){
-		level = levelnr;
-		LevelCreator.resetItemMap();
-		Enemy.monsterList.clear();
-		Tracker.trackerList.clear();
-		switch(levelnr) {
+		level = levelnr;						// level nimmt den Wert vom Parameter an -> dient als Laufvariable
+		LevelCreator.resetItemMap();			// Array leeren
+		Enemy.monsterList.clear();				// Monsterbestand wird auf 0 gesetzt
+		Tracker.trackerList.clear();			// Trackerbestand wird auf 0 gesetzt
+		switch(levelnr) {						// Levelnr wird überprüft:
 		case 1:
-			setLevel1();
+			setLevel1();							// Level 1 wird ausgeführt
 			break;
 		case 2:
-			setLevel2();
+			setLevel2();							// Level 2 wird ausgeführt
 			break;
 		case 3:
-			setLevel3();
+			setLevel3();							// Level 3 wird ausgeführt
 			break;
 		}
 	}
 	
 	public static void setNextLevel() {
-		LevelCreator.resetItemMap();
-		Enemy.monsterList.clear();
-		Tracker.trackerList.clear();
-		level++;
-		setLevel(level);
-		Player.resetAllPlayerPositions();
+		LevelCreator.resetItemMap();			// Array leeren
+		Enemy.monsterList.clear();				// Monsterbestand wird auf 0 gesetzt
+		Tracker.trackerList.clear();			// Trackerbestand wird auf 0 gesetzt
+		level++;								// Laufvariable level wird um 1 erhöht
+		setLevel(level);						// Level nr level wird gestartet
+		Player.resetAllPlayerPositions();		// Position der Spieler wird neu gesetzt
 	}
 	
 
-	public static void setFinalGoal() {
-		shutdownLevel();
-		WinWindow.main(null);		
+	public static void setFinalGoal() {			// wird gestartet wenn das Ziel des Spiels erreicht wurde
+		shutdownLevel();						// das ganze Spiel wird zurückgesetzt und beendet
+		WinWindow.main(null);					// das "GewonnenFenster" öffnet sich
 	}
 	
 	public static void resetLevel() {
-		LevelCreator.resetItemMap();
-		Enemy.monsterList.clear();
-		Tracker.trackerList.clear();
-		setLevel(level);
-		Player.resetAllPlayerPositions();
+		LevelCreator.resetItemMap();			// Array leeren
+		Enemy.monsterList.clear();				// Monsterbestand wird auf 0 gesetzt
+		Tracker.trackerList.clear();			// Trackerbestand wird auf 0 gesetzt
+		setLevel(level);						// Level nr level wird gestartet (Das gleiche Level)
+		Player.resetAllPlayerPositions();		// Position der Spieeler wird neu gesetzt.
 	}
 	
 	public static void shutdownLevel() {
-		Player.codeRunning = false;			// Flag, die verhindert, dass Codereste ausgeführt werden, wenn bereits keine Objekte mehr existieren
+		Player.codeRunning = false;				// Flag, die verhindert, dass Codereste ausgeführt werden, wenn bereits keine Objekte mehr existieren
 		Enemy.codeRunning = false;
-		LevelCreator.resetItemMap();	// Array leeren
-		Enemy.monsterList.clear();		// Gegner löschen
-		Tracker.trackerList.clear();	// Tracker löschen
-		Player.playerList.clear();		// Player löschen
-		Setter.timer.stop();			// Timer ausschalten
-		Runner.shutRunnerDown();
+		LevelCreator.resetItemMap();			// Array leeren
+		Enemy.monsterList.clear();				// Monsterbestand wird auf 0 gesetzt
+		Tracker.trackerList.clear();			// Trackerbestand wird auf 0 gesetzt
+		Player.playerList.clear();				// Position der Spieler wird neu gesetzt
+		Setter.timer.stop();					// Timer ausschalten
+		Runner.shutRunnerDown();				// beendet das Speilfenster
 	}
 	
-	public static int getLevelNumber() {
+	public static int getLevelNumber() {		// gibt Levelnr aus
 		return level;
 	}
 	
-	public static int getPlayerDefaultPosX() {
+	public static int getPlayerDefaultPosX() {	// gibt Startposition (x) des Players aus
 		return defaultX;
 	}
 	
-	public static int getPlayerDefaultPosY() {
+	public static int getPlayerDefaultPosY() {	// gibt Startposition (y) des Players aus
 		return defaultY;
 	}
 	
-	private static void setPlayerDefaultPos(int defX, int defY) {
+	private static void setPlayerDefaultPos(int defX, int defY) {	// ändert die Startposition des Players
 		defaultX = defX*20;
 		defaultY = defY*20;
 	}
 	
 	private static void setLevel1(){
+		
 		// Default Player Position
 		setPlayerDefaultPos(0, 13);
-		// Health
+		
+		// Items
 		LevelCreator.createHealthPoint(18, 24);
+		
 		// Monster
-		//Enemy.createMonster(50, 80);
 		Enemy.createMonster(600, 320, 1, 1, 1);
 		Enemy.createMonster(820, 400, -1, -1, 1);
 		Enemy.createMonster(120, 120, -1, -1, 1);
-		//Enemy.createMonster(50, 180, -1, -1);
+		
+		// Tracker
 		Tracker.createTracker(16*20, 22*20, -1, -1);
 		Tracker.createTracker(20*20, 22*20, -1, -1);
-		//Tracker.createTracker(29*20, 22*20, -1, -1);
-		//Enemy en2 = new Enemy(10, 16);
+
 		// Goal
 		LevelCreator.createGoal(47,13,1,3);
+		
 		// Traps
 		LevelCreator.createTrap(10,11);
+		
 		// Walls
 		LevelCreator.createWall(0,1,48,1);
 		LevelCreator.createWall(0,26,48,1);
@@ -109,17 +116,44 @@ public class LevelCaller {
 		LevelCreator.createWall(12,4,1,24);
 		LevelCreator.createWall(36,4,1,24);
 		LevelCreator.createWall(47,16,1,12);
-	}	
+	}
+	
 	private static void setLevel2(){
+		
 		// Default Player Position
 		setPlayerDefaultPos(0, 13);
+		
 		// Goal
 		LevelCreator.createGoal(47, 12, 1, 3);
+		
+		// Traps
+		LevelCreator.createTrap(2,13);
+		LevelCreator.createTrap(2,14);
+		LevelCreator.createTrap(7,18);
+		LevelCreator.createTrap(8,18);
+		LevelCreator.createTrap(10,18);
+		LevelCreator.createTrap(11,18);
+		LevelCreator.createTrap(9,16);
+		LevelCreator.createTrap(42,18);
+		LevelCreator.createTrap(40,19);
+		LevelCreator.createTrap(44,19);
+		LevelCreator.createTrap(44,21);
+		LevelCreator.createTrap(40,21);
+		LevelCreator.createTrap(42,22);
+		LevelCreator.createTrap(43,7);
+		LevelCreator.createTrap(44,7);
+		LevelCreator.createTrap(45,7);
+		LevelCreator.createTrap(44,9);
+		LevelCreator.createTrap(45,9);
+		LevelCreator.createTrap(46,9);
+		
+		
 		// Monster
+			// Monster Bouncy
 		Enemy.createMonster(414, 180, -1, -1, 1);
 		Enemy.createMonster(512, 60, -1, -1, 1);
 		Enemy.createMonster(614, 480, -1, -1, 1);
-		// Monster horizontal
+			// Monster horizontal
 		Enemy.createMonster(20, 460, 1, 0);
 		Enemy.createMonster(140, 460, 1, 0);
 		Enemy.createMonster(270, 120, 1, 0);
@@ -135,6 +169,7 @@ public class LevelCaller {
 		Enemy.createMonster(770, 120, 1, 0);
 		Enemy.createMonster(780, 280, 1, 0);
 		Enemy.createMonster(910, 120, 1, 0);
+		
 		// Walls
 		LevelCreator.createWall(0, 1, 48, 1);
 		LevelCreator.createWall(0, 26, 48, 1);
@@ -159,16 +194,34 @@ public class LevelCaller {
 		LevelCreator.createWall(43, 14, 5, 1);
 		LevelCreator.createWall(47, 15, 1, 11);
 	}	
-	private static void setLevel3(){	
+	
+	private static void setLevel3(){
+		
 		// Default Player Position
 		setPlayerDefaultPos(0, 5);
+		
 		// Final Goal
 		LevelCreator.createFinalGoal(47, 18, 1, 3);
+		
 		// Items
 		LevelCreator.createHealthPoint(6, 11);
 		LevelCreator.createHealthPoint(38, 25);
+		
+		// Traps
+		LevelCreator.createTrap(7,16);
+		LevelCreator.createTrap(8,21);
+		LevelCreator.createTrap(26,25);
+		LevelCreator.createTrap(33,25);
+		LevelCreator.createTrap(41,21);
+		LevelCreator.createTrap(38,2);
+		LevelCreator.createTrap(42,2);
+		LevelCreator.createTrap(45,6);
+		LevelCreator.createTrap(45,9);
+		LevelCreator.createTrap(45,12);
+		LevelCreator.createTrap(45,15);
+		
 		// Monster
-		// Monster Horizontal
+			// Monster Horizontal
 		Enemy.createMonster(80, 60, -1, 0);
 		Enemy.createMonster(180, 40, -1, 0);
 		Enemy.createMonster(180, 160, -1, 0);
@@ -180,7 +233,7 @@ public class LevelCaller {
 		Enemy.createMonster(720, 260, -1, 0);
 		Enemy.createMonster(860, 440, -1, 0);
 		Enemy.createMonster(880, 60, -1, 0);
-		//Monster Vertikal
+			//Monster Vertikal
 		Enemy.createMonster(40, 120, 0, 1);
 		Enemy.createMonster(140, 160, 0, 1);
 		Enemy.createMonster(360, 360, 0, 1);
@@ -188,6 +241,7 @@ public class LevelCaller {
 		Enemy.createMonster(600, 320, 0, 1);
 		Enemy.createMonster(780, 380, 0, 1);
 		Enemy.createMonster(920, 160, 0, 1);
+		
 		// Walls
 		LevelCreator.createWall(0, 1, 48, 1);
 		LevelCreator.createWall(0, 26, 48, 1);

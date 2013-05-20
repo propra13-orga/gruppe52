@@ -35,7 +35,7 @@ public class Setter extends JPanel implements ActionListener {
         LevelCaller.setLevel(levelNumber);	// Leveldaten werden initialisiert; Parameter legt fest welches Level gestartet wird
 
         Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY());		// erzeugt Objekt der Klasse Player: Fügt einen Spieler in das Spielfeld ein, an der durch die Parameter festgelegte Stelle
-        //Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY()+5);	// (noch) zu Testzwecken wird ein zweiter Spieler erzeugt
+        //Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY()+16);	// (noch) zu Testzwecken wird ein zweiter Spieler erzeugt
         
         timer = new Timer(8, this);			// erzeugt ein Objekt timer der Klasse Timer; Parameter: legt den Aktualisierungsintervall fest (in millisekunden)
         timer.start();						// startet den timer
@@ -55,6 +55,8 @@ public class Setter extends JPanel implements ActionListener {
         Image explosion = setImagePath("explosion.gif");
         Image menu = setImagePath("headmenu.png");
         Image finalGoal = setImagePath("goal.png");
+        Image layer = setImagePath("transparentLayer.png");
+        Image youDiedMenu = setImagePath("youdied.png");
         
         g2d.drawImage(background, 1, 1, this); 	// Titelmenü - Hintergrund darstellen
         
@@ -93,6 +95,11 @@ public class Setter extends JPanel implements ActionListener {
         // Tracker
 		for(int a=0; a<Tracker.trackerList.size(); a++) { // Setzt ein Icon für jeden erstellten Tracker
 			g2d.drawImage(monster, Tracker.getX(a), Tracker.getY(a), this);
+		}
+		// You Died Menu
+		if(Player.showYouDiedImage) {
+			g2d.drawImage(layer, 0, 0, this);
+			g2d.drawImage(youDiedMenu, 200, 100, this);
 		}
         
         Toolkit.getDefaultToolkit().sync();

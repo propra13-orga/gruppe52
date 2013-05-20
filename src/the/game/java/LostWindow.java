@@ -11,9 +11,11 @@ import javax.swing.JFrame;
 public class LostWindow extends JFrame implements ActionListener{
     
 	/**
-	 * 
+	 *  Dieses Fenster öffnet sich nachdem man "Game Over" verloren hat
 	 */
+	
 	private static final long serialVersionUID = 1L;
+	
 	//Buttons werden deklariert
 	private JButton zurueck;
 	private JButton nochmal;
@@ -24,21 +26,20 @@ public class LostWindow extends JFrame implements ActionListener{
 		super(title);
 				
 	    //Buttons werden erzeugt
-				
 		zurueck= new JButton("Zurück zum Hauptmenü");
 		zurueck.setBounds(100, 20, 200, 40);
-		zurueck.addActionListener(this);
+		zurueck.addActionListener(this);					// ActionListener wird mit Button verknüpft
 		add(zurueck);
 				
 		nochmal= new JButton("Nochmal von Anfang");
 		nochmal.setBounds(340, 20, 200, 40);
-		nochmal.addActionListener(this);
+		nochmal.addActionListener(this);					// ActionListener wird mit Button verknüpft
 		add(nochmal);
 		
 		
 		choose= new JButton("Level auswählen");
 		choose.setBounds(580, 20, 200, 40);
-		choose.addActionListener(this);
+		choose.addActionListener(this);						// // ActionListener wird mit Button verknüpft
 		add(choose);
 		 
 				
@@ -49,27 +50,27 @@ public class LostWindow extends JFrame implements ActionListener{
 				
 			if (e.getSource()==zurueck){
 				this.dispose();
-				StartWindow.main(null); //Hauptmenü
+				StartWindow.main(null); 		// Hauptmenü
 			}
 			if (e.getSource()==nochmal){
 				this.dispose();
-				StartWindow.fenster(); //Spiel
+				StartWindow.fenster(); 			// Spiel
 			}
 			if (e.getSource()==choose){
 				this.dispose();
-				LevChooWindow.main(null); //Levelwahl
+				LevChooWindow.main(null); 		// Levelwahl
 			}
 		 }
 			
 			
 		public static void main(String[] args) {
 			LostWindow frame = new LostWindow("You Lost! HAHAHAHA. Was möchtest du jetzt tun?"); 
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Schliessen mit x?
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  			// Schliessen mit x
 			frame.setSize(880, 120);    
 				
-			frame.setLayout(null); //Kein vorgefertigtes Layout vewenden
-			frame.setVisible(true); //Frame ist sichtbar
-			frame.setLocationRelativeTo(null);	// Fenster startet in der Mitte
-			frame.setResizable(false);							// Fenstergröße manuell nicht veränderbar
+			frame.setLayout(null); 											// Kein vorgefertigtes Layout vewenden
+			frame.setVisible(true); 										// Frame ist sichtbar
+			frame.setLocationRelativeTo(null);								// Fenster startet in der Mitte
+			frame.setResizable(false);										// Fenstergröße manuell nicht veränderbar
 		}
 }

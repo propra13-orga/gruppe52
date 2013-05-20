@@ -72,6 +72,10 @@ public class Tracker {
 			int playerY = Player.playerList.get(0).getY();
 			int trackerX = trackerList.get(index).x;
 			int trackerY = trackerList.get(index).y;
+			// Entscheiden, welcher Player verfolgt werden soll: gewählt wird kürzeste Distanz
+			//for(int a=0; a<Player.playerList.size(); a++) {
+			//	
+			//}
 			// Einfache Steigungsberechnung
 			if(playerX-trackerX>0)
 				trackerList.get(index).mx = 1;

@@ -10,9 +10,10 @@ import javax.swing.JFrame;
 public class WinWindow extends JFrame implements ActionListener{
 	
 	/**
-	 * 
+	 * Dieses Fenster öffnet sich, wenn man das Spiel gewonnen hat, bzw wenn man das "FinalGoal" passiert hat. 
 	 */
 	private static final long serialVersionUID = 1L;
+	
 	//Buttons werden deklariert
 	private JButton zurueck;
 	private JButton nochmal;
@@ -22,8 +23,7 @@ public class WinWindow extends JFrame implements ActionListener{
 		//Titel einstellen
 		super(title);
 				
-	    //Buttons werden erzeugt
-				
+	    //Buttons werden erzeugt		
 		zurueck= new JButton("Zurück zum Hauptmenü");
 		zurueck.setBounds(100, 20, 200, 40);
 		zurueck.addActionListener(this);
@@ -64,13 +64,13 @@ public class WinWindow extends JFrame implements ActionListener{
 			
 			public static void main(String[] args) {
 				WinWindow frame = new WinWindow("You Won! JUHUUUUUUUU! Was möchtest du jetzt tun?"); 
-				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Schliessen mit x?
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 		//Schliessen mit x
 				frame.setSize(880, 120);                       
 				
-				frame.setLayout(null); //Kein vorgefertigtes Layout vewenden
-				frame.setVisible(true); //Frame ist sichtbar
-				frame.setLocationRelativeTo(null);	// Fenster startet in der Mitte
-				frame.setResizable(false);							// Fenstergröße manuell nicht veränderbar
+				frame.setLayout(null); 										// Kein vorgefertigtes Layout vewenden
+				frame.setVisible(true); 									// Frame ist sichtbar
+				frame.setLocationRelativeTo(null);							// Fenster startet in der Mitte
+				frame.setResizable(false);									// Fenstergröße manuell nicht veränderbar
 			}
 
 }
