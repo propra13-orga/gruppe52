@@ -92,6 +92,9 @@ public class StartWindow extends JFrame implements ActionListener {
 		
 		public static void auswahl(){
 			JFrame auswahl= new JFrame("Hier sind bald die Einstellungen"); 
+			
+			
+			
 			auswahl.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);		// Fenster wird durch X geschlossen
 			auswahl.setSize(400,400);										// Größe des Fensters
 			auswahl.setVisible(true);

@@ -36,6 +36,7 @@ public class Player {
     public static boolean codeRunning=true;
     public static boolean showYouDiedImage=false;
     private boolean alreadyPunished;
+    public boolean invincible;
 
     public Player(int posx, int posy) {		// Konstruktor mit Angabe der Startposition
         ii = new ImageIcon(this.getClass().getResource(playerIconPath));
@@ -46,6 +47,7 @@ public class Player {
         lives = 3;		// setzt die Startanzahl der Leben fest
         codeRunning = true;	// true, solange noch Objekte der Klasse Player gibt
         alreadyPunished = false; // Verhindert unnötiges Abziehen von Leben: true, sobald ein Spieler ein Leben verloren hat, wieder false, sobald das Level neugestartet wird
+        invincible = false;		// spieler nicht unbesiegbar
     }
     
     public static void createPlayer(int posx, int posy) {	// erstellt neuen Spieler
@@ -403,7 +405,6 @@ public class Player {
 			}
     		break;
     	case 3:					// Enemy
-    		permission=true;
     		playerList.get(index).setLifeStatus(false);
     		break;
     	case 4:					// Goal
@@ -420,9 +421,28 @@ public class Player {
     		lives++;
     		LevelCreator.itemMap[posx][posy] = 0;
     		break;
+    	case 11:				// Invincibility
+    		Item.activateInvincibility(index);	// Shield aktivieren, index (aus playerList) übergeben
+    		LevelCreator.itemMap[posx][posy] = 0;
+    		break;
     	}
+    	checkItems();
     	setDisplayLives();		// Aktualisiert die Lebensanzeige
     	return permission;
+    }
+    
+    private void checkItems() {
+		for(int a=0; a<Item.itemList.size(); a++) {		// geht Item für Item durch
+			if(Item.itemList.get(a).valid==true) {				// nur überprüfen, wenn noch gültig
+				if(Item.itemList.get(a).playerID==index) {			// wenn markiert für diesen Spieler:
+					switch(Item.itemList.get(a).itemID) {
+					case 11:	//	Shield
+						invincible = true;
+						break;
+					}
+				}
+			}
+		}
     }
     
 	private boolean checkPlayerCollideOnCenter(int posx, int posy) {			// Kontrolle der 4 Eckpunkte des Monsters
@@ -454,9 +474,11 @@ public class Player {
     }
     
     public void setLifeStatus(boolean isAlive) {	// ändert 'alive' (vorallem für false) mit gegebenen Konsequenzen
-    	alive = isAlive;
-    	checkLifeStatus();
-    	setDisplayLives();
+    	if(invincible==false) {
+	    	alive = isAlive;
+	    	checkLifeStatus();
+	    	setDisplayLives();
+    	}
     }
     
     private void checkLifeStatus() {

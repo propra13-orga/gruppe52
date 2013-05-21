@@ -24,7 +24,8 @@ public class Setter extends JPanel implements ActionListener {
 	
 	public static Timer timer;	// erzeugt eine Variable timer des Typs Timer
     private ImageIcon ii;		// erzeugt eine Variable ii (ImageIcon) des Typs ImageIcon
-
+    private int interval;
+    
     public Setter(int levelNumber) {	// Konstruktor
         addKeyListener(new TAdapter());		// Fügt KeyListener hinzu und erstellt ein neues Objekt der Klasse TAdapter, welches die Methoden 'keyReleased' und 'keyPressed' überschreibt
         setFocusable(true);					// Kann fokussiert werden; Relevant für den Keylistener
@@ -37,7 +38,8 @@ public class Setter extends JPanel implements ActionListener {
         Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY());		// erzeugt Objekt der Klasse Player: Fügt einen Spieler in das Spielfeld ein, an der durch die Parameter festgelegte Stelle
         //Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY()+16);	// (noch) zu Testzwecken wird ein zweiter Spieler erzeugt
         
-        timer = new Timer(8, this);			// erzeugt ein Objekt timer der Klasse Timer; Parameter: legt den Aktualisierungsintervall fest (in millisekunden)
+        interval = 8;
+        timer = new Timer(interval, this);			// erzeugt ein Objekt timer der Klasse Timer; Parameter: legt den Aktualisierungsintervall fest (in millisekunden)
         timer.start();						// startet den timer
     }
     
@@ -57,6 +59,7 @@ public class Setter extends JPanel implements ActionListener {
         Image finalGoal = setImagePath("goal.png");
         Image layer = setImagePath("transparentLayer.png");
         Image youDiedMenu = setImagePath("youdied.png");
+        Image shield = setImagePath("shield.png");
         
         g2d.drawImage(background, 1, 1, this); 	// Titelmenü - Hintergrund darstellen
         
@@ -67,20 +70,29 @@ public class Setter extends JPanel implements ActionListener {
         // Geht die gesamte itemMap durch und stellt alles dar, was dort angegeben wurde; Jedes darzustellende Objekt hat eine ID
         for(int a=0; a < LevelCreator.getItemMapDimensions(0); a++) {	// Spaltenweise
 			for(int b=0; b<LevelCreator.getItemMapDimensions(1); b++) {		// Zeilenweise
-				if(LevelCreator.getItemMapData(a, b)==1) {
+				switch(LevelCreator.getItemMapData(a, b)) {
+				case 1:
 					g2d.drawImage(wall, a*20, b*20, this);		// Wall
-				}
-				if(LevelCreator.getItemMapData(a, b)==2) {
+					break;
+				case 2:
 					g2d.drawImage(trap, a*20, b*20, this);		// Trap
-				}
-				if(LevelCreator.getItemMapData(a, b)==-2) {
+					break;
+				case -2:
 					g2d.drawImage(explosion, a*20, b*20, this);	// Explosion
-				}
-				if(LevelCreator.getItemMapData(a, b)==10) {
+					break;
+				case 10:
 					g2d.drawImage(heart, a*20, b*20, this);		// Hearts
-				}
-				if(LevelCreator.getItemMapData(a, b)==5) {
+					break;
+				case 5:
 					g2d.drawImage(finalGoal, a*20, b*20, this);	// Final Goal
+					break;
+				case 11:
+					g2d.drawImage(shield, a*20, b*20, this);	// Shield
+					break;
+				}
+				if(LevelCreator.getItemMapData(a, b)>100 && LevelCreator.getItemMapData(a, b)<200) {
+					String str = (LevelCreator.getItemMapData(a, b)-100) + "s";	// verbleibende sekunden
+					g2d.drawString(str, a*20, 15);	// Timer
 				}
 			}
 		}
@@ -116,6 +128,7 @@ public class Setter extends JPanel implements ActionListener {
     	Enemy.move();
     	Tracker.move();
 	    Player.move();
+	    Item.setTime(interval);
     	repaint();		// neu zeichnen
     }
 

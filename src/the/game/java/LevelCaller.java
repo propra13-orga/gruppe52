@@ -89,6 +89,7 @@ public class LevelCaller {
 		
 		// Items
 		LevelCreator.createHealthPoint(18, 24);
+		LevelCreator.createShield(6, 24);
 		
 		// Monster
 		Enemy.createMonster(600, 320, 1, 1, 1);
@@ -103,7 +104,22 @@ public class LevelCaller {
 		LevelCreator.createGoal(47,13,1,3);
 		
 		// Traps
-		LevelCreator.createTrap(10,11);
+		LevelCreator.createTrap(13,4);
+		LevelCreator.createTrap(14,4);
+		LevelCreator.createTrap(15,4);
+		LevelCreator.createTrap(16,4);
+		LevelCreator.createTrap(17,4);
+		LevelCreator.createTrap(18,4);
+		LevelCreator.createTrap(19,4);
+		LevelCreator.createTrap(20,4);
+		LevelCreator.createTrap(23,6);
+		LevelCreator.createTrap(22,6);
+		LevelCreator.createTrap(21,6);
+		LevelCreator.createTrap(20,6);
+		LevelCreator.createTrap(19,6);
+		LevelCreator.createTrap(18,6);
+		LevelCreator.createTrap(17,6);
+		LevelCreator.createTrap(16,6);
 		
 		// Walls
 		LevelCreator.createWall(0,1,48,1);
@@ -206,6 +222,9 @@ public class LevelCaller {
 		// Items
 		LevelCreator.createHealthPoint(6, 11);
 		LevelCreator.createHealthPoint(38, 25);
+		LevelCreator.createShield(33,22);
+		LevelCreator.createShield(1,2);
+		LevelCreator.createShield(21,12);
 		
 		// Traps
 		LevelCreator.createTrap(7,16);

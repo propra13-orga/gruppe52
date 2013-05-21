@@ -24,6 +24,8 @@ public class LevelCreator {
 		for(int a=0; a<getItemMapDimensions(0); a++) {	// Spaltenweise
 			for(int b=0; b<getItemMapDimensions(1); b++) {	// Zeilenweise
 				itemMap[a][b] = 0;
+				if(a>=getItemMapDimensions(0))	// setzt die letzte Spalte (ist auﬂerhalb des Feldes) als Goal
+					itemMap[a][b] = 4;
 			}
 		}
     }
@@ -43,6 +45,10 @@ public class LevelCreator {
 	
 	public static void createHealthPoint(int pointX, int pointY){
 		itemMap[pointX][pointY] = 10;	// Tag 10 = Heart
+	}
+	
+	public static void createShield(int pointX, int pointY){
+		itemMap[pointX][pointY] = 11;	// Tag 11 = Shield
 	}
 	
 	public static void createGoal(int pointX, int pointY, int width, int height){
