@@ -1,9 +1,15 @@
 package the.game.java;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class Tracker {
+	
+	private int[][] flagMap;
+	private Queue<Integer> pathQueueX;
+	private Queue<Integer> pathQueueY;
 	
 	private int speed;
 	private int delay;
@@ -11,33 +17,64 @@ public class Tracker {
 	private int y;
 	private int mx=0;
 	private int my=0;
+	private int damage;
 	public static List<Tracker> trackerList = new ArrayList<Tracker>();
 	private static int index;
-	private static int imgSizeTrackerX = 15;
-	private static int imgSizeTrackerY = 22;
+	private int imgSizeTrackerX;
+	private int imgSizeTrackerY;
+	private int healthPoints;
+	private boolean alive;
+	private static boolean pathFindingActive = false;
+	private boolean dumb;
 	
 	public Tracker(int posx, int posy) {	// Konstruktor 1: Parameter bestimmen Startposition
+		flagMap = new int[LevelCreator.getItemMapDimensions(0)][LevelCreator.getItemMapDimensions(1)];
+		pathQueueX = new LinkedList<Integer>();
+		pathQueueY = new LinkedList<Integer>();
+		
 		x=posx;
 		y=posy;
 		mx=1;
 		speed = -1;
 		delay = 0;
+		damage = 50;
+		
+		healthPoints = 100;
+		alive = true;
+		
+		imgSizeTrackerX = 15;
+		imgSizeTrackerY = 22;
+		
+		dumb = true;
 	}
-	public Tracker(int posx, int posy, int moveX, int moveY) {	// Konstruktor 2: Parameter bestimmen Startposition und Laufrichtung (durch Laufvariable, siehe Beispiel Klasse 'Enemy')
+	public Tracker(int posx, int posy, boolean isDumb) {	// Konstruktor 2: Parameter bestimmen Startposition und Laufrichtung (durch Laufvariable, siehe Beispiel Klasse 'Enemy')
+		flagMap = new int[LevelCreator.getItemMapDimensions(0)][LevelCreator.getItemMapDimensions(1)];
+		pathQueueX = new LinkedList<Integer>();
+		pathQueueY = new LinkedList<Integer>();
+		
 		x = posx;
 		y = posy;
-		mx = moveX;
-		my = moveY;
+		mx = 0;
+		my = 0;
 		speed = -1;
 		delay = 0;
+		damage = 50;
+		
+		healthPoints = 100;
+		alive = true;
+		
+		imgSizeTrackerX = 15;
+		imgSizeTrackerY = 22;
+		
+		dumb = isDumb;
 	}
 	
 	// Folgende Methoden erstellen einen neuen Tracker und erfassen ihn in der Liste 'trackerList' nach den Kriterien der Konstruktoren
 	public static void createTracker(int pointX, int pointY) {
 		trackerList.add(new Tracker(pointX, pointY));
 	}
-	public static void createTracker(int pointX, int pointY, int moveX, int moveY) {
-		trackerList.add(new Tracker(pointX, pointY, moveX, moveY));
+	public static void createTracker(int pointX, int pointY, boolean isDumb) {
+		trackerList.add(new Tracker(pointX, pointY, isDumb));
 	}
 	
 	// Abfragen zur aktuellen Position eines Trackers
@@ -47,20 +84,39 @@ public class Tracker {
 	public static int getY(int listIndex) {
 		return trackerList.get(listIndex).y;
 	}
+	// Abfragen zum Image
+	public static int getImgSizeX(int listIndex) {
+		return trackerList.get(listIndex).imgSizeTrackerX;
+	}
+	public static int getImgSizeY(int listIndex) {
+		return trackerList.get(listIndex).imgSizeTrackerY;
+	}
+	
+	// Lebenspunkte
+	public void reduceHealthPoints(int reduce) {
+		if(healthPoints>0) {
+			healthPoints -= reduce;
+			if(healthPoints<=0) {
+				alive = false;
+			}
+		}
+	}
 	
 	// move-Methode aktualisiert bei jedem Aufruf mit Hilfe der Laufvariablen die Position aller Tracker
 	public static void move() {
 		int faktor=1;
 		for(int a=0; a<trackerList.size(); a++) {	// geht alle Tracker aus der Liste durch
-			index = a;
-			trackerList.get(index).delay++;
-			if(trackerList.get(index).delay>0) {	// Für Verzögerung der Aktualisierung = langsamere Bewegung; Einstellbar mit der Variablen 'speed'
-				faktor=trackerList.get(index).delay;	// delay an faktor übergeben, somit wenn >1 wird geschwindigkeit gesteigert
-				trackerList.get(index).delay = trackerList.get(index).speed;	// delay zurücksetzen
-				trackerList.get(index).setDirection();	// Laufrichtung wird aktualisiert (Richtet sich nach Position des Spielers)
-				if(trackerList.get(index).checkEnvironment() == false) {
-					trackerList.get(index).x += trackerList.get(index).mx*faktor;
-					trackerList.get(index).y += trackerList.get(index).my*faktor;
+			if(trackerList.get(index).alive) {
+				index = a;
+				trackerList.get(index).delay++;
+				if(trackerList.get(index).delay>0) {	// Für Verzögerung der Aktualisierung = langsamere Bewegung; Einstellbar mit der Variablen 'speed'
+					faktor=trackerList.get(index).delay;	// delay an faktor übergeben, somit wenn >1 wird geschwindigkeit gesteigert
+					trackerList.get(index).delay = trackerList.get(index).speed;	// delay zurücksetzen
+					trackerList.get(index).setDirection();	// Laufrichtung wird aktualisiert (Richtet sich nach Position des Spielers)
+					if(trackerList.get(index).checkEnvironment() == false) {
+						trackerList.get(index).x += trackerList.get(index).mx*faktor;
+						trackerList.get(index).y += trackerList.get(index).my*faktor;
+					}
 				}
 			}
 		}
@@ -68,27 +124,52 @@ public class Tracker {
 	
 	private void setDirection() {	// Setzt die Laufrichtung fest (richtet sich nach Position des Spielers)
 			// Positionen von Spieler und Tracker initialisieren
-			int playerX = Player.playerList.get(0).getX();
-			int playerY = Player.playerList.get(0).getY();
+			
 			int trackerX = trackerList.get(index).x;
 			int trackerY = trackerList.get(index).y;
 			// Entscheiden, welcher Player verfolgt werden soll: gewählt wird kürzeste Distanz
 			//for(int a=0; a<Player.playerList.size(); a++) {
 			//	
 			//}
+			
 			// Einfache Steigungsberechnung
-			if(playerX-trackerX>0)
+			int targetX = 0;
+			int targetY = 0;
+			if(dumb) {
+				targetX = Player.playerList.get(0).getX();
+				targetY = Player.playerList.get(0).getY();
+				
+			} else {
+				if(pathQueueX.peek()!=null) {
+					targetX = pathQueueX.peek()*20+30;	// erfasst jeweils die Mitte der Zielkante (somit zusammen Mitte des Zielquadrats)
+					targetY = pathQueueY.peek()*20+10;
+					//System.out.println(targetX + "   |   " + targetY);
+					if(x == targetX && y == targetY) {
+						pathQueueX.poll();
+						pathQueueY.poll();
+						targetX = pathQueueX.peek()*20+10;	// erfasst jeweils die Mitte der Zielkante (somit zusammen Mitte des Zielquadrats)
+						targetY = pathQueueY.peek()*20+10;
+						System.out.println("NEXT!");
+					}
+				} else {
+					//System.out.println("NULL!");
+					targetX = x;
+					targetY = y;
+				}
+			}
+			if(targetX-trackerX>0)
 				trackerList.get(index).mx = 1;
-			else if(playerX-trackerX<0)
+			else if(targetX-trackerX<0)
 				trackerList.get(index).mx = -1;
 			else
 				trackerList.get(index).mx = 0;
-			if(playerY-trackerY>0)
+			if(targetY-trackerY>0)
 				trackerList.get(index).my = 1;
-			else if(playerY-trackerY<0)
+			else if(targetY-trackerY<0)
 				trackerList.get(index).my = -1;
 			else
 				trackerList.get(index).my = 0;
+			//System.out.println(mx + "   |   " + my);
 	}
 		
 	private boolean checkEnvironment() {							// Kontrolle der 4 Eckpunkte des Trackers
@@ -149,11 +230,120 @@ public class Tracker {
 				colliding = true;
 			if((playerMapPosLeft<=(mapPosLeft+(mapPosRight-mapPosLeft)/2)) && ((mapPosLeft+(mapPosRight-mapPosLeft)/2) <= playerMapPosRight) && (playerMapPosUp <= (mapPosUp+(mapPosDown-mapPosUp)/2)) && ((mapPosUp+(mapPosDown-mapPosUp)/2) <= playerMapPosDown))		// 5. Mittelpunkt
 				colliding = true;
-	
-			if(colliding)
-				Player.playerList.get(a).setLifeStatus(false);
+			
+			if(pathFindingActive==false) {
+				if(colliding)
+					Player.playerList.get(a).setHealthPoints(damage*(-1));	// Lebenspunkte abziehen -> wenn keine mehr übrig Spieler tot
+			}
 		}
 		return colliding;
 	}
 	
+	public void pathFinding() {
+		pathFindingActive = true;
+		resetFlagMap();
+		int playerID = 0;
+		boolean iAmLost = false;
+		
+		int posx = translatePixelToMapSquares(x);
+		int posy = translatePixelToMapSquares(y);
+		int playerPosX = translatePixelToMapSquares(Player.playerList.get(playerID).getX() + (Player.playerList.get(playerID).imageSizeX / 2));	// ergibt zusammen das Mapquadrat in dem sich der Mittelpunkt des Spielers befindet
+		int playerPosY = translatePixelToMapSquares(Player.playerList.get(playerID).getY() + (Player.playerList.get(playerID).imageSizeY / 2));
+		System.out.println(posx + " x " + posy);
+		// Feld markieren
+		flagMap[posx][posy] = 1;
+		
+		//while(checkPlayerCollide()==false && iAmLost==false) {
+		int counter = 0;
+		while((posx!=playerPosX || posy!=playerPosY) && iAmLost==false) {
+			counter++;
+			if(counter>3000) {
+				System.out.println("BREAK!");
+				break;
+			}
+			
+			
+			
+			// Nächstes Feld suchen
+			if(isWayFree(posx, posy-1)) {			// hoch
+				// System.out.println("Up");
+				posy--;
+				pathQueueX.add(posx);
+				pathQueueY.add(posy);
+			} else if(isWayFree(posx+1, posy)) {	// rechts
+				// System.out.println("Right");
+				posx++;
+				pathQueueX.add(posx);
+				pathQueueY.add(posy);
+			} else if(isWayFree(posx, posy+1)) {	// runter
+				// System.out.println("Down");
+				posy++;
+				pathQueueX.add(posx);
+				pathQueueY.add(posy);
+			} else if(isWayFree(posx-1, posy)) {	// links
+				// System.out.println("Left");
+				posx--;
+				pathQueueX.add(posx);
+				pathQueueY.add(posy);
+			} else {								// Alle blockiert	(Sackgasse)
+				// Löscht solange Glieder aus der Schlange, bis eine alternative Route gefunden wurde (wenn es keine gibt, aufgeben)
+				while(isWayFree(pathQueueX.peek(), pathQueueY.peek()+1)==false && isWayFree(pathQueueX.peek()+1, pathQueueY.peek())==false && isWayFree(pathQueueX.peek(), pathQueueY.peek()-1)==false && isWayFree(pathQueueX.peek()-1, pathQueueY.peek())==false && iAmLost==false) {
+					if(pathQueueX.size()<=1) {
+						iAmLost = true;
+						System.out.println("I AM LOST!");
+					} else {
+						pathQueueX.poll();
+						pathQueueY.poll();
+					}
+				}
+				posx = pathQueueX.peek();
+				posy = pathQueueY.peek();
+			}
+			
+			// Feld markieren
+			flagMap[posx][posy] = 1;
+			
+			//System.out.print("Counter: " + counter + ":    ");
+			//System.out.println(posx + "   " + posy + "   |   " + playerPosX + "   " + playerPosY);
+			
+		}
+		if(iAmLost==false)
+			System.out.print("ICH HABS !");
+		System.out.print("  Counter: " + counter);
+		System.out.print("  Schritte: " + pathQueueX.size());
+		System.out.println();
+		System.out.println(x + "  " + y);
+		System.out.println();
+		
+		//while(pathQueueX.peek()!=null) {
+		//	System.out.println(pathQueueX.poll() + "   |   " + pathQueueY.poll());
+		//}
+		
+		//DisplayManager.displayString(String.valueOf(counter), pathQueueX.peek()*20, pathQueueY.peek()*20, "dd");
+		pathFindingActive = false;
+		
+	}
+	
+	private boolean isWayFree(int posx, int posy) {
+		boolean free = (LevelCreator.getItemMapData(posx, posy)<=0);
+		//System.out.println("ItemMap:" + LevelCreator.getItemMapData(posx, posy));
+		if(free) {
+			free = (flagMap[posx][posy] != 1);
+			//System.out.println("FlagMap:" + flagMap[posx][posy]);
+		}
+		return free;
+	}
+	
+	private void resetFlagMap() {
+		for(int a=0; a<LevelCreator.getItemMapDimensions(0); a++) {	// Spaltenweise
+			for(int b=0; b<LevelCreator.getItemMapDimensions(1); b++) {	// Zeilenweise
+				flagMap[a][b] = 0;
+			}
+		}
+	}
+
+	private int translatePixelToMapSquares(int value) {
+		value = (value - (value % 20)) / 20;
+		return value;
+	}
 }

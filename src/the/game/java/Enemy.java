@@ -1,7 +1,10 @@
 package the.game.java;
 
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.ImageIcon;
 
 public class Enemy {
 	
@@ -11,10 +14,16 @@ public class Enemy {
 	private int my=0;
 	public static List<Enemy> monsterList = new ArrayList<Enemy>();
 	private static int index;
-	private static int imgSizeMonsterX = 15;
-	private static int imgSizeMonsterY = 19;
+	private int imgSizeMonsterX;
+	private int imgSizeMonsterY;
 	public static boolean codeRunning = true;
 	private int enemyType;
+	private int healthPoints;
+	private boolean alive;
+	private Image imgEnemy;
+	private Image imgEnemyDead;
+	private ImageIcon ii;
+	private int damage;
 	
 	// Konstruktor 1: Nur Startposition angegeben: Bewegung nur horizontal
 	public Enemy(int posx, int posy) {	
@@ -23,6 +32,13 @@ public class Enemy {
 		mx=1;
 		codeRunning = true;		// =true solange ein Objekt der Klasse Enemy existiert
 		enemyType = 0;
+		healthPoints = 100;
+		alive = true;
+		imgEnemy = setImage("enemy.gif");
+		imgEnemyDead = setImage("trap.png");
+		imgSizeMonsterX = 15;
+		imgSizeMonsterY = 19;
+		damage = 100;
 	}
 	// Konstruktor 2: Startposition und Laufvariablen (movex =1 rechts; movex =-1 links; moveY =1 unten; moveY =-1 oben)
 	public Enemy(int posx, int posy, int moveX, int moveY) {	
@@ -32,6 +48,13 @@ public class Enemy {
 		my = moveY;
 		codeRunning = true;
 		enemyType = 0;
+		healthPoints = 100;
+		alive = true;
+		imgEnemy = setImage("enemy.gif");
+		imgEnemyDead = setImage("trap.png");
+		imgSizeMonsterX = 15;
+		imgSizeMonsterY = 19;
+		damage = 100;
 	}
 	// Konstruktor 3: Startposition und 
 	// Laufvariablen (movex =1 rechts; movex =-1 links; moveY =1 unten; moveY =-1 oben), 
@@ -43,19 +66,35 @@ public class Enemy {
 		my = moveY;
 		codeRunning = true;
 		enemyType = type;
+		healthPoints = 100;
+		alive = true;
+		imgEnemy = setImage("enemy.gif");
+		imgEnemyDead = setImage("trap.png");
+		imgSizeMonsterX = 15;
+		imgSizeMonsterY = 19;
+		damage = 100;
 	}
 	
 	// Folgende Methoden erstellen neu Gegner nach Kriterien der Konstruktoren oben
 	// Weiterhin werden die neuen Objekte der Klasse Enemy in einer Liste 'monsterList' erfasst
 	public static void createMonster(int pointX, int pointY) {
+		pointY += LevelCreator.distancePix;	// Wegen Menuleiste oben
 		monsterList.add(new Enemy(pointX, pointY));
 	}
 	public static void createMonster(int pointX, int pointY, int moveX, int moveY) {
+		pointY += LevelCreator.distancePix;	// Wegen Menuleiste oben
 		monsterList.add(new Enemy(pointX, pointY, moveX, moveY));
 	}
 	public static void createMonster(int pointX, int pointY, int moveX, int moveY, int type) {
+		pointY += LevelCreator.distancePix;	// Wegen Menuleiste oben
 		monsterList.add(new Enemy(pointX, pointY, moveX, moveY, type));
 	}
+	
+    private Image setImage(String path) {
+    	ii = new ImageIcon(this.getClass().getResource(path));
+    	Image img = ii.getImage();
+    	return img;
+    }
 	
 	// Abfragen zur aktuellen Position eines Gegners
 	public static int getX(int listIndex) {
@@ -64,35 +103,60 @@ public class Enemy {
 	public static int getY(int listIndex) {
 		return monsterList.get(listIndex).y;
 	}
+	// Abfragen zum Image
+	public static int getImgSizeX(int listIndex) {
+		return monsterList.get(listIndex).imgSizeMonsterX;
+	}
+	public static int getImgSizeY(int listIndex) {
+		return monsterList.get(listIndex).imgSizeMonsterY;
+	}
+	public static Image getImg(int index) {
+		if(monsterList.get(index).alive)
+			return monsterList.get(index).imgEnemy;
+		else
+			return monsterList.get(index).imgEnemyDead;
+	}
+	
+	// Lebenspunkte
+	public void reduceHealthPoints(int reduce) {
+		if(healthPoints>0) {
+			healthPoints -= reduce;
+			if(healthPoints<=0) {
+				alive = false;
+			}
+		}
+	}
 	
 	// move-Methode für alle Gegner
 	public static void move() {		// wird aus Setter aufgerufen und aktualisiert die Position aller Gegner
 		int faktor=1;	// Multiplikator für die Geschwindigkeit normaler Gegner
 		for(int a=0; a<monsterList.size(); a++) {	// Schleife um alle Gegner in der Liste anzusprechen
 			index = a;
-			switch(monsterList.get(index).enemyType) {
-				case 0:		// Bewegung für normalen Feind
-					if(monsterList.get(index).checkEnvironment() == false) {
-						if(codeRunning) {
-							monsterList.get(index).x += monsterList.get(index).mx*faktor;
-							monsterList.get(index).y += monsterList.get(index).my*faktor;
+			if(monsterList.get(index).alive) {	// Bewegung nur gestattet, wenn Gegner lebendig
+				switch(monsterList.get(index).enemyType) {
+					case 0:		// Bewegung für normalen Feind
+						if(monsterList.get(index).checkEnvironment() == false) {
+							if(codeRunning) {
+								monsterList.get(index).x += monsterList.get(index).mx*faktor;
+								monsterList.get(index).y += monsterList.get(index).my*faktor;
+							}
+						} else {		// Wenn nicht passierbares Objekt Getroffen wird, dann Laufvariablen invertieren
+							if(codeRunning) {
+								
+									if(monsterList.get(index).mx!=0)
+										monsterList.get(index).mx = monsterList.get(index).mx * (-1);
+									if(monsterList.get(index).my!=0)
+										monsterList.get(index).my = monsterList.get(index).my * (-1);
+							}
 						}
-					} else {		// Wenn nicht passierbares Objekt Getroffen wird, dann Laufvariablen invertieren
-						if(codeRunning) {
-							
-								if(monsterList.get(index).mx!=0)
-									monsterList.get(index).mx = monsterList.get(index).mx * (-1);
-								if(monsterList.get(index).my!=0)
-									monsterList.get(index).my = monsterList.get(index).my * (-1);
-						}
-					}
-					break;
-				case 1:		// Bewegung für Bouncies
-					monsterList.get(index).setBouncyMovement();
-					monsterList.get(index).x += monsterList.get(index).mx;
-					monsterList.get(index).y += monsterList.get(index).my;
-					monsterList.get(index).checkPlayerCollide();
-					break;
+						break;
+					case 1:		// Bewegung für Bouncies
+						monsterList.get(index).setBouncyMovement();
+						monsterList.get(index).x += monsterList.get(index).mx;
+						monsterList.get(index).y += monsterList.get(index).my;
+						monsterList.get(index).checkPlayerCollide();
+						break;
+				}
 			}
 		}
 	}
@@ -145,7 +209,7 @@ public class Enemy {
 				colliding = true;
 	
 			if(colliding) {										// Wenn Gegner mit Spieler kollidiert:
-				Player.playerList.get(a).setLifeStatus(false);	// Lebensstatus auf falsch setzen -> Spieler tot
+				Player.playerList.get(a).setHealthPoints(damage*(-1));	// Lebenspunkte abziehen -> wenn keine mehr übrig Spieler tot
 			}
 		}
 	}

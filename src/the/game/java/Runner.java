@@ -14,6 +14,10 @@ public class Runner extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static int height = 564;
 	private static int width = 960;
+	public static int borderLe = 0;
+	public static int borderRi = width;
+	public static int borderUp = 20;
+	public static int borderDo = height;
 
 	public Runner(int level) {	// Konstruktor #1 mit Levelwahl
         add(new Setter(level));							// startet setter, Parameter 'level' gibt die Nummer des zu startenden Levels weiter

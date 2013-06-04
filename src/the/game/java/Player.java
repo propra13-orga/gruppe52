@@ -1,7 +1,6 @@
 package the.game.java;
 
 import java.awt.Image;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,10 +32,15 @@ public class Player {
     //private int defaultPosX;
     //private int defaultPosY;
     private int lives;
+    private int healthPoints;
+    private int healthPointsMax;
     public static boolean codeRunning=true;
     public static boolean showYouDiedImage=false;
     private boolean alreadyPunished;
     public boolean invincible;
+    private int lastDirectionX;
+    private int lastDirectionY;
+    private boolean fire;
 
     public Player(int posx, int posy) {		// Konstruktor mit Angabe der Startposition
         ii = new ImageIcon(this.getClass().getResource(playerIconPath));
@@ -45,14 +49,23 @@ public class Player {
         y = posy;		// default y position
         alive = true;	// Spielfigur ist lebendig
         lives = 3;		// setzt die Startanzahl der Leben fest
+        healthPointsMax = 100;	// setzt die maximale Anzahl an Lebenspunkten fest
+        healthPoints = healthPointsMax;	// setzt die Lebenspunkte fest
         codeRunning = true;	// true, solange noch Objekte der Klasse Player gibt
-        alreadyPunished = false; // Verhindert unnötiges Abziehen von Leben: true, sobald ein Spieler ein Leben verloren hat, wieder false, sobald das Level neugestartet wird
+        alreadyPunished = false; // Verhindert unnötiges Abziehen von Leben (lives): true, sobald ein Spieler ein Leben verloren hat, wieder false, sobald das Level neugestartet wird
         invincible = false;		// spieler nicht unbesiegbar
+        lastDirectionX = 1;
+        lastDirectionY = 0;
+        fire = false;	// kontrolliert das Schießen
     }
     
     public static void createPlayer(int posx, int posy) {	// erstellt neuen Spieler
+    	WeaponManager.createWeaponManager();
+    	ProjectileManager.createProjectileManager(playerList.size());
+    	Score.createScore();
     	playerList.add(new Player(posx, posy));		// Objekt wird in Liste geschrieben
     	setDisplayLives();							// Lebensanzeige wird aktualisiert
+    	DisplayLine.setDisplay();
     }
     
     public static void resetAllPlayerPositions() {
@@ -69,46 +82,70 @@ public class Player {
     }
     
     private void switchPlayerIcon(int flag) {		// flag gibt an, in welche Richtung sich Player bewegt und setzt richtungsabhängig das richtige Bild
-    		// Left, Right, Up, Down    	
+    		// Left, Right, Up, Down
     		switch(flag) {
     		// 1. GERADE	MOVING
 	    	case 7:	// Moving - left
 	    		setPlayerIcon("left.png");
+	    		lastDirectionX = -1;
+		        lastDirectionY = 0;
 		    	break;
 	    	case 3:	// Moving - right
 	    		setPlayerIcon("right.png");
+	    		lastDirectionX = 1;
+		        lastDirectionY = 0;
 		    	break;
 	    	case 1:	// Moving - up
 		    	setPlayerIcon("up.png");
+		    	lastDirectionX = 0;
+		        lastDirectionY = -1;
 		    	break;
 	    	case 5:	// Moving - down
 		    	setPlayerIcon("down.png");
+		    	lastDirectionX = 0;
+		        lastDirectionY = 1;
 		    	break;  
 		    // 2. SCHRÄG	MOVING
 	    	case 2:	// Moving - up-right
 		    	setPlayerIcon("upright.png");
+		    	lastDirectionX = 1;
+		        lastDirectionY = -1;
 		    	break;
 	    	case 4:	// Moving - down-right
 		    	setPlayerIcon("downright.png");
+		    	lastDirectionX = 1;
+		        lastDirectionY = 1;
 		    	break;
 	    	case 6:	// Moving - down-left
 		    	setPlayerIcon("downleft.png");
+		    	lastDirectionX = -1;
+		        lastDirectionY = 1;
 		    	break;
 	    	case 8:	// Moving - up-left
 		    	setPlayerIcon("upleft.png");
+		    	lastDirectionX = -1;
+		        lastDirectionY = -1;
 		    	break;
 		    // 3. GERADE	STANDING STILL
 		    case 17:	// Standing still - left
 			    setPlayerIcon("standing_left.png");
+			    lastDirectionX = -1;
+		        lastDirectionY = 0;
 			    break;
 		    case 13:	// Standing still - right
 			    setPlayerIcon("standing_right.png");
+			    lastDirectionX = 1;
+		        lastDirectionY = 0;
 			    break;
 		    case 11:	// Standing still - up
 			    setPlayerIcon("standing_up.png");
+			    lastDirectionX = 0;
+		        lastDirectionY = -1;
 			    break;
 		    case 15:	// Standing still - down
 			    setPlayerIcon("standing_down.png");
+			    lastDirectionX = 0;
+		        lastDirectionY = 1;
 			    break;
     		}
     }
@@ -124,7 +161,22 @@ public class Player {
     public Image getPlayerIcon() {		// returns playericon
         return playerIcon;
     }
+    public boolean getFireStatus() {
+    	return fire;
+    }
+    public int getLastDirectionX() {
+    	return lastDirectionX;
+    }
+    public int getLastDirectionY() {
+    	return lastDirectionY;
+    }
     // REQUESTS END
+    
+    // SETS
+    public void setFireStatus(boolean fireStatus) {
+    	fire = fireStatus;
+    }
+    // SETS END
     
     // MOVEMENT RELEVANT
     public static void move() {	// Rechnung: (aktuelle Position + Bewegung für x- oder y-Achse) für jeden Aufruf
@@ -395,13 +447,15 @@ public class Player {
     	boolean permission=true;
     	switch(LevelCreator.itemMap[posx][posy]) {	// Geht alle möglichen gespeicherten Tags in dem Arraybereich durch und aktualisiert permission und ggf. 'alive'
     	case 1:					// Wall
-    		permission=false;
+    		permission=false;    		
     		break;
-    	case 2:					// Trap	EVENTUELL EINE EIGENE KLASSE FÜR TRAPS
+    	case 2:					// Trap
     		// Collision nur wenn Mitte passiert wird!
 			if(checkPlayerCollideOnCenter(posx, posy)) {
 				Player.playerList.get(index).setLifeStatus(false);
-				LevelCreator.itemMap[posx][posy]=-2;
+				LevelCreator.itemMap[posx][posy]=0;
+				DisplayManager.displayImage("explosion.gif", posx*20, posy*20, 850);
+				System.out.println(posx*20 +"    "+ posy*20);
 			}
     		break;
     	case 3:					// Enemy
@@ -473,7 +527,17 @@ public class Player {
     	return alive;
     }
     
-    public void setLifeStatus(boolean isAlive) {	// ändert 'alive' (vorallem für false) mit gegebenen Konsequenzen
+    public void setHealthPoints(int change) {
+    	if(invincible==false && healthPoints>0) {
+	    	healthPoints += change;
+	    	if(healthPoints<=0)
+	    		setLifeStatus(false);
+	    	else
+	    		setDisplayLives();
+    	}
+    }
+    
+    private void setLifeStatus(boolean isAlive) {	// ändert 'alive' (vorallem für false) mit gegebenen Konsequenzen
     	if(invincible==false) {
 	    	alive = isAlive;
 	    	checkLifeStatus();
@@ -505,6 +569,7 @@ public class Player {
     private void resetLevel() {
 		for(int a=0; a<Player.playerList.size(); a++) {	// setzt alle spielerrelevanten Laufvariablen zurück
 			if(playerList.get(a).lives>0) {				// nur zurücksetzen, wenn Spieler noch Leben hat
+				playerList.get(a).healthPoints = playerList.get(a).healthPointsMax;
 				playerList.get(a).alive = true;
 				playerList.get(a).alreadyPunished = false;
 				playerList.get(a).checkDirection(-2);			// zurücksetzen des PlayerIcons
@@ -542,119 +607,15 @@ public class Player {
 			c+=5;	// Rückt 5 Spalten weiter, um Abstand zu schaffen für Lebensanzeige eines weiteren Spielers
 		}
     }
-    
+    // TODO: Verbessern, displayLine
     private static void resetDisplayLine() {		// Setzt die oberste Menuleiste zurück (leer)
 		for(int a=0; a<LevelCreator.getItemMapDimensions(0); a++) {
-			LevelCreator.itemMap[a][0] = 0;			// Setzt die Stellen in der IconMap auf 0 zurück
+			if(LevelCreator.itemMap[a][0] < 1000)
+				LevelCreator.itemMap[a][0] = 0;			// Setzt die Stellen in der IconMap auf 0 zurück
 		}
     }
     // LIFE STATUS END
-
-    // KEY BINDINGS
-    public void keyPressed(KeyEvent event) {	// Wenn Tastatur benutzt wird folgende Tasten überprüfen:
-        int key = event.getKeyCode();
         
-        if (key == KeyEvent.VK_LEFT) {			// <
-        	mx = -1;							// MoveVariable x-Achse (gibt an wie viel Pixel sich der Spieler bewegt pro Aufruf von 'move()')
-        	if(alive)
-        		checkDirection(1);				// PlayerIcon für jeweilige Richtung anpassen
-        }
-        if (key == KeyEvent.VK_RIGHT) {			// >
-        	mx = 1;								// MoveVariable x-Achse
-        	if(alive)
-        		checkDirection(2);				// PlayerIcon ...
-        }
-        if (key == KeyEvent.VK_UP) {			// ^
-        	my = -1;							// MoveVariable y-Achse
-        	if(alive)
-        		checkDirection(3);				// PlayerIcon ...
-        }
-        if (key == KeyEvent.VK_DOWN) {			// v
-        	my = 1;								// MoveVariable y-Achse
-        	if(alive)
-        		checkDirection(4);				// PlayerIcon ...
-        }
-    }
-    public void keyReleased(KeyEvent event) {	// Wenn Taste nach Drücken wieder losgelassen wird, sonst wie oben
-        int key = event.getKeyCode();
-
-        if (key == KeyEvent.VK_LEFT) {
-            mx = 0;								// MoveVariable x-Achse wird auf 0 gesetzt, damit Figut stehen bleibt, wenn Taste losgelassen wird
-            if(alive)
-        		checkDirection(-1);
-        }
-        if (key == KeyEvent.VK_RIGHT) {
-            mx = 0;								// MoveVariable x-Achse ...
-            if(alive)
-        		checkDirection(-2);
-        }
-        if (key == KeyEvent.VK_UP) {
-            my = 0;								// MoveVariable y-Achse ...
-            if(alive)
-        		checkDirection(-3);
-        }
-        if (key == KeyEvent.VK_DOWN) {
-            my = 0;								// MoveVariable y-Achse ...
-            if(alive)
-        		checkDirection(-4);
-        }
-        if (key == KeyEvent.VK_SPACE) {
-            if(showYouDiedImage) {
-            	showYouDiedImage=false;
-            	resetLevel();
-            }
-            
-        }
-    }
-    
-    public void keyPressed_wasd(KeyEvent event) {	// Wenn Tastatur benutzt wird folgende Tasten überprüfen:
-        int key = event.getKeyCode();
-        
-        if (key == KeyEvent.VK_A) {			// <
-        	mx = -1;							// MoveVariable x-Achse (gibt an wie viel Pixel sich der Spieler bewegt pro Aufruf von 'move()')
-        	if(alive)
-        		checkDirection(1);				// PlayerIcon für jeweilige Richtung anpassen
-        }
-        if (key == KeyEvent.VK_D) {			// >
-        	mx = 1;								// MoveVariable x-Achse
-        	if(alive)
-        		checkDirection(2);				// PlayerIcon ...
-        }
-        if (key == KeyEvent.VK_W) {			// ^
-        	my = -1;							// MoveVariable y-Achse
-        	if(alive)
-        		checkDirection(3);				// PlayerIcon ...
-        }
-        if (key == KeyEvent.VK_S) {			// v
-        	my = 1;								// MoveVariable y-Achse
-        	if(alive)
-        		checkDirection(4);				// PlayerIcon ...
-        }
-    }
-    public void keyReleased_wasd(KeyEvent event) {	// Wenn Taste nach Drücken wieder losgelassen wird, sonst wie oben
-        int key = event.getKeyCode();
-
-        if (key == KeyEvent.VK_A) {
-            mx = 0;								// MoveVariable x-Achse wird auf 0 gesetzt, damit Figut stehen bleibt, wenn Taste losgelassen wird
-            if(alive)
-        		checkDirection(-1);
-        }
-        if (key == KeyEvent.VK_D) {
-            mx = 0;								// MoveVariable x-Achse ...
-            if(alive)
-        		checkDirection(-2);
-        }
-        if (key == KeyEvent.VK_W) {
-            my = 0;								// MoveVariable y-Achse ...
-            if(alive)
-        		checkDirection(-3);
-        }
-        if (key == KeyEvent.VK_S) {
-            my = 0;								// MoveVariable y-Achse ...
-            if(alive)
-        		checkDirection(-4);
-        }
-    }
 
     private void checkDirection(int flag) {		// Überprüft die Laufrichtung und setzt ein flag, dass diese an 'switchPlayerIcon()' übergibt, um das richtige Bild anzuzeigen
     	int checkSum;
@@ -685,7 +646,7 @@ public class Player {
     	else if(flag==-4)
     		ks4=true;
     	
-    	// Ermitteln der Laufrichtung durch die boolean werten von oben und die MoveVariablen mx und my.
+    	// Ermitteln der Laufrichtung durch die boolean werte von oben und die MoveVariablen mx und my
     	checkSum = mx + my;
     	// MOVING
     	if(k1) {
@@ -747,6 +708,31 @@ public class Player {
     			flag=7;
     	}
     	switchPlayerIcon(flag);
+    }
+    
+    public void setMoveStatusX(int speed, int tag) {
+    	mx = speed;
+    	if(alive)
+    		checkDirection(tag);
+    }
+    public void setMoveStatusY(int speed, int tag) {
+    	my = speed;
+    	if(alive)
+    		checkDirection(tag);
+    }
+    
+    public void setYouDiedScreenStatus(boolean display) {
+    	if(showYouDiedImage) {
+    		if(display==false) {
+    			showYouDiedImage=display;	// somit = false
+    			resetLevel();
+    		}
+    	} else {
+    		if(display) {
+    			showYouDiedImage=display;	// somit = true
+    		}
+    	}
+    		
     }
     // KEY BINDINGS END	
 }
