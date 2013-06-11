@@ -1,9 +1,15 @@
 package the.game.java;
 
 import java.awt.Image;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 public class Player {
@@ -158,9 +164,14 @@ public class Player {
     public int getY() {		// returns actual y-position
         return y;
     }
+    public int getLives() {		// returns actual y-position
+        return lives;
+    }
+    /*
     public Image getPlayerIcon() {		// returns playericon
         return playerIcon;
     }
+    */
     public boolean getFireStatus() {
     	return fire;
     }
@@ -169,6 +180,20 @@ public class Player {
     }
     public int getLastDirectionY() {
     	return lastDirectionY;
+    }
+    public BufferedImage getPlayerImage() {
+    	BufferedImage im = new BufferedImage(15,15,BufferedImage.TYPE_INT_RGB);
+        try {
+			im = ImageIO.read(new File("src/the/game/java/right.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		};
+        AffineTransformOp op = new AffineTransformOp(AffineTransform.getRotateInstance(
+        		Math.toRadians(Controls.getangle()),
+				(double)im.getWidth(null)/2.0, 
+				(double)im.getHeight(null)/2.0), 
+				AffineTransformOp.TYPE_BILINEAR);
+		return op.filter(im, null);
     }
     // REQUESTS END
     
@@ -190,6 +215,7 @@ public class Player {
 				    		playerList.get(index).x += playerList.get(index).mx;		// ID = 0: Beide Achsen aktualisieren.	> 0: nur x-Achse
 				    	if(permission>=0)
 				    		playerList.get(index).y += playerList.get(index).my;		// ID = 0: Beide Achsen aktualisieren.	< 0: nur y-Achse
+				    	checkCollideWithGoodies(a);
 		    		}
 		    	}
     		}
@@ -208,6 +234,8 @@ public class Player {
     	int borderYU = 20;			// Border up
     	int borderYD = Runner.getHeightF();//-43;			// Border down
 		
+    	NPC.checkPlayerCollide();
+    	
 		// Überprüfen ob Border passiert werden: XL (x-Achse, left)	XR (x-Achse, right)	YU (y-Achse, up)	YD (y-Achse, down)
     	if(mx==-1) {					// Check Border: left
     		if(x<=borderXL)
@@ -520,6 +548,12 @@ public class Player {
 		}
 			return colliding;
 	}
+	
+	private static void checkCollideWithGoodies(int playerID) {
+		for(int goodieID=0; goodieID<Goodies.goodiesList.size(); goodieID++) {
+			Goodies.checkPlayerCollideWithGoodie(playerID, goodieID);
+		}
+	}
     // MOVEMENT RELEVANT END
     
     // LIFE STATUS
@@ -598,6 +632,7 @@ public class Player {
     }
     
     private static void setDisplayLives() {
+    	/*
     	resetDisplayLine();
     	int c=0;
 		for(int a=0; a<Player.playerList.size(); a++) {
@@ -606,6 +641,8 @@ public class Player {
 			}
 			c+=5;	// Rückt 5 Spalten weiter, um Abstand zu schaffen für Lebensanzeige eines weiteren Spielers
 		}
+		*/
+    	DisplayLine.setDisplay();
     }
     // TODO: Verbessern, displayLine
     private static void resetDisplayLine() {		// Setzt die oberste Menuleiste zurück (leer)

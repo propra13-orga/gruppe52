@@ -28,9 +28,9 @@ public class Shop {
 	private static int currentCat=0;
 	
 	private static int itemAreaFixPointX = 0;
-	private static int itemAreaFixPointY = 2;
+	private static int itemAreaFixPointY = 1;
 	private static int itemAreaWidth = 6;
-	private static int itemAreaHeight = 5;
+	private static int itemAreaHeight = 6;
 	
 	private static String imageTagShop = "shop";
 	private static String imageTagIcons = "";
@@ -40,6 +40,7 @@ public class Shop {
 	private static String imageTagItemAttachment = "shopIconAttachment";
 	private static String imageTagCredits = "shopCredits";
 	private static String imageTagButtonBuyHover = "shopBuyHover";
+	private static String imageTagButtonCatMenuHover = "shoptCatMenuHover";
 	
 	private static int borderLe;
 	private static int borderRi;
@@ -56,6 +57,7 @@ public class Shop {
 	private static int currentSelection = -1;
 	
 	private static boolean flagHoverButtonBuy = false;
+	private static boolean flagHoverButtonCatMenu = false;
 	
 	private static ImageIcon ii;
 	private static Image buttonBuy;
@@ -64,10 +66,12 @@ public class Shop {
 	//private static Image buttonBuySelected;
 	
 	public Shop() {
-		shopMap = new int[getShopDimensions(0)][getShopDimensions(1)];
-		setVariable();
-		show = true;
-		setShopDisplay();
+		if(show==false) {
+			shopMap = new int[getShopDimensions(0)][getShopDimensions(1)];
+			setVariable();
+			show = true;
+			setShopDisplay();
+		}
 	}
 		
 	private static int getShopDimensions(int axis) {	// Ermittelt Arraygröße
@@ -104,19 +108,20 @@ public class Shop {
 	
 	private static void setShopDisplay() {
 		if(show) {
-			DisplayManager.displayImage("transparentLayer.png", 0, 0, imageTagShop);
-			DisplayManager.displayImage("shop/shopBackground.png", fixPointX-5, fixPointY-5, imageTagShop);
-			DisplayManager.displayImage("shop/title.png", fixPointX, fixPointY, imageTagShop);
-			DisplayManager.displayImage(buttonBuy, buttonBuyBorderLe, buttonBuyBorderUp, imageTagShop);
+			DisplayManager.displayImage("transparentLayer.png", 0, 0, imageTagShop, true);
+			DisplayManager.displayImage("shop/shopBackground.png", fixPointX-5, fixPointY-5, imageTagShop, true);
+			DisplayManager.displayImage("shop/titel.png", fixPointX-5, fixPointY-5, imageTagShop, true);
+			DisplayManager.displayImage("shop/catMenu.png", fixPointX, fixPointY-5, imageTagShop, true);
+			DisplayManager.displayImage(buttonBuy, buttonBuyBorderLe, buttonBuyBorderUp, imageTagShop, true);
 
 	        for(int a=0; a < getShopDimensions(0); a++) {	// Spaltenweise
 				for(int b=0; b<getShopDimensions(1); b++) {		// Zeilenweise
 					if(b>=itemAreaFixPointY && a>= itemAreaFixPointX && a<itemAreaFixPointX+itemAreaWidth && b<itemAreaFixPointY+itemAreaHeight)
-						DisplayManager.displayImage("shop/iconFieldBg.png", fixPointX+a*iconFieldWidth, fixPointY+b*iconFieldHeight, imageTagShop);
+						DisplayManager.displayImage("shop/iconFieldBg.png", fixPointX+a*iconFieldWidth, fixPointY+b*iconFieldHeight, imageTagShop, true);
 				}
 			}
 	        displayCredits();
-	        chooseItemCat(2);
+	        chooseItemCat(1);
 		}
 	}
 	
@@ -142,7 +147,7 @@ public class Shop {
 	}
 	private static void selectItem_Ammo(int fieldNo) {
 		displaySelectionFrame(fieldNo, false);
-		displaySelectedItemInfo_Weapon(fieldNo); //TODO: anpassen an AMMO
+		displaySelectedItemInfo_Ammo(fieldNo);
 	}
 	
 	private static void displaySelectionFrame(int fieldNo, boolean isHover) {
@@ -155,10 +160,10 @@ public class Shop {
 			
 			if(isHover) {
 				DisplayManager.removeChangeableImages(imageTagIconHover);
-				DisplayManager.displayImage("shop/iconFieldHover.png", POSX, POSY, imageTagIconHover);
+				DisplayManager.displayImage("shop/iconFieldHover.png", POSX, POSY, imageTagIconHover, true);
 			} else {
 				DisplayManager.removeChangeableImages(imageTagIconSelected);
-				DisplayManager.displayImage("shop/iconFieldSelected.png", POSX, POSY, imageTagIconSelected);
+				DisplayManager.displayImage("shop/iconFieldSelected.png", POSX, POSY, imageTagIconSelected, true);
 			}
 		}
 	}
@@ -219,6 +224,10 @@ public class Shop {
 			if(itemNo<itemCount)	// Wenn gewähltes Feld ein Item enthält:
 				price = Weapon.weaponList.get(itemNo+1).price;
 			break;
+		case 2:
+			if(itemNo<itemCount)	// Wenn gewähltes Feld ein Item enthält:
+				price = Weapon.weaponList.get(itemNo+1).magPackPrice;
+			break;
 		}
 		return price;
 	}
@@ -233,7 +242,7 @@ public class Shop {
 			
 			if(isMoreThanOne==false)
 				DisplayManager.removeChangeableImages(imageTag);
-			DisplayManager.displayImage(imgPath, POSX, POSY, imageTag);
+			DisplayManager.displayImage(imgPath, POSX, POSY, imageTag, true);
 		}
 	}
 	
@@ -255,7 +264,22 @@ public class Shop {
 		info[3] = String.valueOf(Weapon.weaponList.get(fieldNo+1).bulletSpeed);
 		info[4] = String.valueOf(Weapon.weaponList.get(fieldNo+1).fireRate) + "/s";
 		info[5] = String.valueOf(Weapon.weaponList.get(fieldNo+1).reloadTime) + "ms";
-		info[6] = String.valueOf(Weapon.weaponList.get(fieldNo+1).price) + "C";
+		info[6] = String.valueOf(Weapon.weaponList.get(fieldNo+1).price) + " C";
+		
+		displaySelectedItemInfo(titel, info);
+	}
+	
+	private static void displaySelectedItemInfo_Ammo(int fieldNo) {
+		// fieldNo sollte bei 0 beginnen
+		
+		String[] titel = new String[10];
+		titel[0] = "AmmoPack: " + Weapon.weaponList.get(fieldNo+1).name;
+		titel[1] = "Größe";
+		titel[2] = "Preis";
+		
+		String[] info = new String[10];
+		info[1] = String.valueOf(Weapon.weaponList.get(fieldNo+1).magPackSize) + " Mags";
+		info[2] = String.valueOf(Weapon.weaponList.get(fieldNo+1).magPackPrice) + " C";
 		
 		displaySelectedItemInfo(titel, info);
 	}
@@ -268,16 +292,16 @@ public class Shop {
 		
 		DisplayManager.removeChangeableStrings(imageTagInfos);
 		
-		DisplayManager.displayString(titel[0], infoAreaFixPointX, infoAreaFixPointY-20, imageTagInfos);	// ITEMNAME
+		DisplayManager.displayString(titel[0], infoAreaFixPointX, infoAreaFixPointY, imageTagInfos);	// ITEMNAME
 		for(int a=1; a<titel.length; a++) {
 			if(titel[a]!=null && info[a]!=null) {
-				DisplayManager.displayString(titel[a], infoAreaFixPointX, infoAreaFixPointY + (a-1)*20, imageTagInfos);
-				DisplayManager.displayString(info[a], infoAreaFixPointX + distance, infoAreaFixPointY + (a-1)*20, imageTagInfos);
+				DisplayManager.displayString(titel[a], infoAreaFixPointX, infoAreaFixPointY + (a)*20, imageTagInfos);
+				DisplayManager.displayString(info[a], infoAreaFixPointX + distance, infoAreaFixPointY + (a)*20, imageTagInfos);
 			}
 		}
 	}
 	
-	public static int isInItemSquare(int posx, int posy) {	// Rückgabewert <0 wenn kein Bereich betroffen; wenn Feld getroffen, dann Rückgabewert = feldnummer
+	private static int isInItemSquare(int posx, int posy) {	// Rückgabewert <0 wenn kein Bereich betroffen; wenn Feld getroffen, dann Rückgabewert = feldnummer
 		int hitFieldNo = -1;
 
 		if(posx>borderLe && posx<borderRi && posy>borderUp && posy<borderDo) {
@@ -292,12 +316,26 @@ public class Shop {
 		return hitFieldNo;
 	}
 	
-	public static boolean isInButtonBuy(int posx, int posy) {	// Rückgabewert false wenn kein Bereich betroffen; wenn Feld getroffen, dann Rückgabewert true
+	private static boolean isInButtonBuy(int posx, int posy) {	// Rückgabewert false wenn kein Bereich betroffen; wenn Feld getroffen, dann Rückgabewert true
 		boolean hit = false;
 
 		if(posx>buttonBuyBorderLe && posx<buttonBuyBorderRi && posy>buttonBuyBorderUp && posy<buttonBuyBorderDo)
 			hit = true;
 		
+		return hit;
+	}
+	private static boolean isInUpperButtonCatMenu(int posx, int posy) {	// Rückgabewert false wenn kein Bereich betroffen; wenn Feld getroffen, dann Rückgabewert true
+		boolean hit = false;
+
+		if(posx>(borderRi-28) && posx<(borderRi-2) && posy>(fixPointY-5) && posy<(fixPointY+14))
+			hit = true;
+		return hit;
+	}
+	private static boolean isInLowerButtonCatMenu(int posx, int posy) {	// Rückgabewert false wenn kein Bereich betroffen; wenn Feld getroffen, dann Rückgabewert true
+		boolean hit = false;
+
+		if(posx>(borderRi-28) && posx<(borderRi-2) && posy>(fixPointY+16) && posy<(fixPointY+35))
+			hit = true;
 		return hit;
 	}
 	
@@ -313,6 +351,13 @@ public class Shop {
 				buyItem();
 			}
 		}
+		{	// Category Menu
+			if(isInUpperButtonCatMenu(posx, posy)) {
+				setCatPrev();
+			} else if(isInLowerButtonCatMenu(posx, posy)) {
+				setCatNext();
+			}
+		}
 	}
 	
 	public static void receiveMouseMovement(int posx, int posy) {
@@ -325,6 +370,9 @@ public class Shop {
 		// Button Hover (keine überprüfung von already um löschen des Hoovers zu ermöglichen
 		//already = 
 		setButtonBuyHover(posx, posy);			// setzt Hover, sofern Bereich richtig ist. gibt true aus wenn erfolgreich, false wenn Bereich falsch
+	
+		// Category Menu Hover
+		setCatMenuHover(posx, posy);
 	}
 	
 	/**     Hover     */
@@ -342,8 +390,8 @@ public class Shop {
 			if(hit) {
 				if(flagHoverButtonBuy==false) {	// nur Bild ausgeben, wenn noch nicht angezeigt
 					if(isSelectionValid()==false)	// Wenn Selektion ungültig, dann folgendes Hoverbild zusätzlich laden:
-						DisplayManager.displayImage(buttonBuyHoverNV, buttonBuyBorderLe, buttonBuyBorderUp, imageTagButtonBuyHover);
-					DisplayManager.displayImage(buttonBuyHover, buttonBuyBorderLe, buttonBuyBorderUp, imageTagButtonBuyHover);	// Hover laden
+						DisplayManager.displayImage(buttonBuyHoverNV, buttonBuyBorderLe, buttonBuyBorderUp, imageTagButtonBuyHover, true);
+					DisplayManager.displayImage(buttonBuyHover, buttonBuyBorderLe, buttonBuyBorderUp, imageTagButtonBuyHover, true);	// Hover laden
 					flagHoverButtonBuy = true;
 				}
 			} else {
@@ -352,19 +400,46 @@ public class Shop {
 			}
 		return hit;
 	}
+	public static boolean setCatMenuHover(int posx, int posy) {
+		boolean hit = false;
+		
+		if(isInUpperButtonCatMenu(posx, posy)) {
+			if(flagHoverButtonCatMenu==false) {	// nur Bild ausgeben, wenn noch nicht angezeigt
+				DisplayManager.displayImage("shop/catMenuSelectHover.png", (borderRi-27), (fixPointY-5), imageTagButtonCatMenuHover, true);	// Hover laden
+				flagHoverButtonCatMenu = true;
+			}
+		} else if(isInLowerButtonCatMenu(posx, posy)) {
+			if(flagHoverButtonCatMenu==false) {	// nur Bild ausgeben, wenn noch nicht angezeigt
+				DisplayManager.displayImage("shop/catMenuSelectHover.png", (borderRi-27), (fixPointY+15), imageTagButtonCatMenuHover, true);		// Hover laden
+				flagHoverButtonCatMenu = true;
+			}
+		} else {
+			flagHoverButtonCatMenu = false;
+			DisplayManager.removeChangeableImages(imageTagButtonCatMenuHover);
+		}
+		return hit;		
+	}
 	
 	/**     Choose ItemKategorie     */
 	private static void chooseItemCat(int catID) {
-		currentCat = catID;
-		switch(currentCat) {
+		switch(catID) {
 		case 1:
+			chooseItemCatActions(catID);
 			displayItemCat_Weapon();
+			setDisplayItemAttachment();
 			break;
 		case 2:
+			chooseItemCatActions(catID);
 			displayItemCat_Ammo();
+			setDisplayItemAttachment();
 			break;
 		}
-		setDisplayItemAttachment();
+	}
+	private static void chooseItemCatActions(int catID) {
+		if(currentCat>0) {
+			unloadItemImages();
+		}
+		currentCat = catID;
 	}
 	
 	private static void displayItemCat_Weapon() {
@@ -374,16 +449,21 @@ public class Shop {
 		int zeile = itemAreaFixPointY;
 		int spalte = itemAreaFixPointX;
 		itemCount = 0;	// Anzahl an gelisteten Items
+		
+		// Items auflisten
 		for(int a=1; a < Weapon.weaponList.size(); a++) {	// Spaltenweise (a=1 start, da faust nicht erwerbbar)
 			if(spalte>itemAreaWidth-1) {
 				spalte = itemAreaFixPointX;
 				zeile++;
 			}
 			
-			DisplayManager.displayImage(Weapon.weaponList.get(a).imgPath, fixPointX+spalte*iconFieldWidth, fixPointY+zeile*iconFieldHeight+10, imageTagIcons);
+			DisplayManager.displayImage(Weapon.weaponList.get(a).imgPath, fixPointX+spalte*iconFieldWidth, fixPointY+zeile*iconFieldHeight+10, imageTagIcons, true);
 			spalte++;
 			itemCount++;
 		}
+		
+		// Titelleiste anpassen
+		displayCatMenuTitle("weapon");
 	}
 	
 	private static void displayItemCat_Ammo() {
@@ -399,21 +479,92 @@ public class Shop {
 				zeile++;
 			}
 			
-			DisplayManager.displayImage(Weapon.weaponList.get(a).imgPath, fixPointX+spalte*iconFieldWidth, fixPointY+zeile*iconFieldHeight+10, imageTagIcons);
+			DisplayManager.displayImage(Weapon.weaponList.get(a).imgPath, fixPointX+spalte*iconFieldWidth, fixPointY+zeile*iconFieldHeight+10, imageTagIcons, true);
 			spalte++;
 			itemCount++;
 		}
+		
+		// Titelleiste anpassen
+		displayCatMenuTitle("ammo");
+	}
+	
+	private static void displayCatMenuTitle(String category) {
+		DisplayManager.removeChangeableImages("catMenu");
+		DisplayManager.displayImage("shop/catMenu_" + category + ".png", fixPointX-5, fixPointY-5, "catMenu", true);
+	}
+	
+	private static void setCatNext() {
+		chooseItemCat(currentCat+1);
+	}
+
+	private static void setCatPrev() {
+		chooseItemCat(currentCat-1);
 	}
 	
 	/**     Display: Credits     */
 	private static void displayCredits() {	// zeigt den aktuellen CreditStand oben rechts in der Ecke an
-		int posx = fixPointX + shopWidth - iconFieldWidth * 2;
-		int posy = fixPointY + 10;
+		//int posx = fixPointX + shopWidth - iconFieldWidth;
+		//int posy = fixPointY + 10;
 		
 		currentCredits = Score.scoreList.get(0).getScore();
-		String text = "Credits:  " + String.valueOf(currentCredits);
-		DisplayManager.removeChangeableStrings(imageTagCredits);		// löschen, falls dies nicht der erste Aufruf ist, sondern eine Aktualisierung
-		DisplayManager.displayString(text, posx, posy, imageTagCredits);
+		displayCreditsNumberCheck();			
+	}
+	private static void displayCreditsNumberCheck() {
+		DisplayManager.removeChangeableImages(imageTagCredits);	// löschen, falls dies nicht der erste Aufruf ist, sondern eine Aktualisierung
+		
+		int value = currentCredits;
+		int counter = 0;
+		while(value / Math.pow(10, counter) >= 1) {
+			counter++;
+		}
+
+		for(int ziffer = 0; ziffer < counter; ziffer++ ) {
+			displayCreditsNumberCheckDisplay((int) (value/Math.pow(10, ziffer) % 10), ziffer);
+		}
+		if(counter<=0) {	// falls kein Geld vorhanden Null anzeigen
+			displayCreditsNumberCheckDisplay(0, 0);
+		}
+	}
+	private static void displayCreditsNumberCheckDisplay(int number, int ziffer) {
+		int imgSizeX = 15;
+		String path = "numbers/";
+		if(number>9)
+			number=0;
+		
+		switch(number) {
+		case 0:
+			path += "0";
+			break;
+		case 1:
+			path += "1";
+			break;
+		case 2:
+			path += "2";
+			break;
+		case 3:
+			path += "3";
+			break;
+		case 4:
+			path += "4";
+			break;
+		case 5:
+			path += "5";
+			break;
+		case 6:
+			path += "6";
+			break;
+		case 7:
+			path += "7";
+			break;
+		case 8:
+			path += "8";
+			break;
+		case 9:
+			path += "9";
+			break;
+		}
+		path += ".png";
+		DisplayManager.displayImage(path, fixPointX+shopWidth-(imgSizeX*(ziffer+2)), fixPointY-5, imageTagCredits, true);
 	}
 	
 	/**     Unload/Close Operations     */
@@ -423,12 +574,16 @@ public class Shop {
 		DisplayManager.removeChangeableImages(imageTagIconSelected);
 		DisplayManager.removeChangeableImages(imageTagIconHover);
 		DisplayManager.removeChangeableImages(imageTagItemAttachment);
+		DisplayManager.removeChangeableImages("catMenu");
+		DisplayManager.removeChangeableImages(imageTagButtonCatMenuHover);
+		currentSelection = -1;
 	}
 	
 	private static void unloadShopImages() {
 		DisplayManager.removeChangeableImages(imageTagShop);
 		DisplayManager.removeChangeableStrings(imageTagCredits);
 		DisplayManager.removeChangeableImages(imageTagButtonBuyHover);
+		DisplayManager.removeChangeableImages(imageTagCredits);
 	}
 	
 	public static void closeShop() {
@@ -451,16 +606,18 @@ public class Shop {
 			case 1:
 				Score.scoreList.get(0).setScore(price * (-1));
 				WeaponManager.weaponManagerList.get(0).chooseWeapon(currentSelection+1);
-				updateScreen();
 				break;
 			case 2:
 				Score.scoreList.get(0).setScore(price * (-1));
-				WeaponManager.weaponManagerList.get(0).addAmmo(currentSelection+1, 5);
-				updateScreen();
+				WeaponManager.weaponManagerList.get(0).addAmmo(currentSelection+1, getMagPackSize(currentSelection));
 				break;
 			}
-			
+			updateScreen();
 		}
+	}
+	
+	private static int getMagPackSize(int fieldNo) {
+		return Weapon.weaponList.get(fieldNo+1).magPackSize;
 	}
 	
 	private static boolean isSelectionValid() {

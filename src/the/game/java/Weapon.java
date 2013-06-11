@@ -21,6 +21,10 @@ public class Weapon {
 	public int bulletSpread;
 	public String name;
 	public int price;
+	public int radius;
+	public int magPackSize;
+	public int magPackPrice;
+	public int vigor;
 	
 	private static int sFireRate;
 	private static int sBulletSpeed;
@@ -36,9 +40,13 @@ public class Weapon {
 	private static int sBulletSpread;
 	private static String sName;
 	private static int sPrice;
+	private static int sRadius;
+	private static int sMagPackSize;
+	private static int sMagPackPrice;
+	private static int sVigor;
 	
 	// Konstruktor
-	private Weapon(String wName, int wFireRate, int wBulletSpeed, int wBulletSpread, int wMagSize, int wMagCount, int wReloadTime, int wShotsPerRound, int wDamage, boolean wMelee, String wImgPath, String wImgPathProjectile, boolean wShotgun, int wPrice) {
+	private Weapon(String wName, int wFireRate, int wBulletSpeed, int wBulletSpread, int wMagSize, int wMagCount, int wReloadTime, int wShotsPerRound, int wDamage, int wVigor, boolean wMelee, int wRadius, String wImgPath, String wImgPathProjectile, boolean wShotgun, int wPrice, int wMagPackSize, int wMagPackPrice) {
 		weaponID = weaponIDCounter;
 		weaponIDCounter++;
 		
@@ -52,10 +60,15 @@ public class Weapon {
 		magCount = wMagCount;
 		reloadTime = wReloadTime;
 		shotsPerRound = wShotsPerRound;
+		radius = wRadius;
 		
 		damage = wDamage;
+		vigor = wVigor;
 		melee = wMelee;
 		shotgun = wShotgun;
+		
+		magPackSize = wMagPackSize;
+		magPackPrice = wMagPackPrice;
 		
 		imgPath = wImgPath;
 		imgPathProjectile = wImgPathProjectile;
@@ -76,7 +89,7 @@ public class Weapon {
 	}
 
 	private static void addWeapon() {
-		weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun, sPrice));
+		weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sVigor, sMelee, sRadius, sImgPath, sImgPathProjectile, sShotgun, sPrice, sMagPackSize, sMagPackPrice));
 	}
 	
 	/**     HIER SIND ALLE WAFFEN AUFGELISTET     */
@@ -114,12 +127,16 @@ public class Weapon {
 		sMagCount = 15;
 		sReloadTime = 500;
 		sShotsPerRound = 4;
+		sRadius = 25;
 		
 		sDamage = 6;
 		sMelee = true;
 		sShotgun = false;
 
 		sImgPath = "trap.png";
+		
+		sMagPackSize = 3;
+		sMagPackPrice = 600;
 		
 		addWeapon();
 		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
@@ -144,6 +161,9 @@ public class Weapon {
 		sImgPath = "weapon/weaponPistol.png";
 		sImgPathProjectile = "projectile.png";
 		
+		sMagPackSize = 3;
+		sMagPackPrice = 600;
+		
 		addWeapon();
 		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
@@ -166,6 +186,9 @@ public class Weapon {
 
 		sImgPath = "weapon/weaponMP.png";
 		sImgPathProjectile = "projectile.png";
+		
+		sMagPackSize = 3;
+		sMagPackPrice = 600;
 		
 		addWeapon();
 		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
@@ -190,6 +213,9 @@ public class Weapon {
 		sImgPath = "weapon/weaponRifle.png";
 		sImgPathProjectile = "projectile.png";
 		
+		sMagPackSize = 3;
+		sMagPackPrice = 600;
+		
 		addWeapon();
 		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
@@ -207,11 +233,15 @@ public class Weapon {
 		sShotsPerRound = 1;
 		
 		sDamage = 26;
+		sVigor = 10;
 		sMelee = false;
 		sShotgun = false;
 
 		sImgPath = "weapon/weaponRifle2.png";
 		sImgPathProjectile = "projectile.png";
+		
+		sMagPackSize = 3;
+		sMagPackPrice = 600;
 		
 		addWeapon();
 		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
@@ -236,6 +266,9 @@ public class Weapon {
 		sImgPath = "weapon/weaponRifle3.png";
 		sImgPathProjectile = "projectile.png";
 		
+		sMagPackSize = 3;
+		sMagPackPrice = 600;
+		
 		addWeapon();
 		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
@@ -259,6 +292,9 @@ public class Weapon {
 		sImgPath = "weapon/weaponShotgun.png";
 		sImgPathProjectile = "projectile.png";
 		
+		sMagPackSize = 3;
+		sMagPackPrice = 600;
+		
 		addWeapon();
 		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
@@ -276,11 +312,15 @@ public class Weapon {
 		sShotsPerRound = 6;
 		
 		sDamage = 10;
+		sVigor = 20;
 		sMelee = false;
 		sShotgun = true;
 
 		sImgPath = "weapon/weaponShotgun2.png";
 		sImgPathProjectile = "projectile.png";
+		
+		sMagPackSize = 3;
+		sMagPackPrice = 600;
 		
 		addWeapon();
 		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));

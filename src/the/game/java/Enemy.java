@@ -123,6 +123,7 @@ public class Enemy {
 			healthPoints -= reduce;
 			if(healthPoints<=0) {
 				alive = false;
+				Goodies.createGoodie(x, y, 0);
 			}
 		}
 	}
@@ -183,30 +184,8 @@ public class Enemy {
 	
 	private void checkPlayerCollide() {		// Kontrolle der 4 Eckpunkte des Monsters
 		for(int a=0; a<Player.playerList.size(); a++) {	// Wird für alle Player nacheinander überprüft
-			boolean colliding=false;
-			// Positionen der Kanten initialisieren
-			int mapPosLeft = monsterList.get(index).x;
-			int mapPosRight = monsterList.get(index).x + imgSizeMonsterX;
-			int mapPosUp = monsterList.get(index).y;
-			int mapPosDown = monsterList.get(index).y + imgSizeMonsterY;
-			int playerMapPosLeft = Player.playerList.get(a).getX();
-			int playerMapPosRight = Player.playerList.get(a).getX() + Player.playerList.get(a).imageSizeX;
-			int playerMapPosUp = Player.playerList.get(a).getY();
-			int playerMapPosDown = Player.playerList.get(a).getY() + Player.playerList.get(a).imageSizeY;
 			
-			// Ecken überprüfen (Überprüft wird die "aktuelle" Position)
-			// Es wird überprüft ob die 4 Ecken des Gegners innerhalb des von dem Spieler belegten Intervalls liegen
-			// wenn ja, stirbt der Spieler
-			if((playerMapPosLeft<=mapPosLeft) && (mapPosLeft <= playerMapPosRight) && (playerMapPosUp <= mapPosUp) && (mapPosUp <= playerMapPosDown))		// 1. Fixpunkt
-				colliding = true;
-			if((playerMapPosLeft<=mapPosRight) && (mapPosRight <= playerMapPosRight) && (playerMapPosUp <= mapPosUp) && (mapPosUp <= playerMapPosDown))		// 2. Oben rechts
-				colliding = true;
-			if((playerMapPosLeft<=mapPosRight) && (mapPosRight <= playerMapPosRight) && (playerMapPosUp <= mapPosDown) && (mapPosDown <= playerMapPosDown))	// 3. Unten rechts
-				colliding = true;
-			if((playerMapPosLeft<=mapPosLeft) && (mapPosLeft <= playerMapPosRight) && (playerMapPosUp <= mapPosDown) && (mapPosDown <= playerMapPosDown))	// 4. Unten links
-				colliding = true;
-			if((playerMapPosLeft<=(mapPosLeft+(mapPosRight-mapPosLeft)/2)) && ((mapPosLeft+(mapPosRight-mapPosLeft)/2) <= playerMapPosRight) && (playerMapPosUp <= (mapPosUp+(mapPosDown-mapPosUp)/2)) && ((mapPosUp+(mapPosDown-mapPosUp)/2) <= playerMapPosDown))		// 5. Mittelpunkt
-				colliding = true;
+			boolean colliding = Intersect.isCollidingWithPlayer(a, monsterList.get(index).x, monsterList.get(index).y, imgSizeMonsterX, imgSizeMonsterY);
 	
 			if(colliding) {										// Wenn Gegner mit Spieler kollidiert:
 				Player.playerList.get(a).setHealthPoints(damage*(-1));	// Lebenspunkte abziehen -> wenn keine mehr übrig Spieler tot

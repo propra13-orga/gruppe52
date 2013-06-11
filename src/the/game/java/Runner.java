@@ -1,5 +1,10 @@
 package the.game.java;
 
+import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+
 import javax.swing.JFrame;
 
 
@@ -12,12 +17,15 @@ public class Runner extends JFrame {
 	 * Gestartet wird diese Klasse (erstellt wird ein Objekt dieser Klasse) in 'StartWindow.java', Methode: 'fenster()'
 	 */
 	private static final long serialVersionUID = 1L;
-	private static int height = 564;
 	private static int width = 960;
+	private static int height = 564;
+	private static int centerX = width/2;
+	private static int centerY = height/2;
 	public static int borderLe = 0;
 	public static int borderRi = width;
 	public static int borderUp = 20;
 	public static int borderDo = height;
+	//private static Cursor defaultCursor = StartWindow.getRunner().getCursor();
 
 	public Runner(int level) {	// Konstruktor #1 mit Levelwahl
         add(new Setter(level));							// startet setter, Parameter 'level' gibt die Nummer des zu startenden Levels weiter
@@ -29,6 +37,7 @@ public class Runner extends JFrame {
         setResizable(false);							// Fenstergröße manuell nicht veränderbar
         //setUndecorated(true);
         setVisible(true);
+        
     }
 	
 	public Runner() {			// Konstruktor #2 ohne Levelwahl
@@ -41,6 +50,7 @@ public class Runner extends JFrame {
         setResizable(false);							// Fenstergröße manuell nicht veränderbar
         //setUndecorated(true);
         setVisible(true);
+        
     }
 	
 	public static int getHeightF() {	// gibt Höhe des Fenster aus
@@ -51,8 +61,45 @@ public class Runner extends JFrame {
 		return width;
 	}
 	
+	public static int getCenterX() {
+		return centerX;
+	}
+	
+	public static int getCenterY() {
+		return centerY;
+	}
+	
+	public static int getOnScreenFrameCenterX() {
+		return centerX + getFrameLocationOnScreen().x;
+	}
+	
+	public static int getOnScreenFrameCenterY() {
+		return centerY + getFrameLocationOnScreen().y;
+	}
+	
+	public static Point getFrameLocationOnScreen() {
+		return StartWindow.getRunner().getLocationOnScreen();
+	}
+	
 	public static void shutRunnerDown() {	// schließt das Fenster
 		StartWindow.getRunner().dispose();
+	}
+	
+	public static void setMouseVisibility(boolean arg0) {
+		if(arg0) {
+			// Sets the JPanel's cursor to the system default.
+			StartWindow.getRunner().getContentPane().setCursor(Cursor.getDefaultCursor());
+		} else {
+			// Transparent 16 x 16 pixel cursor image.
+			BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+
+			// Create a new blank cursor.
+			Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+			    cursorImg, new Point(0, 0), "blank cursor");
+
+			// Set the blank cursor to the JFrame.
+			StartWindow.getRunner().getContentPane().setCursor(blankCursor);
+		}
 	}
 }
 

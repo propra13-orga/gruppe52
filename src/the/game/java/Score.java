@@ -15,7 +15,7 @@ public class Score {
 	public int scr;  //Score des Spielers
 	
 	private Score() {
-		scr = 3000;
+		scr = 6500;
 	}
 	
 	public static List<Score> scoreList = new ArrayList<Score>();

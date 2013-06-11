@@ -34,6 +34,7 @@ public class DisplayLine {
 			setWeapon();
 			setBullets();
 		}
+		setHearts();
 	}
 	
 	private static void setWeapon() {
@@ -60,6 +61,12 @@ public class DisplayLine {
 		for(int a=0; a<count; a++) {
 			displayLineList.add(new DisplayLine(posx, posy, "weaponBullet.png"));
 			posx += 4;
+		}
+	}
+	
+	private static void setHearts() {
+		for(int a=0; a<Player.playerList.get(0).getLives(); a++) {
+			displayLineList.add(new DisplayLine(a*20, 0, "heart.png"));
 		}
 	}
 	// TODO: HEARTS Lebensanzeige

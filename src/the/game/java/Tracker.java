@@ -1,9 +1,12 @@
 package the.game.java;
 
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
+import javax.swing.ImageIcon;
 
 public class Tracker {
 	
@@ -26,6 +29,8 @@ public class Tracker {
 	private boolean alive;
 	private static boolean pathFindingActive = false;
 	private boolean dumb;
+	private Image imgEnemy;
+	private Image imgEnemyDead;
 	
 	public Tracker(int posx, int posy) {	// Konstruktor 1: Parameter bestimmen Startposition
 		flagMap = new int[LevelCreator.getItemMapDimensions(0)][LevelCreator.getItemMapDimensions(1)];
@@ -41,6 +46,9 @@ public class Tracker {
 		
 		healthPoints = 100;
 		alive = true;
+		
+		imgEnemy = setImage("enemy.gif");
+		imgEnemyDead = setImage("trap.png");
 		
 		imgSizeTrackerX = 15;
 		imgSizeTrackerY = 22;
@@ -62,6 +70,9 @@ public class Tracker {
 		
 		healthPoints = 100;
 		alive = true;
+		
+		imgEnemy = setImage("enemy.gif");
+		imgEnemyDead = setImage("trap.png");
 		
 		imgSizeTrackerX = 15;
 		imgSizeTrackerY = 22;
@@ -91,6 +102,12 @@ public class Tracker {
 	public static int getImgSizeY(int listIndex) {
 		return trackerList.get(listIndex).imgSizeTrackerY;
 	}
+	public static Image getImg(int trackerID) {
+		if(trackerList.get(trackerID).alive)
+			return trackerList.get(trackerID).imgEnemy;
+		else
+			return trackerList.get(trackerID).imgEnemyDead;
+	}
 	
 	// Lebenspunkte
 	public void reduceHealthPoints(int reduce) {
@@ -98,6 +115,7 @@ public class Tracker {
 			healthPoints -= reduce;
 			if(healthPoints<=0) {
 				alive = false;
+				Goodies.createGoodie(x, y, 0);
 			}
 		}
 	}
@@ -106,16 +124,16 @@ public class Tracker {
 	public static void move() {
 		int faktor=1;
 		for(int a=0; a<trackerList.size(); a++) {	// geht alle Tracker aus der Liste durch
-			if(trackerList.get(index).alive) {
+			if(trackerList.get(a).alive) {
 				index = a;
-				trackerList.get(index).delay++;
-				if(trackerList.get(index).delay>0) {	// Für Verzögerung der Aktualisierung = langsamere Bewegung; Einstellbar mit der Variablen 'speed'
-					faktor=trackerList.get(index).delay;	// delay an faktor übergeben, somit wenn >1 wird geschwindigkeit gesteigert
-					trackerList.get(index).delay = trackerList.get(index).speed;	// delay zurücksetzen
-					trackerList.get(index).setDirection();	// Laufrichtung wird aktualisiert (Richtet sich nach Position des Spielers)
-					if(trackerList.get(index).checkEnvironment() == false) {
-						trackerList.get(index).x += trackerList.get(index).mx*faktor;
-						trackerList.get(index).y += trackerList.get(index).my*faktor;
+				trackerList.get(a).delay++;
+				if(trackerList.get(a).delay>0) {	// Für Verzögerung der Aktualisierung = langsamere Bewegung; Einstellbar mit der Variablen 'speed'
+					faktor=trackerList.get(a).delay;	// delay an faktor übergeben, somit wenn >1 wird geschwindigkeit gesteigert
+					trackerList.get(a).delay = trackerList.get(index).speed;	// delay zurücksetzen
+					trackerList.get(a).setDirection();	// Laufrichtung wird aktualisiert (Richtet sich nach Position des Spielers)
+					if(trackerList.get(a).checkEnvironment() == false) {
+						trackerList.get(a).x += trackerList.get(index).mx*faktor;
+						trackerList.get(a).y += trackerList.get(index).my*faktor;
 					}
 				}
 			}
@@ -205,38 +223,18 @@ public class Tracker {
 	}
 	
 	private boolean checkPlayerCollide() {			// Kontrolle der 4 Eckpunkte des Trackers
-		boolean colliding=false;
+		boolean generalCollide = false;
 		for(int a=0; a<Player.playerList.size(); a++) {	// Wird für alle Player nacheinander überprüft
-			// Positionen der Kanten initialisieren
-			int mapPosLeft = trackerList.get(index).x;
-			int mapPosRight = trackerList.get(index).x + imgSizeTrackerX;
-			int mapPosUp = trackerList.get(index).y;
-			int mapPosDown = trackerList.get(index).y + imgSizeTrackerY;
-			int playerMapPosLeft = Player.playerList.get(a).getX();
-			int playerMapPosRight = Player.playerList.get(a).getX() + Player.playerList.get(a).imageSizeX;
-			int playerMapPosUp = Player.playerList.get(a).getY();
-			int playerMapPosDown = Player.playerList.get(a).getY() + Player.playerList.get(a).imageSizeY;
 			
-			// Ecken überprüfen (Überprüft wird die "aktuelle" Position)
-			// Es wird überprüft ob die 4 Ecken des Gegners innerhalb des von dem Spieler belegten Intervalls liegen
-			// wenn ja, stirbt der Spieler
-			if((playerMapPosLeft<=mapPosLeft) && (mapPosLeft <= playerMapPosRight) && (playerMapPosUp <= mapPosUp) && (mapPosUp <= playerMapPosDown))		// 1. Fixpunkt
-				colliding = true;
-			if((playerMapPosLeft<=mapPosRight) && (mapPosRight <= playerMapPosRight) && (playerMapPosUp <= mapPosUp) && (mapPosUp <= playerMapPosDown))		// 2. Oben rechts
-				colliding = true;
-			if((playerMapPosLeft<=mapPosRight) && (mapPosRight <= playerMapPosRight) && (playerMapPosUp <= mapPosDown) && (mapPosDown <= playerMapPosDown))	// 3. Unten rechts
-				colliding = true;
-			if((playerMapPosLeft<=mapPosLeft) && (mapPosLeft <= playerMapPosRight) && (playerMapPosUp <= mapPosDown) && (mapPosDown <= playerMapPosDown))	// 4. Unten links
-				colliding = true;
-			if((playerMapPosLeft<=(mapPosLeft+(mapPosRight-mapPosLeft)/2)) && ((mapPosLeft+(mapPosRight-mapPosLeft)/2) <= playerMapPosRight) && (playerMapPosUp <= (mapPosUp+(mapPosDown-mapPosUp)/2)) && ((mapPosUp+(mapPosDown-mapPosUp)/2) <= playerMapPosDown))		// 5. Mittelpunkt
-				colliding = true;
+			boolean colliding = Intersect.isCollidingWithPlayer(a, trackerList.get(index).x, trackerList.get(index).y, imgSizeTrackerX, imgSizeTrackerY);
 			
-			if(pathFindingActive==false) {
-				if(colliding)
+			if(colliding) {
+				generalCollide = true;
+				if(pathFindingActive==false)
 					Player.playerList.get(a).setHealthPoints(damage*(-1));	// Lebenspunkte abziehen -> wenn keine mehr übrig Spieler tot
 			}
 		}
-		return colliding;
+		return generalCollide;
 	}
 	
 	public void pathFinding() {
@@ -346,4 +344,9 @@ public class Tracker {
 		value = (value - (value % 20)) / 20;
 		return value;
 	}
+	
+	private Image setImage(String path) {
+    	ImageIcon ii = new ImageIcon(this.getClass().getResource(path));
+    	return ii.getImage();
+    }
 }

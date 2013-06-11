@@ -1,0 +1,145 @@
+package the.game.java;
+
+import java.awt.Image;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.ImageIcon;
+
+/**
+ *	In dieser Klasse werden NPC's erzeugt. Jedem NPC wird eine Nummer zugeordnet. Jede Nummer hat ein zugehöriges Bild
+ *  mit dem Text, den der entsprechende NPC sagen soll. Wenn der Spieler und ein NPC kollidieren, wird das jeweilige
+ *  Bild dargestellt. Durch Bewegung der Spielfigur, sodass der Spieler sich vom NPC entfernt, verschwindet das Bild
+ *  sobald sich Spieler und NPC nicht mehr berühren.
+ *  NPC's erklären das Spiel, geben Ratschläge oder machen doofe Witze.
+ */
+
+public class NPC {
+
+	private ImageIcon ii;
+	private Image npc_pic_up = setImagePath("npcLookingUp.png");				// NPC Bild auf Map
+	private Image npc_pic_right = setImagePath("npcLookingRight.png");	
+	private Image npc_pic_down = setImagePath("npcLookingDown.png");	
+	private Image npc_pic_left = setImagePath("npcLookingLeft.png");
+	
+	public static List<NPC> npcList = new ArrayList<NPC>(); 		// NPC's werden 'archiviert'
+	
+	private int x=0;														// x-Position
+	private int y=0;														// y-Position
+	
+	private static int width_text=565;
+	private static int height_text=325;
+	
+	private int npc_nr;														// nr des NPC's (wichtig um den passenden Text darzustellen)
+	private static int collidedNPC=0;										// mit welchem NPC wurde collidiert?
+	
+	private static boolean already=false;									// wird das Text-Bild bereits dargestellt? (Damit nicht immer wieder neu gezeichnet)
+	private static boolean hilfCollide=false;								// will Java haben weil in schleifen true und false nicht erkannt werden
+	
+	private String npc_direction = "down";
+	
+	/*
+	 *  Ein neuer NPC bekommt die Parameter nr (nötig für den Text), x und y (für die Position)
+	 */
+	public NPC(int nr, int posx, int posy, String lookingDirection){
+		x=posx;
+		y=posy;
+		npc_nr=nr;
+		npc_direction = lookingDirection;
+	}
+
+	/*
+	 * Stellt Bild des NPC's dar
+	 */
+	public static void displayNPC(){
+		for(int i=0; i<npcList.size(); i++){			// so viele NPC's existieren
+			//npcList.get(i);
+			
+			switch(npcList.get(i).npc_direction) {
+			case "down": 
+				DisplayManager.displayImage(npcList.get(i).npc_pic_down, npcList.get(i).x, npcList.get(i).y, "NPC"); // NPC ist der Tag - siehe Display Manager
+				break;
+			case "up":
+				// 							Bild jedes NPC's		X-Position		  Y-Position		Tag	
+				DisplayManager.displayImage(npcList.get(i).npc_pic_up, npcList.get(i).x, npcList.get(i).y, "NPC"); // NPC ist der Tag - siehe Display Manager
+				break;
+			case "right":
+				DisplayManager.displayImage(npcList.get(i).npc_pic_right, npcList.get(i).x, npcList.get(i).y, "NPC"); // NPC ist der Tag - siehe Display Manager
+				break;
+			case "left":
+				DisplayManager.displayImage(npcList.get(i).npc_pic_left, npcList.get(i).x, npcList.get(i).y, "NPC"); // NPC ist der Tag - siehe Display Manager
+				break;
+			}
+		}
+	}
+	
+	/*
+	 *  Stellt das der Nummer entsprechende Bild mit zugehörigem Text dar
+	 */
+	public static void setCollidedPicture(){
+		// Wenn Spieler mit einem NPC kollidiert & das Bild nicht bereits gemalt wird
+		if(collidedNPC>0 && already==false){
+			DisplayManager.displayImage("transparentLayer.png", 0, 0, "menu");
+			//							Bild des Textes eines NPC's		 x-Position			   y-Position	          Tag
+			DisplayManager.displayImage("npc/npcMsg"+collidedNPC+".png", Runner.getWidthF()/2-width_text/2, Runner.getHeightF()/2-height_text/2, "menu"); // menu -> das Bild kann geschlossen werden
+			already=true;
+		}
+	}
+	
+	/*
+	 *  Überprüft, ob der Spieler mit einem NPC kollidiert
+	 */
+	public static boolean checkPlayerCollide(){
+		// Jeder Spieler muss zusammen mit jedem NPC überprüft werden
+		for(int i=0; i<Player.playerList.size(); i++){
+			for(int z=0; z<npcList.size(); z++){
+
+				// wenn: x<=PlayerX+20 && PlayerX<=x+20		&&		y<=PlayerY+20 && PlayerY<=y+20
+				// dh:   Player kollidiert vertikal					Player kollidiert horizontal
+				if(Player.playerList.get(i).getX()+Player.playerList.get(i).imageSizeX>=npcList.get(z).getX() && Player.playerList.get(i).getX()<=npcList.get(z).getX()+20 && Player.playerList.get(i).getY()+Player.playerList.get(i).imageSizeX>=npcList.get(z).getY() && Player.playerList.get(i).getY()<=npcList.get(z).getY()+20){
+					hilfCollide=true;
+					collidedNPC=npcList.get(z).getNr();				// collidedNPC nimmt die Nummer des ber+hrten NPCs an
+					setCollidedPicture();							// malt das Bild mit Text
+				}else{
+					if(hilfCollide) {								// wenn gerade eine Nachricht angezeigt wird:
+						if(collidedNPC==npcList.get(z).getNr()) {	// wenn gerade der NPC überprüft wird, dessen Nachricht angezeigt wird:
+							hilfCollide=false;						// flag zurücksetzen
+							already=false;							// flag zurücksetzen
+							collidedNPC=0;							// damit aktualisiert wird, wenn sie nicht mehr kollidieren
+							DisplayManager.removeChangeableImages("menu");	// Das Bild wird entfernt
+						}
+					}
+				}
+
+			}
+		}
+		return hilfCollide;
+	}
+	
+	/*
+	 *  erstellt in LevelCaller einen NPC mit Nummer ... an Position ...
+	 */
+	public static void createNPC(int nr, int posx, int posy, String lookingDirection) {
+		posy += LevelCreator.distancePix;							// Wegen Menuleiste oben
+		npcList.add(new NPC(nr, posx, posy, lookingDirection));
+	}
+	
+	/*
+	 * bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
+	 */
+    public Image setImagePath(String path) {						
+    	ii = new ImageIcon(this.getClass().getResource(path));
+    	Image img = ii.getImage();
+    	return img;
+    }
+    
+    public int getX(){
+    	return x;
+    }
+    public int getY(){
+    	return y;
+    }
+    public int getNr(){
+    	return npc_nr;
+    }
+}

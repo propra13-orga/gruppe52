@@ -35,6 +35,7 @@ public class ProjectileManager {	// Managed den Vorgang des Schießens
 	private ImageIcon ii;
 	private Image imgProjectile;
 	private boolean shotgun;
+	private int vigor;
 	
 	// TODO: measureForReload
 	
@@ -50,6 +51,7 @@ public class ProjectileManager {	// Managed den Vorgang des Schießens
 		reloadTime = WeaponManager.weaponManagerList.get(playerID).weaponInUseList.get(WeaponManager.weaponManagerList.get(playerID).weaponInUseID).reloadTime;			// Zeit in ms für Nachladevorgang
 		melee = WeaponManager.weaponManagerList.get(playerID).weaponInUseList.get(WeaponManager.weaponManagerList.get(playerID).weaponInUseID).melee;					// Nahkampf oder nicht
 		damage = WeaponManager.weaponManagerList.get(playerID).weaponInUseList.get(WeaponManager.weaponManagerList.get(playerID).weaponInUseID).damage;					// Schadenspunkte
+		vigor = WeaponManager.weaponManagerList.get(playerID).weaponInUseList.get(WeaponManager.weaponManagerList.get(playerID).weaponInUseID).vigor;					// Durchschlagskraft
 		imgProjectile = setProjectile(WeaponManager.weaponManagerList.get(playerID).weaponInUseList.get(WeaponManager.weaponManagerList.get(playerID).weaponInUseID).imgPathProjectile);
 		currentMagSize = WeaponManager.weaponManagerList.get(playerID).weaponInUseList.get(WeaponManager.weaponManagerList.get(playerID).weaponInUseID).currentMagSize;
 		shotgun = WeaponManager.weaponManagerList.get(playerID).weaponInUseList.get(WeaponManager.weaponManagerList.get(playerID).weaponInUseID).shotgun;
@@ -75,6 +77,7 @@ public class ProjectileManager {	// Managed den Vorgang des Schießens
 			projectileManagerList.get(a).reloadTime = WeaponManager.weaponManagerList.get(a).weaponInUseList.get(WeaponManager.weaponManagerList.get(a).weaponInUseID).reloadTime;			// Zeit in ms für Nachladevorgang
 			projectileManagerList.get(a).melee = WeaponManager.weaponManagerList.get(a).weaponInUseList.get(WeaponManager.weaponManagerList.get(a).weaponInUseID).melee;					// Nahkampf oder nicht
 			projectileManagerList.get(a).damage = WeaponManager.weaponManagerList.get(a).weaponInUseList.get(WeaponManager.weaponManagerList.get(a).weaponInUseID).damage;					// Schadenspunkte
+			projectileManagerList.get(a).vigor = WeaponManager.weaponManagerList.get(a).weaponInUseList.get(WeaponManager.weaponManagerList.get(a).weaponInUseID).vigor;					// Durchschlagskraft
 			projectileManagerList.get(a).imgProjectile = projectileManagerList.get(a).setProjectile(WeaponManager.weaponManagerList.get(a).weaponInUseList.get(WeaponManager.weaponManagerList.get(a).weaponInUseID).imgPathProjectile);					// Schadenspunkte
 			projectileManagerList.get(a).currentMagSize = WeaponManager.weaponManagerList.get(a).weaponInUseList.get(WeaponManager.weaponManagerList.get(a).weaponInUseID).currentMagSize;	// Kugeln im Magazin
 			projectileManagerList.get(a).shotgun = WeaponManager.weaponManagerList.get(a).weaponInUseList.get(WeaponManager.weaponManagerList.get(a).weaponInUseID).shotgun;				// Waffe ist eine Shotgun, ja/nein
@@ -179,13 +182,21 @@ public class ProjectileManager {	// Managed den Vorgang des Schießens
 	    		}
     		} else {
     			// TODO: MELEE
+    			
+    			
+    			
     		}
     	}
     }
     
+
     private void createProjectile(int index) {
-    	Projectile.createProjectile((Player.playerList.get(index).getX() + Player.playerList.get(index).imageSizeX / 2), (Player.playerList.get(index).getY() + Player.playerList.get(index).imageSizeY / 2), Player.playerList.get(index).getLastDirectionX() * bulletSpeed, Player.playerList.get(index).getLastDirectionY() * bulletSpeed, damage, bulletSpread, imgProjectile);
+    	Projectile.createProjectile((Player.playerList.get(index).getX() + Player.playerList.get(index).imageSizeX / 2), (Player.playerList.get(index).getY() + Player.playerList.get(index).imageSizeY / 2), bulletSpeed, damage, vigor, bulletSpread, imgProjectile, Controls.getDirectionMarkerX(), Controls.getDirectionMarkerY());
+
+    	//Projectile.createProjectile((Player.playerList.get(index).getX() + Player.playerList.get(index).imageSizeX / 2), (Player.playerList.get(index).getY() + Player.playerList.get(index).imageSizeY / 2), Player.playerList.get(index).getLastDirectionX() * bulletSpeed, Player.playerList.get(index).getLastDirectionY() * bulletSpeed, damage, vigor, bulletSpread, imgProjectile);
     }
+    
+    
     
     private void updateChanges(int index) {
     	// Änderungen weiterleiten

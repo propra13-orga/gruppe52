@@ -56,12 +56,12 @@ public class Editor extends JFrame implements ActionListener {
     private Image heart = setImagePath("heart.png");
     private Image finalGoal = setImagePath("goal.png");
     private Image shield = setImagePath("shield.png");
-    private Image bouncy = setImagePath("bouncy.png");
-    private Image tracker = setImagePath("tracker.png");
-    private Image vertiMonster = setImagePath("vertimonster.png");
-    private Image horiMonster = setImagePath("horimonster.png");
-    private Image r_u_monster = setImagePath("r_u_monster.png");
-    private Image l_u_monster = setImagePath("l_u_monster.png");
+    private Image bouncy = setImagePath("allenemy.png");
+    private Image tracker = setImagePath("allenemy.png");
+    private Image vertiMonster = setImagePath("allenemy.png");
+    private Image horiMonster = setImagePath("allenemy.png");
+    private Image r_u_monster = setImagePath("allenemy.png");
+    private Image l_u_monster = setImagePath("allenemy.png");
     //private Image bg = setImagePath("bg.png");
 	
 	public Editor(){

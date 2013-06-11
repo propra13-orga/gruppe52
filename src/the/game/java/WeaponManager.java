@@ -18,6 +18,7 @@ public class WeaponManager {
 	public int reloadTime;
 	public int shotsPerRound;
 	public int damage;
+	public int vigor;
 	public boolean melee;
 	public String imgPath;
 	public String imgPathProjectile;
@@ -30,19 +31,6 @@ public class WeaponManager {
 		
 		weaponInUseList.add(new WeaponManager(weaponID));
 		weaponInUseID = 0;
-
-		/**	 
-		// eigentlich unnötig
-		fireRate = weaponInUseList.get(weaponInUseID).fireRate;
-		bulletSpeed = weaponInUseList.get(weaponInUseID).bulletSpeed;
-		magSize = weaponInUseList.get(weaponInUseID).magSize;
-		magCount = weaponInUseList.get(weaponInUseID).magCount;
-		reloadTime = weaponInUseList.get(weaponInUseID).reloadTime;
-		shotsPerRound = weaponInUseList.get(weaponInUseID).shotsPerRound;
-		melee = weaponInUseList.get(weaponInUseID).melee;
-		imgPath = weaponInUseList.get(weaponInUseID).imgPath;
-		imgPathProjectile = weaponInUseList.get(weaponInUseID).imgPathProjectile;
-		*/
 	}
 	
 	private WeaponManager(int sWeaponID) {	// Mit Waffe (für weaponInUseList)
@@ -58,6 +46,7 @@ public class WeaponManager {
 		currentMagSize = magSize;
 		
 		damage = Weapon.weaponList.get(weaponID).damage;
+		vigor = Weapon.weaponList.get(weaponID).vigor;
 		melee = Weapon.weaponList.get(weaponID).melee;
 		shotgun = Weapon.weaponList.get(weaponID).shotgun;
 		imgPath = Weapon.weaponList.get(weaponID).imgPath;
