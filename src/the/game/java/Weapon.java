@@ -113,7 +113,6 @@ public class Weapon {
 		sImgPath = "trap.png";
 		
 		addWeapon();
-		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
 	
 	private static void knife() {
@@ -139,7 +138,6 @@ public class Weapon {
 		sMagPackPrice = 600;
 		
 		addWeapon();
-		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
 	
 	private static void pistol() {
@@ -165,12 +163,11 @@ public class Weapon {
 		sMagPackPrice = 600;
 		
 		addWeapon();
-		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
 	
 	private static void mp() {
 		sName = "MP";
-		sPrice = 1000;
+		sPrice = 900;
 		
 		sFireRate = 20;
 		sBulletSpeed = 6;
@@ -181,6 +178,7 @@ public class Weapon {
 		sShotsPerRound = 1;
 		
 		sDamage = 12;
+		sVigor = 1;
 		sMelee = false;
 		sShotgun = false;
 
@@ -191,12 +189,11 @@ public class Weapon {
 		sMagPackPrice = 600;
 		
 		addWeapon();
-		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
 	
 	private static void rifle() {
 		sName = "Rifle";
-		sPrice = 2000;
+		sPrice = 1800;
 		
 		sFireRate = 8;
 		sBulletSpeed = 6;
@@ -207,6 +204,7 @@ public class Weapon {
 		sShotsPerRound = 3;
 		
 		sDamage = 24;
+		sVigor = 1;
 		sMelee = false;
 		sShotgun = false;
 		
@@ -217,12 +215,11 @@ public class Weapon {
 		sMagPackPrice = 600;
 		
 		addWeapon();
-		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
 	
 	private static void rifleBig() {
 		sName = "Big Rifle";
-		sPrice = 3500;
+		sPrice = 2500;
 		
 		sFireRate = 7;
 		sBulletSpeed = 6;
@@ -244,22 +241,22 @@ public class Weapon {
 		sMagPackPrice = 600;
 		
 		addWeapon();
-		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
 	
 	private static void rifleFast() {
 		sName = "Small Bore Rifle";
-		sPrice = 4000;
+		sPrice = 3500;
 		
 		sFireRate = 22;
 		sBulletSpeed = 7;
-		sBulletSpread = 3;
+		sBulletSpread = 2;
 		sMagSize = 42;
 		sMagCount = 6;
 		sReloadTime = 1350;
 		sShotsPerRound = 1;
 		
 		sDamage = 16;
+		sVigor = 1;
 		sMelee = false;
 		sShotgun = false;
 
@@ -270,22 +267,22 @@ public class Weapon {
 		sMagPackPrice = 600;
 		
 		addWeapon();
-		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
 	
 	private static void shotgun() {
 		sName = "Shotgun";
-		sPrice = 3000;
+		sPrice = 5000;
 		
 		sFireRate = 2;
 		sBulletSpeed = 7;
-		sBulletSpread = 10;
+		sBulletSpread = 5;
 		sMagSize = 8;
 		sMagCount = 6;
 		sReloadTime = 1350;
 		sShotsPerRound = 6;
 		
 		sDamage = 10;
+		sVigor = 1;
 		sMelee = false;
 		sShotgun = true;
 
@@ -296,23 +293,22 @@ public class Weapon {
 		sMagPackPrice = 600;
 		
 		addWeapon();
-		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
 	
 	private static void shotgunFast() {
 		sName = "The Grim Reaper";
-		sPrice = 6000;
+		sPrice = 7000;
 		
 		sFireRate = 5;
 		sBulletSpeed = 7;
-		sBulletSpread = 10;
+		sBulletSpread = 5;
 		sMagSize = 20;
 		sMagCount = 6;
 		sReloadTime = 1350;
 		sShotsPerRound = 6;
 		
 		sDamage = 10;
-		sVigor = 20;
+		sVigor = 5;
 		sMelee = false;
 		sShotgun = true;
 
@@ -323,6 +319,5 @@ public class Weapon {
 		sMagPackPrice = 600;
 		
 		addWeapon();
-		//weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sMelee, sImgPath, sImgPathProjectile, sShotgun));
 	}
 }

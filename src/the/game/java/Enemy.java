@@ -6,17 +6,20 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
+/**
+ * Verwaltet alle Objekte der Klasse Enemy
+ *
+ */
 public class Enemy {
 	
 	private int x;
 	private int y;
 	private int mx=0;
 	private int my=0;
-	public static List<Enemy> monsterList = new ArrayList<Enemy>();
+	public static List<Enemy> monsterList = new ArrayList<Enemy>();				// Alle Enemys werden in monsterList 'archiviert'
 	private static int index;
 	private int imgSizeMonsterX;
 	private int imgSizeMonsterY;
-	public static boolean codeRunning = true;
 	private int enemyType;
 	private int healthPoints;
 	private boolean alive;
@@ -25,124 +28,210 @@ public class Enemy {
 	private ImageIcon ii;
 	private int damage;
 	
-	// Konstruktor 1: Nur Startposition angegeben: Bewegung nur horizontal
+	/*
+	 * Konstruktor 1: Nur Startposition angegeben: Bewegung nur horizontal 
+	 * @param posx = Startpos x
+	 * @param posy = Startpos y
+	 */
 	public Enemy(int posx, int posy) {	
-		x=posx;
-		y=posy;
-		mx=1;
-		codeRunning = true;		// =true solange ein Objekt der Klasse Enemy existiert
-		enemyType = 0;
-		healthPoints = 100;
-		alive = true;
-		imgEnemy = setImage("enemy.gif");
-		imgEnemyDead = setImage("trap.png");
-		imgSizeMonsterX = 15;
-		imgSizeMonsterY = 19;
-		damage = 100;
-	}
-	// Konstruktor 2: Startposition und Laufvariablen (movex =1 rechts; movex =-1 links; moveY =1 unten; moveY =-1 oben)
-	public Enemy(int posx, int posy, int moveX, int moveY) {	
-		x = posx;
-		y = posy;
-		mx = moveX;
-		my = moveY;
-		codeRunning = true;
-		enemyType = 0;
-		healthPoints = 100;
-		alive = true;
-		imgEnemy = setImage("enemy.gif");
-		imgEnemyDead = setImage("trap.png");
-		imgSizeMonsterX = 15;
-		imgSizeMonsterY = 19;
-		damage = 100;
-	}
-	// Konstruktor 3: Startposition und 
-	// Laufvariablen (movex =1 rechts; movex =-1 links; moveY =1 unten; moveY =-1 oben), 
-	// Type legt die Monsterart fest (=0 ist normaler Feind, der hin und her läuft; =1 ist 'Bouncy', der sich wie ein Flummi verhält)
-	public Enemy(int posx, int posy, int moveX, int moveY, int type) {
-		x = posx;
-		y = posy;
-		mx = moveX;
-		my = moveY;
-		codeRunning = true;
-		enemyType = type;
-		healthPoints = 100;
-		alive = true;
-		imgEnemy = setImage("enemy.gif");
-		imgEnemyDead = setImage("trap.png");
-		imgSizeMonsterX = 15;
-		imgSizeMonsterY = 19;
-		damage = 100;
+		x=posx;											// x = aktuelle Position x = Startpos x
+		y=posy;											// y = aktuelle Position y= Startpos y
+		mx=1;											// Horizontale Bewegung
+		enemyType = 0;									// kein Bouncy
+		healthPoints = 100;								// Enemy bekommt 100 Lebenspunkte
+		alive = true;									// Monster existiert & ist in Bewegung
+		imgEnemy = setImage("enemy.gif");				// Bild für lebendiges Monster auf map
+		imgEnemyDead = setImage("trap.png");			// Bild für gestorbenes Monster auf map
+		imgSizeMonsterX = 15;							// Breite des Monsters
+		imgSizeMonsterY = 19;							// Höhe des Monsters
+		damage = 80;									// Schaden den der Player bei Berührung mit Monster erleidet
 	}
 	
-	// Folgende Methoden erstellen neu Gegner nach Kriterien der Konstruktoren oben
-	// Weiterhin werden die neuen Objekte der Klasse Enemy in einer Liste 'monsterList' erfasst
+	/*
+	 * Konstruktor 2: Startposition und Laufvariablen angegeben: Bewegung horizontal, vertikal oder diagonal
+	 * @param posx = Startpos x
+	 * @param posy = Startpos y
+	 * @param moveX = Bewegung horizontal; 1 = rechts; -1 = links; Höhere Zahlen bedeuten schnellere Bewegung
+	 * @param moveY = Bewegung vertikal; 1 = unten; -1 = oben; Höhere Zahlen bedeuten schnellere Bewegung
+	 */
+	public Enemy(int posx, int posy, int moveX, int moveY) {	
+		x = posx;								// xPosition = posx
+		y = posy;								// yPosition = posy
+		mx = moveX;								// Bewegung in Richtung x (rechts)
+		my = moveY;								// Bewegung in Richtung y (unten)
+		enemyType = 0;							// kein Bouncy
+		healthPoints = 100;						// Enemy bekommt 100 Lebenspunkte
+		alive = true;							// Monster existiert & ist Bewegung
+		imgEnemy = setImage("enemy.gif");		// Bild für lebendiges Monster auf map
+		imgEnemyDead = setImage("trap.png");	// Bild für gestorbenes Monster auf Map
+		imgSizeMonsterX = 15;					// Breite des Enemys
+		imgSizeMonsterY = 19;					// Höhe des Enemys
+		damage = 80;							// Schaden den der Player bei Berührung mit Monster erleidet
+	}
+
+	/*
+	 * Konstruktor 3: Startposition, Laufvariablen (moveX!=0 und moveY!=0) und Type=1 angegeben: Bouncy (Flummi-artige Bewegung); 
+	 * Type=0 und moveX=0 oder moveY=0: normales Monster wie Konstruktor 2
+	 * @param posx = Startpos x
+	 * @param posy = Startpos y
+	 * @param moveX  = Bewegung horizontal; 1 = rechts; -1 = links; Höhere Zahlen bedeuten schnellere Bewegung
+	 * @param moveY = Bewegung vertikal; 1 = unten; -1 = oben; Höhere Zahlen bedeuten schnellere Bewegung
+	 * @param type = 1 für Bouncy, 0 für normales Monster
+	 */
+	public Enemy(int posx, int posy, int moveX, int moveY, int type) {
+		x = posx;								// xPosition = posx
+		y = posy;								// yPosition = posy
+		mx = moveX;								// Bewegung in richtung x (rechts)
+		my = moveY;								// Bewegung in richtung y (unten)
+		enemyType = type;						// 1 für Bouncy, 2 für normal
+		healthPoints = 100;						// 100 Lebenspunkte für Bouncy
+		alive = true;							// Bouncys existieren und sind in Bewegung
+		imgEnemy = setImage("enemy.gif");		// Bild für lebendiges Bouncy auf map
+		imgEnemyDead = setImage("trap.png");	// Bild für gestorbenes Bouncy auf map
+		imgSizeMonsterX = 15;					// Breite des Bouncys
+		imgSizeMonsterY = 19;					// Höhe des Bouncys
+		damage = 80;							// Schaden den der Player bei Berührung mit Bouncy erleidet
+	}
+	
+	/*
+	 * Erstellt ein Monster mit horizontaler Bewegung und fügt es der monsterList hinzu
+	 * @param pointX = Startposx
+	 * @param pointY = Startposy
+	 */
 	public static void createMonster(int pointX, int pointY) {
 		pointY += LevelCreator.distancePix;	// Wegen Menuleiste oben
 		monsterList.add(new Enemy(pointX, pointY));
 	}
+	/*
+	 * Erstellt ein Monster mit horizontaler, vertikaler oder diagonaler Bewegung und fügt es der MonsterList hinzu
+	 * @param pointX = startpos x
+	 * @param pointY = startpos y
+	 * @param moveX = Bewegung horizontal; 1 = rechts; -1 = links; Höhere Zahlen bedeuten schnellere Bewegung
+	 * @param moveY = Bewegung vertikal; 1 = unten; -1 = oben; Höhere Zahlen bedeuten schnellere Bewegung
+	 */
 	public static void createMonster(int pointX, int pointY, int moveX, int moveY) {
 		pointY += LevelCreator.distancePix;	// Wegen Menuleiste oben
 		monsterList.add(new Enemy(pointX, pointY, moveX, moveY));
 	}
+	/*
+	 * Erstellt ein Bouncy, dass sich standartmäßig zuerst nach unten-rechts bewegt
+	 * @param pointX = Startpos x
+	 * @param pointY = Startpos y
+	 */
+	public static void createBouncy(int pointX, int pointY) {
+		pointY += LevelCreator.distancePix;	// Wegen Menuleiste oben
+		monsterList.add(new Enemy(pointX, pointY, 1, 1, 1));
+	}
+	/*
+	 * Erstellt ein Bouncy dessen Beginn-Laufrichtung von moveX und moveY abhängt
+	 * @param pointX
+	 * @param pointY
+	 * @param moveX
+	 * @param moveY
+	 */
+	public static void createBouncy(int pointX, int pointY, int moveX, int moveY) {
+		pointY += LevelCreator.distancePix;	// Wegen Menuleiste oben
+		monsterList.add(new Enemy(pointX, pointY, moveX, moveY, 1));
+	}
+	/*
+	 * Erstellt ein Monster, dass ein Boncy bei type=0 oder ein normales Monster bei type=0 ist
+	 * @param pointX = Startpos x
+	 * @param pointY = Startpos y
+	 * @param moveX  = Bewegung horizontal; 1 = rechts; -1 = links; Höhere Zahlen bedeuten schnellere Bewegung
+	 * @param moveY = Bewegung vertikal; 1 = unten; -1 = oben; Höhere Zahlen bedeuten schnellere Bewegung
+	 * @param type = 1 für Bouncy, 0 für normales Monster
+	 */
 	public static void createMonster(int pointX, int pointY, int moveX, int moveY, int type) {
 		pointY += LevelCreator.distancePix;	// Wegen Menuleiste oben
 		monsterList.add(new Enemy(pointX, pointY, moveX, moveY, type));
 	}
 	
+	/*
+	 * bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
+	 */
     private Image setImage(String path) {
     	ii = new ImageIcon(this.getClass().getResource(path));
     	Image img = ii.getImage();
     	return img;
     }
 	
-	// Abfragen zur aktuellen Position eines Gegners
+	/*
+	 *  Abfragen zur aktuellen Position eines Gegners
+	 */
 	public static int getX(int listIndex) {
 		return monsterList.get(listIndex).x;
 	}
 	public static int getY(int listIndex) {
 		return monsterList.get(listIndex).y;
 	}
-	// Abfragen zum Image
+	/*
+	 *  Abfragen zur Größe des Monsters
+	 */
 	public static int getImgSizeX(int listIndex) {
 		return monsterList.get(listIndex).imgSizeMonsterX;
 	}
 	public static int getImgSizeY(int listIndex) {
 		return monsterList.get(listIndex).imgSizeMonsterY;
 	}
+	/*
+	 * Organisiert welches Bild für jedes Monster der monsterList angezeigt wird;
+	 * abhängig von Lebensstatus des Monsters
+	 */
 	public static Image getImg(int index) {
 		if(monsterList.get(index).alive)
 			return monsterList.get(index).imgEnemy;
 		else
 			return monsterList.get(index).imgEnemyDead;
 	}
+	/* 
+	 * Sonstige Abfragen
+	 */
+	public static int getType(int listIndex) {
+		return monsterList.get(listIndex).enemyType;
+	}
+	public static int getMX(int listIndex) {
+		return monsterList.get(listIndex).mx;
+	}
+	public static int getMY(int listIndex) {
+		return monsterList.get(listIndex).my;
+	}
+	public static boolean isAlive(int listIndex) {
+		return monsterList.get(listIndex).alive;
+	}
 	
-	// Lebenspunkte
+	/*
+	 *  Lebenspunkte verringern
+	 */
 	public void reduceHealthPoints(int reduce) {
 		if(healthPoints>0) {
 			healthPoints -= reduce;
 			if(healthPoints<=0) {
 				alive = false;
-				Goodies.createGoodie(x, y, 0);
+				Goodies.createCredits(x, y, 20); 			// Punkte für den Score können eingesammelt werden an 
 			}
 		}
 	}
 	
-	// move-Methode für alle Gegner
+	/*
+	 *  move-Methode für alle Gegner
+	 */
 	public static void move() {		// wird aus Setter aufgerufen und aktualisiert die Position aller Gegner
-		int faktor=1;	// Multiplikator für die Geschwindigkeit normaler Gegner
+		if(TemporaryItem.flagEnemyFreezed)
+			return;
+		
+		int faktor=1;				// Multiplikator für die Geschwindigkeit normaler Gegner
 		for(int a=0; a<monsterList.size(); a++) {	// Schleife um alle Gegner in der Liste anzusprechen
 			index = a;
 			if(monsterList.get(index).alive) {	// Bewegung nur gestattet, wenn Gegner lebendig
 				switch(monsterList.get(index).enemyType) {
 					case 0:		// Bewegung für normalen Feind
 						if(monsterList.get(index).checkEnvironment() == false) {
-							if(codeRunning) {
+							if(Runner.codeRunning) {
 								monsterList.get(index).x += monsterList.get(index).mx*faktor;
 								monsterList.get(index).y += monsterList.get(index).my*faktor;
 							}
 						} else {		// Wenn nicht passierbares Objekt Getroffen wird, dann Laufvariablen invertieren
-							if(codeRunning) {
+							if(Runner.codeRunning) {
 								
 									if(monsterList.get(index).mx!=0)
 										monsterList.get(index).mx = monsterList.get(index).mx * (-1);
@@ -161,23 +250,26 @@ public class Enemy {
 			}
 		}
 	}
-		
+	
+	//TODO: ÜBERARBEITEN!
 	private boolean checkEnvironment() {	// Kontrolle der 4 Eckpunkte des Monsters
-		boolean colliding=false;
-		// Positionen der Kanten initialisieren
-		int mapPosLeft = (monsterList.get(index).x+monsterList.get(index).mx-((monsterList.get(index).x+monsterList.get(index).mx)%20))/20;
-		int mapPosRight = (monsterList.get(index).x+monsterList.get(index).mx+imgSizeMonsterX-((monsterList.get(index).x+monsterList.get(index).mx+imgSizeMonsterX)%20))/20;
-		int mapPosUp = (monsterList.get(index).y+monsterList.get(index).my-((monsterList.get(index).y+monsterList.get(index).my)%20))/20;
-		int mapPosDown = (monsterList.get(index).y+monsterList.get(index).my+imgSizeMonsterY-((monsterList.get(index).y+monsterList.get(index).my+imgSizeMonsterY)%20))/20;
-		// Ecken überprüfen (Überprüft wird die "künftige" Position)
-		if(LevelCreator.itemMap[mapPosLeft][mapPosUp]>0)					// 1. Fixpunkt
-			colliding = true;
-		if(LevelCreator.itemMap[mapPosRight][mapPosUp]>0)					// 2. Oben rechts
-			colliding = true;
-		if(LevelCreator.itemMap[mapPosRight][mapPosDown]>0)					// 3. Unten rechts
-			colliding = true;
-		if(LevelCreator.itemMap[mapPosLeft][mapPosDown]>0)					// 4. Unten links
-			colliding = true;
+		boolean colliding=checkCollideOnMiscObjekts(x-1+mx, y+1+my); // Diverse Objekte prüfen;
+		if(colliding==false) {
+			// Positionen der Kanten initialisieren
+			int mapPosLeft = (x+mx-((x+mx)%20))/20;
+			int mapPosRight = (x+mx+imgSizeMonsterX-((x+mx+imgSizeMonsterX)%20))/20;
+			int mapPosUp = (y+my-((y+my)%20))/20;
+			int mapPosDown = (y+my+imgSizeMonsterY-((y+my+imgSizeMonsterY)%20))/20;
+			// Ecken überprüfen (Überprüft wird die "künftige" Position)
+			if(LevelCreator.itemMap[mapPosLeft][mapPosUp]>0)					// 1. Fixpunkt
+				colliding = true;
+			if(LevelCreator.itemMap[mapPosRight][mapPosUp]>0)					// 2. Oben rechts
+				colliding = true;
+			if(LevelCreator.itemMap[mapPosRight][mapPosDown]>0)					// 3. Unten rechts
+				colliding = true;
+			if(LevelCreator.itemMap[mapPosLeft][mapPosDown]>0)					// 4. Unten links
+				colliding = true;
+		}
 		checkPlayerCollide();	// Überprüft, ob der Gegner mit einem Player kollidiert, falls ja wird lebensstatus des Spielers aktualisiert
 		return colliding;
 	}
@@ -188,7 +280,7 @@ public class Enemy {
 			boolean colliding = Intersect.isCollidingWithPlayer(a, monsterList.get(index).x, monsterList.get(index).y, imgSizeMonsterX, imgSizeMonsterY);
 	
 			if(colliding) {										// Wenn Gegner mit Spieler kollidiert:
-				Player.playerList.get(a).setHealthPoints(damage*(-1));	// Lebenspunkte abziehen -> wenn keine mehr übrig Spieler tot
+				Player.playerList.get(a).reduceHealthPoints(damage);	// Lebenspunkte abziehen -> wenn keine mehr übrig Spieler tot
 			}
 		}
 	}
@@ -209,14 +301,25 @@ public class Enemy {
 		}
 	}
 	
-	 private boolean checkItemMap(int posx, int posy) {	// Überprüft den Arraybereich an der angegebenen Stelle
+	private boolean checkItemMap(int posx, int posy) {	// Überprüft den Arraybereich an der angegebenen Stelle
+		boolean permission = !checkCollideOnMiscObjekts(posx, posy); // Diverse Objekte prüfen
+		if(permission) {
 			posx=(posx - (posx % 20 )) / 20;	// Umrechnung: Pixel in Planquadrat des Arrays
 			posy=(posy - (posy % 20 )) / 20;	// Umrechnung: Pixel in Planquadrat des Arrays
-	    	boolean permission=true;	// Ausgangswert
-	    	if(LevelCreator.itemMap[posx][posy]>0)
-	    		permission = false;		// Falls irgendein Objekt im Weg, ist permission = false
-	    	return permission;
-	    }
+		    if(LevelCreator.itemMap[posx][posy]>0)
+		    	permission = false;		// Falls irgendein Objekt im Weg, ist permission = false
+		}
+	    return permission;
+	}
+	
+	private boolean checkCollideOnMiscObjekts(int posx, int posy) {
+		for(int a=0; a<Traps.trapList.size(); a++) {
+			if(Intersect.isCollidingWithTrap(a, posx, posy, 1, 1)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	private int checkMovementPermission() {	// Überprüft das Array 'itemMap' auf Gegenstände & Objekte in Bewegungsrichtung und erteilt Bewegungsfreigabe oder -verbot
     	boolean permissionX = true;

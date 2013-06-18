@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<map>
+	<spawn x="0" y="3" />
+	
+	<goodie type="vest" x="40" y="60" />
+	
+	<goal x="47" y="21" width="2" height="2" />
+
+	<wall x="0" y="0" width="1" height="2" />
+	<wall x="1" y="0" width="47" height="1" />
+	<wall x="47" y="1" width="1" height="20" />
+	<wall x="47" y="23" width="1" height="2" />
+	<wall x="0" y="4" width="1" height="21" />
+	<wall x="0" y="25" width="48" height="1" />
+	<wall x="11" y="1" width="1" height="22" />
+	<wall x="36" y="2" width="1" height="23" />
+	<wall x="14" y="6" width="22" height="1" />
+	<wall x="12" y="12" width="22" height="1" />
+	
+	<mine x="1" y="4" />
+	<mine x="2" y="4" />
+	<mine x="3" y="4" />
+	<mine x="4" y="4" />
+	<mine x="5" y="4" />
+	<mine x="6" y="4" />
+	<mine x="7" y="4" />
+	<mine x="8" y="4" />
+	<mine x="9" y="4" />
+	<mine x="2" y="7" />
+	<mine x="3" y="7" />
+	<mine x="4" y="7" />
+	<mine x="5" y="7" />
+	<mine x="6" y="7" />
+	<mine x="7" y="7" />
+	<mine x="8" y="7" />
+	<mine x="9" y="7" />
+	<mine x="10" y="7" />
+	<mine x="1" y="9" />
+	<mine x="2" y="9" />
+	<mine x="3" y="9" />
+	<mine x="4" y="9" />
+	<mine x="5" y="9" />
+	<mine x="6" y="9" />
+	<mine x="7" y="9" />
+	<mine x="8" y="9" />
+	<mine x="9" y="9" />
+	<mine x="9" y="5" />
+	<mine x="5" y="5" />
+	<mine x="7" y="6" />
+	<mine x="3" y="6" />
+	
+	<enemy x="440" y="40" movex="1" movey="0" />
+	<enemy x="540" y="60" movex="1" movey="0" />
+	<enemy x="460" y="140" movex="1" movey="0" />
+	<enemy x="280" y="160" movex="1" movey="0" />
+	<enemy x="400" y="40" movex="0" movey="1" />
+	<enemy x="520" y="100" movex="0" movey="1" />
+	<enemy x="500" y="200" movex="0" movey="1" />
+	<enemy x="480" y="180" movex="0" movey="1" />
+	<enemy x="340" y="180" movex="0" movey="1" />
+	<enemy x="320" y="200" movex="0" movey="1" />
+	<enemy x="600" y="40" movex="1" movey="-1" />
+	<enemy x="320" y="40" movex="-1" movey="-1" />
+	
+	<bouncy x="920" y="400" movex="-1" movey="1" />
+	<bouncy x="740" y="100" movex="-1" movey="1" />
+	
+	<tracker x="620" y="460" />
+	<tracker x="680" y="400" />
+	
+	<npc id="1" x="60" y="20" look="down" />
+	<npc id="2" x="200" y="220" look="left" />
+	<npc id="3" x="700" y="100" look="up" />
+	
+	<checkpoint x="240" y="120" />
+	
+	<mana x="680" y="160" />
+	<mana x="460" y="120" />
+	<mana x="740" y="500" />
+	<mana x="240" y="280" />
+	
+	<credits x="260" y="280" value="10" />
+	<credits x="240" y="300" value="10" />
+	
+	<credits x="380" y="80" value="10" />
+	<credits x="420" y="80" value="10" />
+	<credits x="460" y="80" value="10" />
+	<credits x="500" y="80" value="10" />
+	<credits x="540" y="80" value="10" />
+	
+	<credits x="380" y="200" value="10" />
+	<credits x="420" y="200" value="10" />
+	<credits x="460" y="200" value="10" />
+	<credits x="500" y="200" value="10" />
+	<credits x="540" y="200" value="10" />
+</map>

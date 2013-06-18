@@ -58,6 +58,20 @@ public class WeaponManager {
 		weaponManagerList.add(new WeaponManager());
 	}
 	
+	public static void resetWeaponInUseLists() {	// für jeden Spieler einen
+		for(int a=0; a<weaponManagerList.size(); a++) {
+			weaponManagerList.get(a).weaponInUseList.clear();
+		}
+		DisplayLine.setDisplay();
+	}
+	
+	public void addWeaponPrecisely(int sWeaponID, int sMagCount, int sMagSize) {
+		chooseWeapon(sWeaponID);
+		weaponInUseList.get(weaponInUseID).magCount = sMagCount;
+		weaponInUseList.get(weaponInUseID).currentMagSize = sMagSize;
+		updateData();
+	}
+	
 	public void chooseNextWeapon() {
 		if((weaponInUseID+1)<weaponInUseList.size()) {
 			chooseWeapon(weaponInUseList.get(weaponInUseID+1).weaponID);
@@ -105,5 +119,15 @@ public class WeaponManager {
 		ProjectileManager.updateData();
 		// Display aktualisieren
 		DisplayLine.setDisplay();
+	}
+	
+	public static int getMagCount(int playerID, int weaponInUseID) {
+		return weaponManagerList.get(playerID).weaponInUseList.get(weaponInUseID).magCount;
+	}
+	public static int getCurrentMagSize(int playerID, int weaponInUseID) {
+		return weaponManagerList.get(playerID).weaponInUseList.get(weaponInUseID).currentMagSize;
+	}
+	public static int getWeaponID(int playerID, int weaponInUseID) {
+		return weaponManagerList.get(playerID).weaponInUseList.get(weaponInUseID).weaponID;
 	}
 }

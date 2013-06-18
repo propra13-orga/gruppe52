@@ -1,7 +1,10 @@
 package the.game.java;
 
 import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 
@@ -95,9 +98,9 @@ public class Shop {
 		borderUp = fixPointY + (itemAreaFixPointY * squareLength);
 		borderDo = borderUp + (itemAreaHeight * iconFieldHeight);
 		
-		buttonBuy = getImage("shop/buttonBuy.png");
-		buttonBuyHover = getImage("shop/buttonBuyHover.png");
-		buttonBuyHoverNV = getImage("shop/buttonBuyHoverNotValid.png");
+		buttonBuy = DisplayManager.getImage("shop/buttonBuy.png");
+		buttonBuyHover = DisplayManager.getImage("shop/buttonBuyHover.png");
+		buttonBuyHoverNV = DisplayManager.getImage("shop/buttonBuyHoverNotValid.png");
 		//buttonBuySelected = getImage("shop/buttonBuySelected.png");
 		
 		buttonBuyBorderLe = borderRi;
@@ -593,10 +596,15 @@ public class Shop {
 	}
 	
 	/**     HILFSMETHODEN     */
-	public static Image getImage(String path) {	// bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
-    	ii = new ImageIcon(Shop.class.getResource(path));
-    	return ii.getImage();
-    }
+	private static Image getImage(String path) {	// bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
+		Image img = null;
+		try {
+			img = ImageIO.read(new File("src/the/game/java/" + path));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return img;
+	}
 	
 	/**     KAUFEN     */
 	private static void buyItem() {

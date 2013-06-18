@@ -108,6 +108,10 @@ public class Tracker {
 		else
 			return trackerList.get(trackerID).imgEnemyDead;
 	}
+	// Sonstige Abfragen
+	public static boolean isAlive(int trackerID) {
+		return trackerList.get(trackerID).alive;
+	}
 	
 	// Lebenspunkte
 	public void reduceHealthPoints(int reduce) {
@@ -115,13 +119,16 @@ public class Tracker {
 			healthPoints -= reduce;
 			if(healthPoints<=0) {
 				alive = false;
-				Goodies.createGoodie(x, y, 0);
+				Goodies.createCredits(x, y, 35);
 			}
 		}
 	}
 	
 	// move-Methode aktualisiert bei jedem Aufruf mit Hilfe der Laufvariablen die Position aller Tracker
 	public static void move() {
+		if(TemporaryItem.flagEnemyFreezed)
+			return;
+		
 		int faktor=1;
 		for(int a=0; a<trackerList.size(); a++) {	// geht alle Tracker aus der Liste durch
 			if(trackerList.get(a).alive) {
@@ -231,7 +238,7 @@ public class Tracker {
 			if(colliding) {
 				generalCollide = true;
 				if(pathFindingActive==false)
-					Player.playerList.get(a).setHealthPoints(damage*(-1));	// Lebenspunkte abziehen -> wenn keine mehr übrig Spieler tot
+					Player.playerList.get(a).reduceHealthPoints(damage);	// Lebenspunkte abziehen -> wenn keine mehr übrig Spieler tot
 			}
 		}
 		return generalCollide;

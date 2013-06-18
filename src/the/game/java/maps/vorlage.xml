@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<map>
+	<wall x="5" y="5" width="7" height="1" />
+	<mine x="6" y="7" width="2" height="3" />
+	<tracker x="" y="" />
+	<npc id="" x="" y="" look="" /> <!-- Inhalt für look: "up", "down", "right", "left"-->
+	<life x="" y="" />
+	<shield x="" y="" />
+	<checkpoint x="" y="" />
+	<shop x="" y="" />
+</map>

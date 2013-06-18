@@ -6,77 +6,118 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
+/**
+ * In dieser Klasse werden Checkpoints alle nötigen Eigenschaften zugewiesen.
+ * Ein Checkpoint kann zwei zustände haben. Entweder er ist unaktiviert, oder aktiviert.
+ * Wenn ein Checkpoint aktiviert ist und der Spieler stirbt, startet der Spieler an der position dieses Checkpoints.
+ * Wenn kein Checkpoint nach der Level-Startposition aktiviert wurde, dann startet der Spieler am Levelanfang
+ *
+ */
 public class Checkpoints {
 	private ImageIcon ii;
-	private Image check = setImagePath("checkpoint.png");				
-	private Image checkActivated = setImagePath("checkpoint_activated.png");	
+	private Image check = DisplayManager.getImage("checkpoint.png");							// Bild eines unaktiviertem Checkpoints auf map				
+	private Image checkActivated = DisplayManager.getImage("checkpoint_activated.png");		// Bild eines aktivierten Checkpoints auf map
+	private int imgSizeX = check.getWidth(null);									// Breite des Checkpoints (wird benötigt um zu überprüfen, ob Player und Checkpoint kollidieren)
+	private int imgSizeY = check.getHeight(null);									// Höhe des Checkpoints (wird benötigt um zu überprüfen, ob Player und Checkpoint kollidieren)
 	
 	public static List<Checkpoints> checkList = new ArrayList<Checkpoints>(); 		// Checkpoints werden 'archiviert'
 
-	int x=0;
-	int y=0;
-	static boolean isActivated;
+	private int x = 0;																// xPosition eines Checkpoints
+	private int y = 0;																// yPosition eines Checkpoints
+	private boolean isActivated;
+	private String tag;
+	private static int marker = 0;
 	
+	/*
+	 * Konstruktor der Klasse Checkpoints. Wenn ein Objekt der Klasse Checkpoint erstellt wird, wird dieses an position (posx, posy) mit dem
+	 * Bild eines unaktivierten Checkpoints dargestellt und die boolean-Variable isActivated wird vorerst auf false gesetzt
+	 */
 	public Checkpoints(int posx, int posy){
 		x=posx;
 		y=posy;
 		isActivated=false;
-		DisplayManager.displayImage(check, x, y, "Checkpoint");
+		marker++;
+		tag = "checkpoint" + marker;
+		DisplayManager.displayImage(check, x, y, tag);
+	}
+	public Checkpoints(int posx, int posy, boolean activated){
+		x=posx;
+		y=posy;
+		isActivated=activated;
+		marker++;
+		tag = "checkpoint" + marker;
+		if(isActivated)
+			DisplayManager.displayImage(checkActivated, x, y, tag);
+		else
+			DisplayManager.displayImage(check, x, y, tag);
 	}
 	
 	/*
-	 *  erstellt in LevelCaller einen unaktivitierten Checkpoint
+	 *  Fügt ein Objekt der Klasse Checkpoints der Liste aller Checkpoints hinzu
 	 */
 	public static void createCheckpoint(int posx, int posy) {
 		posy += LevelCreator.distancePix;							// Wegen Menuleiste oben
 		checkList.add(new Checkpoints(posx, posy));
 	}
+	public static void createCheckpoint(int posx, int posy, int isActivated) {
+		posy += LevelCreator.distancePix;							// Wegen Menuleiste oben
+		if(isActivated>0)
+			checkList.add(new Checkpoints(posx, posy, true));
+		else
+			checkList.add(new Checkpoints(posx, posy, false));
+	}
 	
 	/*
-	 * Stellt Bild des Checkpoints dar
+	 * Stellt Bild des Checkpoints dar, nachdem dieser aktiviert wurde.
+	 * Die Startposition des Spielers wird auf die Position des Checkpoints geändert
 	 */
-	public static void displayCheckpoint(){
-		for(int i=0; i<checkList.size(); i++){			// so viele Checkpoint's existieren
-			if(isActivated == true){
-				// 							Bild jedes Checkpoint's		X-Position		  Y-Position		Tag	
-				DisplayManager.removeChangeableImages("Checkpoint");
-				DisplayManager.displayImage(checkList.get(i).checkActivated, checkList.get(i).x, checkList.get(i).y, "Checkpoint"); // Checkpoint ist der Tag - siehe Display Manager
-				//DisplayManager.displayImage(checkList.get(i).checkActivated, checkList.get(i).x, checkList.get(i).y, "Checkpoint"); // Checkpoint ist der Tag - siehe Display Manager
-			}else{
-				
-				
-			}
+	public void doOnTouch(){
+		if(isActivated==false){
+			isActivated=true;													// Boolean isActivated = true
+			Savegame.savegame();
+			DisplayManager.removeChangeableImages(tag);				// alle Checkpoint-Bilder werden gelöscht
+			DisplayManager.displayImage(checkActivated, x, y, tag); 	// Bild eines aktiviertem Checkpoints wird dargestellt
 		}
 	}
 	
 	/*
 	 *  Überprüft, ob der Spieler mit einem Checkpoint kollidiert
 	 */
-	public static boolean checkPlayerCollide(){
-		// Jeder Spieler muss zusammen mit jedem Checkpoint überprüft werden
-		for(int i=0; i<Player.playerList.size(); i++){
-			for(int z=0; z<checkList.size(); z++){
-				// wenn: x<=PlayerX+20 && PlayerX<=x+20		&&		y<=PlayerY+20 && PlayerY<=y+20
-				// dh:   Player kollidiert vertikal					Player kollidiert horizontal
-				if(Player.playerList.get(i).getX()+Player.playerList.get(i).imageSizeX/*-*/>=checkList.get(z).getX() && Player.playerList.get(i).getX()<=checkList.get(z).getX()+20/*-*/ && Player.playerList.get(i).getY()+Player.playerList.get(i).imageSizeX/*-*/>=checkList.get(z).getY() && Player.playerList.get(i).getY()<=checkList.get(z).getY()+20/*-*/){
-					isActivated=true;
-					displayCheckpoint();							// malt das Bild mit Text
-				}
-			}
+	public static void checkPlayerCollideWithCheckpoint(int playerID){
+		for(int z=0; z<checkList.size(); z++){									// Jedes Objekt der Checkpoint-Liste muss überprüft werden
+			// In der Klasse Intersect kann auf Kollision mit Player überprüft werden. Folgende Parameter werden gebraucht:
+			// player ID, xPosition des Checkpoints, yPosition des Checkpoints, Breite des Checkpoints, Höhe des Checkpoints
+			if(Intersect.isCollidingWithPlayer(playerID, checkList.get(z).getX(), checkList.get(z).getY(), checkList.get(z).imgSizeX, checkList.get(z).imgSizeY)) {
+				checkList.get(z).doOnTouch();									// Wenn Kollision -> public void doOnTouch
+			}						
 		}
-		return isActivated;
 	}
-	
-    public Image setImagePath(String path) {						
-    	ii = new ImageIcon(this.getClass().getResource(path));
-    	Image img = ii.getImage();
-    	return img;
+	    
+    public static void removeAllCheckpoints() {
+    	for(int a=0; a<checkList.size(); a++) {
+			DisplayManager.removeChangeableImages(checkList.get(a).tag);
+		}
+    	checkList.clear();
     }
     
+    /*
+     * gibt xPosition zurück
+     */
     public int getX(){
     	return x;
     }
+    
+    /*
+     * gibt yPosition zurück
+     */
     public int getY(){
     	return y;
     }
+    public int getIsActivated(){
+    	if(isActivated)
+    		return 1;
+    	else
+    		return 0;
+    }
+    
 }

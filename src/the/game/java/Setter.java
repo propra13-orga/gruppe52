@@ -10,15 +10,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -31,25 +25,27 @@ public class Setter extends JPanel implements ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+		
 	public static Timer timer;	// erzeugt eine Variable timer des Typs Timer
     private ImageIcon ii;		// erzeugt eine Variable ii (ImageIcon) des Typs ImageIcon
     public static List<Image> imageList = new ArrayList<Image>();
     public static List<Integer> positionList = new ArrayList<Integer>();
     public static List<Long> timingList = new ArrayList<Long>();
     
+    private static JPanel jp;
+    
     // Initialisieren der benötigten Bilder
-    private Image wall = setImagePath("wall.png");
-    private Image trap = setImagePath("mine.gif");
-    private Image monster = setImagePath("enemy.gif");
-    private Image heart = setImagePath("heart.png");
+    //private Image wall = setImagePath("wall.png");
+    //private Image trap = setImagePath("mine.gif");
+    //private Image monster = setImagePath("enemy.gif");
+    //private Image heart = setImagePath("heart.png");
     private Image background = setImagePath("bg.png");
-    private Image projectile = setImagePath("projectile.png");
-    private Image menu = setImagePath("headmenu.png");
-    private Image finalGoal = setImagePath("goal.png");
+    //private Image projectile = setImagePath("projectile.png");
+    //private Image menu = setImagePath("headmenu.png");
+    //private Image finalGoal = setImagePath("goal.png");
     private Image layer = setImagePath("transparentLayer.png");
     private Image youDiedMenu = setImagePath("youdied.png");
-    private Image shield = setImagePath("shield.png");
+    //private Image shield = setImagePath("shield.png");
     
     
     public Setter(int levelNumber) {	// Konstruktor
@@ -60,32 +56,32 @@ public class Setter extends JPanel implements ActionListener {
         setFocusable(true);					// Kann fokussiert werden; Relevant für den Keylistener
         setBackground(Color.GRAY);			// Setzt Hintergrund auf Grau
         setDoubleBuffered(true);			// verhindert mögliches Flackern
+        setOpaque(true);					// setzt ein JPanel undurchsichtig
 
         new LevelCaller();					// erzeugt Objekt der Klasse LevelCaller
-        LevelCaller.setLevel(levelNumber);	// Leveldaten werden initialisiert; Parameter legt fest welches Level gestartet wird
-
+        
         Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY());		// erzeugt Objekt der Klasse Player: Fügt einen Spieler in das Spielfeld ein, an der durch die Parameter festgelegte Stelle
         //Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY()+16);	// (noch) zu Testzwecken wird ein zweiter Spieler erzeugt
         
+        LevelCaller.setLevel(levelNumber);	// Leveldaten werden initialisiert; Parameter legt fest welches Level gestartet wird
+        
         timer = new Timer(8, this);	// erzeugt ein Objekt timer der Klasse Timer; Parameter: legt den Aktualisierungsintervall fest (in millisekunden)
         timer.start();				// startet den timer
-    
+        
+        // JPanel
+        jp = this;
+        
         Controls.createControls();	// erstellt einen Controller (Für Steuerung zuständig)
     }
-    
+
 
     public void paint(Graphics g) {			// Erzeugt und platziert alle Grafiken
         super.paint(g);
-        long zeit = System.currentTimeMillis();
+        //long zeit = System.currentTimeMillis();
         
         Graphics2D g2d = (Graphics2D)g;
         
-        g2d.drawImage(background, 1, 1, this); 	// Hintergrundbild
-        
-        for(int a=0; a<((Runner.getWidthF()-(Runner.getWidthF()%20))/20); a++) {	// Titelmenü - Hintergrund darstellen
-        	g2d.drawImage(menu, a*20, 0, this);
-        }
-        
+        g2d.drawImage(background, 0, 0, this); 	// Hintergrundbild
         
         // Monster
 		for(int a=0; a<Enemy.monsterList.size(); a++) { // Setzt ein Icon für jeden erstellten Gegner
@@ -95,73 +91,31 @@ public class Setter extends JPanel implements ActionListener {
 		for(int a=0; a<Tracker.trackerList.size(); a++) { // Setzt ein Icon für jeden erstellten Tracker
 			g2d.drawImage(Tracker.getImg(a), Tracker.getX(a), Tracker.getY(a), this);
 		}
-		// Projectiles
-        for(int a=0; a<Projectile.projectileList.size(); a++) {	// Setzt ein Icon für jedes erstellte Projektil
-        	//g2d.drawImage(Projectile.projectileList.get(a).getPlayerIcon(), Player.playerList.get(a).getX(), Player.playerList.get(a).getY(), this);
-        	// TEST
-        	if(Projectile.projectileList.get(a).isValid())
-        		//g2d.drawString("o", Projectile.projectileList.get(a).getX(), Projectile.projectileList.get(a).getY());
-        		g2d.drawImage(Projectile.projectileList.get(a).projectile, Projectile.projectileList.get(a).getX(), Projectile.projectileList.get(a).getY(), this);
-        }
-        // Display Line
-		for(int a=0; a<DisplayLine.displayLineList.size(); a++) {
-			if(DisplayLine.displayLineList.get(a).isString) {
-				g2d.drawString(DisplayLine.displayLineList.get(a).magCount + "x", DisplayLine.displayLineList.get(a).x, DisplayLine.displayLineList.get(a).y);
-			} else {
-				g2d.drawImage(DisplayLine.displayLineList.get(a).img, DisplayLine.displayLineList.get(a).x, DisplayLine.displayLineList.get(a).y, this);
-			}
-		}
+		
+        
 		
 		
 		// DisplayList
 		for(int a=0; a<DisplayManager.displayList.size(); a++) {
-        		g2d.drawImage(DisplayManager.displayList.get(a).img, DisplayManager.displayList.get(a).x, DisplayManager.displayList.get(a).y, this);
-        }
-		// AnimationList
-		for(int a=0; a<DisplayManager.animationList.size(); a++) {
-			g2d.drawImage(DisplayManager.animationList.get(a).img, DisplayManager.animationList.get(a).x, DisplayManager.animationList.get(a).y, this);
-		}
-		
-		
-        
-        
-		// ChangeableList
-		for(int a=0; a<DisplayManager.changeableList.size(); a++) {
-        		g2d.drawImage(DisplayManager.changeableList.get(a).img, DisplayManager.changeableList.get(a).x, DisplayManager.changeableList.get(a).y, this);
+        	g2d.drawImage(DisplayManager.displayList.get(a).img, DisplayManager.displayList.get(a).x, DisplayManager.displayList.get(a).y, this);
         }
 		
-		// Player
-        for(int a=0; a<Player.playerList.size(); a++) {	// Setzt ein Icon für jeden erstellten Spieler
-        	g2d.drawImage(Player.playerList.get(a).getPlayerImage(), Player.playerList.get(a).getX(), Player.playerList.get(a).getY(), this);
-        }
+
+		DisplayManager.draw(g2d);
+        
 		
-		// FrontList
-		for(int a=0; a<DisplayManager.frontList.size(); a++) {
-			g2d.drawImage(DisplayManager.frontList.get(a).img, DisplayManager.frontList.get(a).x, DisplayManager.frontList.get(a).y, this);
-		}
 		
-		// ChangeableStringList
-		for(int a=0; a<DisplayManager.stringList.size(); a++) {
-		        g2d.drawString(DisplayManager.stringList.get(a).text, DisplayManager.stringList.get(a).x, DisplayManager.stringList.get(a).y);
-		        //System.out.println(DisplayManager.stringList.get(a).text+"   "+DisplayManager.stringList.get(a).x+"   "+DisplayManager.stringList.get(a).y);
-		}
-        
-        
-        
 		// You Died Menu
 		if(Player.showYouDiedImage) {
 			g2d.drawImage(layer, 0, 0, this);
 			g2d.drawImage(youDiedMenu, 200, 100, this);
 		}
 		
-		// TODO: LÖSCHEN
-		//g2d.drawImage(projectile, Controls.getDirectionMarkerX()+Runner.getCenterX(), Controls.getDirectionMarkerY()+Runner.getCenterY(), this);
-        
         Toolkit.getDefaultToolkit().sync();
         g.dispose();
         
         //if(System.currentTimeMillis()-zeit>4)
-			//System.out.println((System.currentTimeMillis()-zeit));
+		//	System.out.println((System.currentTimeMillis()-zeit));
     }
     
     public static void displayImage(Image img, int posx, int posy, int last) {	// TODO: Darstellung von endlischer Dauer
@@ -178,15 +132,20 @@ public class Setter extends JPanel implements ActionListener {
     	return img;
     }
     
+    public static JPanel getJPanel() {
+    	return jp;
+    }
+    
     
 
     public void actionPerformed(ActionEvent event) {	// Positionsdaten der bewegbaren Objekte aktualisieren und im Anschluss neu zeichnen
     	Enemy.move();
     	Tracker.move();
 	    Player.move();
-	    Item.setTime();
+	    TemporaryItem.updater();
 	    ProjectileManager.controlProjectiles();
 	    DisplayManager.updateDisplayTimers();
+	    Traps.updater();
     	repaint();		// neu zeichnen
     }
 

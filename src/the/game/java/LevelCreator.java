@@ -37,6 +37,9 @@ public class LevelCreator {
 		}
     }
     
+    public static void createWall(int pointX, int pointY){	// erstellt in der itemMap alle Tags für Wände
+		itemMap[pointX][pointY] = 1;		// Tag 1 = Wall
+	}
 	public static void createWall(int pointX, int pointY, int width, int height){	// erstellt in der itemMap alle Tags für Wände
 		//System.out.println("x:" + pointX + "   y:" + pointY + "    w:" + width + "    h:" + height);
 		pointY += distanceField;
@@ -47,21 +50,45 @@ public class LevelCreator {
 		}
 	}
 	
-	public static void createTrap(int pointX, int pointY){
-		pointY += distanceField;
-		itemMap[pointX][pointY] = 2;	// Tag 2 = Trap
+	public static void createTrap(int posx, int posy){
+		posy += distanceField;
+		//itemMap[pointX][pointY] = 2;	// Tag 2 = Trap
+		Traps.createMine(posx*20, posy*20);
+		//System.out.println(posx + "  " + posy);
+	}
+	public static void createTrap(int posx, int posy, int width, int height){
+		posy += distanceField;
+		for(int a=posx; a<width+posx; a++) {	// Spaltenweise
+			for(int b=posy; b<height+posy; b++) {
+				Traps.createMine(posx*20, posy*20);
+				//itemMap[a][b] = 2;		// Tag 2 = Trap
+			}
+		}
 	}
 	
-	public static void createHealthPoint(int pointX, int pointY){
-		pointY += distanceField;
-		itemMap[pointX][pointY] = 10;	// Tag 10 = Heart
+	public static void createGoodie(int posx, int posy, String type){
+		posy += distanceField;
+		Goodies.createGoodie(posx, posy, type);
 	}
 	
-	public static void createShield(int pointX, int pointY){
-		pointY += distanceField;
-		itemMap[pointX][pointY] = 11;	// Tag 11 = Shield
+	public static void createHealthPoint(int posx, int posy){
+		posy += distanceField;
+		Goodies.createGoodie(posx, posy, "heart");
 	}
 	
+	public static void createMana(int posx, int posy){
+		posy += distanceField;
+		Goodies.createGoodie(posx, posy, "mana");
+	}
+	
+	public static void createShield(int posx, int posy){
+		posy += distanceField;
+		Goodies.createGoodie(posx, posy, "shield");
+	}
+	
+	public static void createGoal(int pointX, int pointY){
+		itemMap[pointX][pointY] = 4;		// Tag 4 = Ziel
+	}
 	public static void createGoal(int pointX, int pointY, int width, int height){
 		pointY += distanceField;
 		for(int a=pointX; a<width+pointX; a++) {	// Spaltenweise

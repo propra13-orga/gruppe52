@@ -191,7 +191,8 @@ public class ProjectileManager {	// Managed den Vorgang des Schieﬂens
     
 
     private void createProjectile(int index) {
-    	Projectile.createProjectile((Player.playerList.get(index).getX() + Player.playerList.get(index).imageSizeX / 2), (Player.playerList.get(index).getY() + Player.playerList.get(index).imageSizeY / 2), bulletSpeed, damage, vigor, bulletSpread, imgProjectile, Controls.getDirectionMarkerX(), Controls.getDirectionMarkerY());
+    	//Projectile.createProjectile((Player.playerList.get(index).getX() + Player.playerList.get(index).imageSizeX / 2), (Player.playerList.get(index).getY() + Player.playerList.get(index).imageSizeY / 2), bulletSpeed, damage, vigor, bulletSpread, imgProjectile, Controls.getDirectionMarkerX(), Controls.getDirectionMarkerY());
+    	Projectile.createProjectile((Player.playerList.get(index).getX() + Player.playerList.get(index).imageSizeX / 2), (Player.playerList.get(index).getY() + Player.playerList.get(index).imageSizeY / 2), bulletSpeed, damage, vigor, bulletSpread, imgProjectile, Controls.getAngle(), "player");
 
     	//Projectile.createProjectile((Player.playerList.get(index).getX() + Player.playerList.get(index).imageSizeX / 2), (Player.playerList.get(index).getY() + Player.playerList.get(index).imageSizeY / 2), Player.playerList.get(index).getLastDirectionX() * bulletSpeed, Player.playerList.get(index).getLastDirectionY() * bulletSpeed, damage, vigor, bulletSpread, imgProjectile);
     }

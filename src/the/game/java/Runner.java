@@ -25,6 +25,7 @@ public class Runner extends JFrame {
 	public static int borderRi = width;
 	public static int borderUp = 20;
 	public static int borderDo = height;
+	public static boolean codeRunning = true;
 	//private static Cursor defaultCursor = StartWindow.getRunner().getCursor();
 
 	public Runner(int level) {	// Konstruktor #1 mit Levelwahl

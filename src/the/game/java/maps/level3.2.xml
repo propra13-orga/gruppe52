@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<map>
+	<spawn x="21" y="1" />
+	
+	<goal x="0" y="25" width="3" height="2" />
+
+	<wall x="0" y="0" width="21" height="1" />
+	<wall x="22" y="0" width="26" height="1" />
+	<wall x="0" y="1" width="1" height="25" />
+	<wall x="5" y="2" width="1" height="18" />
+	<wall x="2" y="2" width="3" height="1" />
+	<wall x="1" y="4" width="3" height="1" />
+	<wall x="2" y="6" width="3" height="1" />
+	<wall x="1" y="8" width="3" height="1" />
+	<wall x="2" y="10" width="3" height="1" />
+	<wall x="1" y="12" width="3" height="1" />
+	<wall x="2" y="14" width="3" height="1" />
+	<wall x="2" y="15" width="1" height="3" />
+	<wall x="3" y="17" width="1" height="1" />
+	<wall x="1" y="19" width="4" height="1" />
+	<wall x="1" y="21" width="16" height="1" />
+	<wall x="2" y="25" width="46" height="1" />
+	<wall x="2" y="23" width="1" height="2" />
+	<wall x="4" y="22" width="1" height="2" />
+	<wall x="6" y="23" width="1" height="2" />
+	<wall x="10" y="23" width="1" height="2" />
+	<wall x="14" y="23" width="1" height="2" />
+	<wall x="8" y="22" width="1" height="2" />
+	<wall x="12" y="22" width="1" height="2" />
+	<wall x="16" y="23" width="26" height="1" />
+	<wall x="16" y="22" width="1" height="1" />
+	<wall x="18" y="21" width="28" height="1" />
+	<wall x="41" y="22" width="1" height="1" />
+	<wall x="43" y="23" width="1" height="2" />
+	<wall x="45" y="22" width="1" height="2" />
+	<wall x="47" y="1" width="1" height="24" />
+	<wall x="6" y="15" width="13" height="1" />
+	<wall x="20" y="15" width="7" height="1" />
+	<wall x="28" y="15" width="16" height="1" />
+	<wall x="7" y="19" width="16" height="1" />
+	<wall x="13" y="17" width="4" height="1" />
+	<wall x="18" y="17" width="5" height="1" />
+	<wall x="7" y="17" width="1" height="2" />
+	<wall x="11" y="17" width="1" height="2" />
+	<wall x="9" y="16" width="1" height="2" />
+	<wall x="13" y="16" width="1" height="1" />
+	<wall x="18" y="16" width="1" height="1" />
+	<wall x="18" y="2" width="1" height="13" />
+	<wall x="22" y="18" width="1" height="1" />
+	<wall x="24" y="17" width="1" height="4" />
+	<wall x="26" y="19" width="21" height="1" />
+	<wall x="30" y="17" width="16" height="1" />
+	<wall x="28" y="16" width="1" height="2" />
+	<wall x="26" y="17" width="1" height="2" />
+	<wall x="7" y="2" width="11" height="1" />
+	<wall x="7" y="3" width="1" height="11" />
+	<wall x="8" y="13" width="9" height="1" />
+	<wall x="16" y="4" width="1" height="9" />
+	<wall x="9" y="4" width="7" height="1" />
+	<wall x="9" y="5" width="1" height="7" />
+	<wall x="10" y="11" width="5" height="1" />
+	<wall x="14" y="6" width="1" height="5" />
+	<wall x="11" y="6" width="3" height="1" />
+	<wall x="11" y="7" width="1" height="3" />
+	<wall x="12" y="9" width="1" height="1" />
+	<wall x="20" y="1" width="1" height="11" />
+	<wall x="19" y="13" width="2" height="1" />
+	<wall x="20" y="14" width="1" height="1" />
+	<wall x="22" y="1" width="1" height="6" />
+	<wall x="22" y="8" width="1" height="4" />
+	<wall x="28" y="1" width="1" height="13" />
+	<wall x="22" y="13" width="6" height="1" />
+	<wall x="23" y="7" width="4" height="1" />
+	<wall x="26" y="8" width="1" height="4" />
+	<wall x="24" y="9" width="1" height="4" />
+	<wall x="26" y="1" width="1" height="3" />
+	<wall x="24" y="2" width="1" height="4" />
+	<wall x="25" y="5" width="3" height="1" />
+	<wall x="30" y="2" width="1" height="13" />
+	<wall x="31" y="2" width="11" height="1" />
+	<wall x="41" y="3" width="1" height="11" />
+	<wall x="32" y="4" width="1" height="10" />
+	<wall x="33" y="13" width="8" height="1" />
+	<wall x="33" y="4" width="7" height="1" />
+	<wall x="39" y="5" width="1" height="7" />
+	<wall x="34" y="11" width="5" height="1" />
+	<wall x="34" y="6" width="1" height="5" />
+	<wall x="35" y="6" width="3" height="1" />
+	<wall x="37" y="7" width="1" height="3" />
+	<wall x="36" y="9" width="1" height="1" />
+	<wall x="43" y="2" width="1" height="13" />
+	<wall x="44" y="2" width="2" height="1" />
+	<wall x="45" y="4" width="2" height="1" />
+	<wall x="44" y="6" width="2" height="1" />
+	<wall x="45" y="8" width="2" height="1" />
+	<wall x="44" y="10" width="2" height="1" />
+	<wall x="45" y="12" width="1" height="5" />
+	<wall x="46" y="12" width="1" height="1" />
+	
+	<enemy x="800" y="20" movex="1" movey="0" />
+	<enemy x="260" y="60" movex="1" movey="0" />
+	<enemy x="420" y="240" movex="1" movey="0" />
+	<enemy x="520" y="280" movex="1" movey="0" />
+	<enemy x="360" y="360" movex="1" movey="0" />
+	<enemy x="760" y="360" movex="1" movey="0" />
+	<enemy x="560" y="400" movex="1" movey="0" />
+	<enemy x="600" y="480" movex="1" movey="0" />
+	<enemy x="120" y="100" movex="0" movey="1" />
+	<enemy x="840" y="140" movex="0" movey="1" />
+	<enemy x="300" y="180" movex="0" movey="1" />
+	<enemy x="660" y="200" movex="0" movey="1" />
+	<enemy x="880" y="260" movex="0" movey="1" />
+	<enemy x="20" y="300" movex="0" movey="1" />
+	
+	<life x="720" y="180" />
+	
+	<shield x="240" y="180" />
+	
+	<npc id="10" x="440" y="140" look="left" />
+	
+	<shop x="420" y="160" />
+	
+	<mana x="540" y="40" />
+	<mana x="60" y="340" />
+	<mana x="420" y="380" />
+	<mana x="920" y="280" />
+	
+	<credits x="240" y="300" value="10" />
+	<credits x="280" y="300" value="10" />
+	<credits x="320" y="300" value="10" />
+	<credits x="200" y="300" value="10" />
+	<credits x="160" y="300" value="10" />
+	<credits x="120" y="300" value="10" />
+	
+	<credits x="720" y="300" value="10" />
+	<credits x="680" y="300" value="10" />
+	<credits x="640" y="300" value="10" />
+	<credits x="760" y="300" value="10" />
+	<credits x="800" y="300" value="10" />
+	<credits x="840" y="300" value="10" />
+</map>

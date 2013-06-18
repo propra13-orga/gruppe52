@@ -10,365 +10,128 @@ import java.util.Random;
 public class Projectile {		// steuert alle einzelnen Projektile und überprüft Treffer
 	
 	public static List<Projectile> projectileList = new ArrayList<Projectile>();
-	private int x;
-	private int y;
-	//private int speedx;
-	//private int speedy;
+	public List<String> alreadyList = new ArrayList<String>();
+	private double x;
+	private double y;
 	private int damage;
 	private int bulletSpread;
-	//private int currentSpread;
-	//private int currentSpreadDir;
 	private int vigor;
 	private boolean valid;
-    public Image projectile;	// playericon
+    public Image projectile;
     private int imgSizeX;
     private int imgSizeY;
+    private String origin;
     private static int borderUp = Runner.borderUp;
     private static int borderDo = Runner.borderDo;
     private static int borderLe = Runner.borderLe;
     private static int borderRi = Runner.borderRi;
     
-    private double gradient;
-    private boolean xIsRelevantAxis;
-    private boolean isRight;
-    private boolean isUp;
-    private int mx;
-    private int my;
-    private double gradientCounter;
+    private double mx;
+    private double my;
     private int speed;
-    private boolean directAxisFlag;
-	private int currentSpreadDir;
-	private int currentSpreadCounter;
+	private int angle;
+	
+	private Image hitWall = DisplayManager.getImage("hit_wall.png");
+	private Image hitBlood = DisplayManager.getImage("hit_blood.png");
+	private Image hitColorRed = DisplayManager.getImage("hit_color_red.png");
+	private Image hitColorPink = DisplayManager.getImage("hit_color_pink.png");
+	private Image hitColorYellow = DisplayManager.getImage("hit_color_yellow.png");
+	private Image hitColorBlue = DisplayManager.getImage("hit_color_blue.png");
+	private Image hitColorGreen = DisplayManager.getImage("hit_color_green.png");
     
-    private static Random random = new Random();
+    public static Random random = new Random();
     
-    // Bilder laden
-    // TODO: Bilder hier vorladen, damit sie nicht jedesmal in displayManager neu geladen werden müssen
-    
-    /*
-    private Projectile(int startx, int starty, int spdx, int spdy, int sDamage, int sVigor, int spread, Image imgProjectile) {
-		valid = true;
-		speedx = spdx;
-		speedy = spdy;
-		damage = sDamage;	// Schadenspunkte
-		bulletSpread = spread;
-		if(bulletSpread>0)
-			setBulletSpread();	// verarbeitet bulletSpread, um es kompatibel zu machen
-		currentSpread = 0;
-		// virgor korrigieren ! Es werden pro Objekt mehrere Einheiten von virgor abgezogen (pro Überprüfung 1)!
-		vigor = sVigor;		// Anzahl an Objekten, die durchschlagen werden können	// sollte besser aus Weapon abfragen	// TODO Durchschlagskraft
-		// TODO bool hitanimation = true
-		// TODO hitanimation festlegen
-		// TODO bool friendlyfire = true
-		projectile = imgProjectile;
-		imgSizeX = projectile.getWidth(null);
-		imgSizeY = projectile.getHeight(null);
-		x = startx;
-		y = starty - imgSizeY / 2;	// korrigiert zusätzlich den Startpunkt des Projektils
-	}
-    */
-    
-	private Projectile(int startx, int starty, int bulletSpeed, int bulletDamage, int bulletVigor, int spread, Image imgProjectile, int gradX, int gradY) {
-		valid = true;
-		speed = bulletSpeed;
-		damage = bulletDamage;	// Schadenspunkte
-		vigor = bulletVigor;		// Anzahl an Objekten, die durchschlagen werden können	// sollte besser aus Weapon abfragen	// TODO Durchschlagskraft
+    /**     KONSTRUKTOR     */
+	private Projectile(int startx, int starty, int bulletSpeed, int bulletDamage, int bulletVigor, int spread, Image imgProjectile, int bulletAngle, String bulletOrigin) {
+		valid = true;							// Gültigkeit
+		speed = bulletSpeed;					// Geschwindikeit (Multiplikator)
+		damage = bulletDamage;					// Schadenspunkte
+		vigor = bulletVigor;					// Anzahl an Objekten, die durchschlagen werden können
+		origin = bulletOrigin;					// Tag für Herkunft um FriendlyFire auszuschließen
 		
-		projectile = imgProjectile;
-		imgSizeX = projectile.getWidth(null);
-		imgSizeY = projectile.getHeight(null);
+		projectile = imgProjectile;				// Projektilbild
+		imgSizeX = projectile.getWidth(null);	// Projektilbreite
+		imgSizeY = projectile.getHeight(null);	// Projektilhöhe
 		
-		x = startx;
-		y = starty - imgSizeY / 2;	// korrigiert zusätzlich den Startpunkt des Projektils
+		x = startx - imgSizeX / 2;				// Startposition x
+		y = starty - imgSizeY / 2;				// Startposition y		
+		angle = bulletAngle;					// Flugrichtung in Grad (0-359)
+		bulletSpread = spread;					// Spread
+		if(bulletSpread>0)						// Wenn Spread vorhanden:
+			setBulletSpread();					// Flugrichtung mit Spread verrechnen
 		
-		gradient = getGradient(gradX, gradY);
-		mx = 0;
-		my = 0;
-		initializeMovementVars();
-		
-		bulletSpread = spread;
-		if(bulletSpread>0)
-			setBulletSpread();
-		
-		gradientCounter = 0;
+		mx = Math.cos(angle*Math.PI/180) * speed;			// X-Steigung aus der Gradzahl berechnen: (Winkel*Pi/180) um Grad in Bogenmaß umzurechnen und für cos() kompatibel zu machen
+		my = Math.sin(angle*Math.PI/180) * (-1) * speed;	// Y-Steigung aus der Gradzahl berechnen: (Winkel*Pi/180) um Grad in Bogenmaß umzurechnen und für sin() kompatibel zu machen, *(-1) da y-Achse verkehrt herum
 	}
 	// TODO bool hitanimation = true
 	// TODO hitanimation festlegen
 	// TODO bool friendlyfire = true
-	
-	/*
-	public static void createProjectile(int startx, int starty, int spdx, int spdy, int sDamage, int sVigor, int spread, Image imgProjectile) {
-		projectileList.add(new Projectile(startx, starty, spdx, spdy, sDamage, sVigor, spread, imgProjectile));
-	}
-	*/
-	public static void createProjectile(int startx, int starty, int speed, int sDamage, int sVigor, int spread, Image imgProjectile, int dirX, int dirY) {
-		projectileList.add(new Projectile(startx, starty, speed, sDamage, sVigor, spread, imgProjectile, dirX, dirY));
-	}
 
-	/*
-    private Image setImage(String path) {
-    	ii = new ImageIcon(this.getClass().getResource(path));
-    	Image img = ii.getImage();
-    	return img;
-    }
-    */
+	private Image getHitImage(){
+		int randomColor = random.nextInt(5);// = (int) (Math.random()*10);
+		switch (randomColor){
+		case 0:
+			return hitColorRed;
+		case 1:
+			return hitColorPink;
+		case 2:
+			return hitColorBlue;
+		case 3:
+			return hitColorYellow;
+		case 4:
+			return hitColorGreen;
+		default:
+			return hitBlood;
+		}
+	}
 	
+	/**     PROJEKTIL ERZEUGEN     */
+	public static void createProjectile(int startx, int starty, int speed, int sDamage, int sVigor, int spread, Image imgProjectile, int angle, String bulletOrigin) {
+		projectileList.add(new Projectile(startx, starty, speed, sDamage, sVigor, spread, imgProjectile, angle, bulletOrigin));
+	}
+	
+	/**     MOVE-METHODEN     */
 	public static void move() {
-		int counter = 0;
-		for(int a=0; a<projectileList.size(); a++) {
-			projectileList.get(a).doMove();
-			counter++;
+		int counter = 0;								// Projektil-Zähler
+		for(int a=0; a<projectileList.size(); a++) {	// Alle Projektile in der Liste durchgehen
+			counter += projectileList.get(a).doMove();				// Ausgewähltes Projektil bewegen und bei Erfolg den Zähler inkrementieren
 		}
 		
-		if(counter==0 && projectileList.size()>0)				// Wenn Liste keine gültigen Projektile mehr enthält:
-			projectileList.clear();	// Liste leeren
+		if(counter==0 && projectileList.size()>0)		// Wenn Projektile vorhanden, aber keines mehr Gültig ist:
+			projectileList.clear();						// Liste leeren
 	}
 
-	
-	private void doMove() {
+	private int doMove() {
 		if(valid) {
 			if(checkCollideEnvironment()==false) {	// wenn etwas aus itemMap getroffen wird, nicht weiter machen
 				
-				updateMovementVars();	// MoveVariablen aktualisieren
-				updatePosition();		// Berechnet neue Position (mit Spread!)	
+				x += mx;				// x-Position verrechnen
+				y += my;				// y-Position verrechnen
 				checkCollide();			// Überprüfen, ob irgendetwas mit sterbliches getroffen wurde
 			}
+			return 1;
 		}
+		return 0;
 	}
 	
-	private void updatePosition() {
-		if(bulletSpread<=0) {									// Projektile ohne Spread
-			x += mx;												// Position X mit speed verrechnen
-			y += my;												// Position Y mit speed verrechnen
-		} else {												// Projektile mit Spread
-			currentSpreadCounter++;									// Zähler +1
-			if(currentSpreadCounter>bulletSpread) {					// Wenn Zähler > Spread, dann einmalige Richtungsabweichung
-				currentSpreadCounter = 0;							// Zähler zurücksetzen
-				int generalSpread = 2;
-				if(currentSpreadDir<1) {						// Wenn Abweichung in Richtung 0:
-					if(mx==0) {										// Wenn mx 0:
-						x += generalSpread;							// Abweichung anpassen
-						y += my;
-					} else if(my==0) {								// Wenn my 0:
-						y += generalSpread;							// Abweichung anpassen
-						x += mx;									// Position X mit speed verrechnen
-					} else {										// Wenn diagonal:
-						if(mx>0)
-							x += mx + generalSpread+1;				// Abweichung anpassen (für positiven speed) (+1 da diagonal mehr Strecke zurückgelegt wird! Der SpreadWinkel würde dadurch sonst zu klein werden.
-						else
-							x += mx - generalSpread+1;				// Abweichung anpassen (für negativen speed)
-						y += my;									// Abweichung anpassen
-					}
-				} else {										// Wenn Abweichung in Richtung 1:
-					if(mx==0) {										// Wenn mx 0:
-						x -= generalSpread;							// Abweichung anpassen
-						y += my;
-					} else if(my==0) {								// Wenn my 0:
-						y -= generalSpread;							// Abweichung anpassen
-						x += mx;
-					} else {										// Wenn diagonal:
-						if(my>0)
-							y += my + generalSpread+1;				// Abweichung anpassen (für positiven speed)
-						else
-							y += my - generalSpread+1;				// Abweichung anpassen (für negativen speed)
-						x += mx;									// Position X mit speed verrechnen
-					}
-				}								
-			} else {																		// Wenn Zähler <= Spread, dann keine Abweichung
-				x += mx;						// Position X mit speed verrechnen
-				y += my;						// Position Y mit speed verrechnen
-			}
-		}
-	}
-	
-	private void updateMovementVars() {
-		//Laufrichtung
-		if(directAxisFlag==false) {
-			gradientCounter++; //(EHEMALS)
-			//gradientCounter += (double)speed;	// TODO: Anpassen, so dass die Abstände nicht = speed sind pro änderung
-			
-			if(isRight) {					// RECHTS
-				if(xIsRelevantAxis) {		// X IST HAUPTACHSE
-					
-					if(isUp) {			// UP (right)
-						if(gradientCounter>=gradient*(-1)) {
-							my = (-1) * speed;
-							gradientCounter -= Math.abs(gradientCounter);
-						} else {
-							my = 0;
-						}
-					} else {									// DOWN (right)
-						if(gradientCounter>=gradient) {
-							my = 1 * speed;
-							gradientCounter -= Math.abs(gradientCounter);
-						} else {
-							my = 0;
-						}
-					}
-					
-				} else {											// Y IST HAUPTACHSE
-					
-					if(isUp) {			// UP (right)
-						if(gradientCounter>=gradient*(-1)) {
-							mx = 1 * speed;
-							gradientCounter -= Math.abs(gradientCounter);
-						} else {
-							mx = 0;
-						}
-					} else {									// DOWN (right)
-						if(gradientCounter>=gradient) {
-							mx = 1 * speed;
-							gradientCounter -= Math.abs(gradientCounter);
-						} else {
-							mx = 0;
-						}
-					}
-					
-				}
-				
-			} else {											// LINKS
-				if(xIsRelevantAxis) {			// X IST HAUPTACHSE
-					
-					if(isUp) {			// UP (left)
-						if(gradientCounter>=gradient) {
-							my = (-1) * speed;
-							gradientCounter -= Math.abs(gradientCounter);
-						} else {
-							my = 0;
-						}
-					} else {									// DOWN (left)
-						if(gradientCounter>=gradient*(-1)) {
-							my = 1 * speed;
-							gradientCounter -= Math.abs(gradientCounter);
-						} else {
-							my = 0;
-						}
-					}
-					
-				} else {											// Y IST HAUPTACHSE
-					
-					if(isUp) {			// UP (left)
-						if(gradientCounter>=gradient) {
-							mx = (-1) * speed;
-							gradientCounter -= Math.abs(gradientCounter);
-						} else {	
-							mx = 0;
-						}
-					} else {									// DOWN (left)
-						if(gradientCounter>=gradient*(-1)) {
-							mx = (-1) * speed;
-							gradientCounter -= Math.abs(gradientCounter);
-						} else {	
-							mx = 0;
-						}
-					}
-					
-				}
-			}
-		}
-	}
-	
-	private void initializeMovementVars() {
-		//Laufrichtung
-		if(directAxisFlag) {
-			
-			if(isUp)
-				my = (-1) * speed;
-			else
-				my = 1 * speed;
-			
-			if(isRight)
-				mx = 1 * speed;
-			else
-				mx = (-1) * speed;
-			
-		} else {
-			gradientCounter++;
-			if(isRight) {				// RECHTS
-				if(xIsRelevantAxis) {		// X IST HAUPTACHSE
-					
-					if(isUp) {				// UP (right)
-						mx = 1 * speed;						
-						my = 0;
-					} else {				// DOWN (right)
-						mx = 1 * speed;
-						my = 0;
-					}
-				} else {					// Y IST HAUPTACHSE
-					if(isUp) {				// UP (right)
-						my = (-1) * speed;
-						mx = 0;
-					} else {				// DOWN (right)
-						my = 1 * speed;
-						mx = 0;
-					}
-				}
-			} else {					// LINKS
-				if(xIsRelevantAxis) {		// X IST HAUPTACHSE
-					
-					if(isUp) {				// UP (left)
-						mx = (-1) * speed;
-						my = 0;
-					} else {				// DOWN (left)
-						mx = (-1) * speed;
-						my = 0;
-					}
-				} else {					// Y IST HAUPTACHSE
-					if(isUp) {				// UP (left)
-						my = (-1) * speed;
-						mx = 0;
-					} else {				// DOWN (left)
-						my = 1 * speed;
-						mx = 0;
-					}
-				}
-			}
-		}
-	}
-	
-	
-	
+	/**     SPREAD     */
 	private void setBulletSpread() {
-		if(bulletSpread>10)
+		// Falsche Werte abfangen
+		if(bulletSpread>360)
+			bulletSpread = 360;
+		else if(bulletSpread<0)
 			bulletSpread = 1;
-		else
-			bulletSpread = (10 - random.nextInt(bulletSpread));	// Zufallszahl von 0 bis (exklusive) bulletSpread
-		currentSpreadDir = random.nextInt(2);					// Zufallszahl entscheidet Richtung für Spread
-	}
-	
-	/*
-	private double setBulletSpread() {
-		double spread = 1;
 		
-		if(bulletSpread>=100)
-			bulletSpread = 99;
-		
-		if(bulletSpread>0) {
-			//bulletSpread = (random.nextInt(bulletSpread));		// Zufallszahl von 0 bis (exklusive) bulletSpread
-			
-			bulletSpread = 100 - random.nextInt(bulletSpread);
-				
-			spread = (double)bulletSpread * 0.01;
-		
-			if(random.nextInt(2)<=0)
-				spread++;
-			else
-				spread = 1 - spread;
+		// Spread bestimmen
+		if(random.nextInt(2)>0) {					// Richtung entscheiden (Zahl 1 oder 0)
+			angle += random.nextInt(bulletSpread);	// Winkel mit Spread verrechnen
+		} else {
+			angle -= random.nextInt(bulletSpread);	// Winkel mit Spread verrechnen
 		}
-		return spread;
-	}
-	*/
-	
-	public int getX() {
-		return x;
-	}
-	public int getY() {
-		return y;
-	}
-	public boolean isValid() {
-		return valid;
+			
 	}
 	
+	/**     COLLIDE-METHODEN     */
 	private boolean checkCollideEnvironment() {
 		boolean colliding = false;
 		// Überprüft Border
@@ -376,9 +139,9 @@ public class Projectile {		// steuert alle einzelnen Projektile und überprüft Tr
 			colliding = true;
 		}
 		// Überprüfen in itemMap
-		if(LevelCreator.getItemMapDataUsingPixels(x+mx, y+my)>0) {
+		if(LevelCreator.getItemMapDataUsingPixels((int)(x+mx), (int)(y+my))>0) {
 			colliding = true;
-			DisplayManager.displayImage("hit_wall.png", x, y, 190);
+			DisplayManager.displayImage(hitWall, getX(), getY(), 190);
 		}
 		// Wenn kollidiert, dann nicht mehr gültig
 		if(colliding)
@@ -388,72 +151,116 @@ public class Projectile {		// steuert alle einzelnen Projektile und überprüft Tr
 	
 	private void checkCollide() {
 		// Überprüfen der Gegner
-		for(int a=0; a<Enemy.monsterList.size(); a++) {	// Wird für alle Gegner nacheinander überprüft
-			
-			boolean colliding = Intersect.isCollidingWithEnemy(a, x, y, imgSizeX, imgSizeY);
-			
-			if(colliding) {										// Wenn Gegner mit Gegner kollidiert:
-				int enemyMapPosLeft = Enemy.getX(a);
-				int enemyMapPosRight = Enemy.getX(a) + Enemy.getImgSizeX(a);
-				int enemyMapPosUp = Enemy.getY(a);
-				int enemyMapPosDown = Enemy.getY(a) + Enemy.getImgSizeY(a);
-				
-				Enemy.monsterList.get(a).reduceHealthPoints(damage);	// Healthpoints - Schaden
-				// TODO: Blutposition korrigieren
-				DisplayManager.displayImage("hit_blood.png", (enemyMapPosLeft-4+(enemyMapPosRight-enemyMapPosLeft)/2), (enemyMapPosUp-4+(enemyMapPosDown-enemyMapPosUp)/2), 190);
-				vigor--;
-				if(vigor<=0)
-					valid = false;
+		if(origin!="enemy" && valid) {
+			for(int a=0; a<Enemy.monsterList.size(); a++) {	// Wird für alle Gegner nacheinander überprüft
+				if(Enemy.isAlive(a) && isHitAlreadyReported("enemy" + a)==false) {
+					boolean colliding = Intersect.isCollidingWithEnemy(a, getX(), getY(), imgSizeX, imgSizeY);
+					
+					if(colliding) {										// Wenn Gegner mit Gegner kollidiert:
+						int enemyMapPosLeft = Enemy.getX(a);
+						int enemyMapPosRight = Enemy.getX(a) + Enemy.getImgSizeX(a);
+						int enemyMapPosUp = Enemy.getY(a);
+						int enemyMapPosDown = Enemy.getY(a) + Enemy.getImgSizeY(a);
+						
+						Enemy.monsterList.get(a).reduceHealthPoints(damage);	// Healthpoints - Schaden
+						
+						// TODO: Blutposition korrigieren
+						DisplayManager.displayImage(getHitImage(), (enemyMapPosLeft-4+(enemyMapPosRight-enemyMapPosLeft)/2), (enemyMapPosUp-4+(enemyMapPosDown-enemyMapPosUp)/2), 190);
+						vigor--;
+						if(vigor<=0)
+							valid = false;
+						else
+							addHitReport("enemy" + a);
+					}
+				}
 			}
 		}
 		
 		// Überprüfen der Tracker
-		for(int a=0; a<Tracker.trackerList.size(); a++) {	// Wird für alle Tracker nacheinander überprüft
-			
-			boolean colliding = Intersect.isCollidingWithTracker(a, x, y, imgSizeX, imgSizeY);
-			
-			if(colliding) {										// Wenn Gegner mit Gegner kollidiert:
-				int enemyMapPosLeft = Tracker.getX(a);
-				//int enemyMapPosRight = Tracker.getX(a) + Tracker.getImgSizeX(a);
-				int enemyMapPosUp = Tracker.getY(a);
-				//int enemyMapPosDown = Tracker.getY(a) + Enemy.getImgSizeY(a);
-				
-				Tracker.trackerList.get(a).reduceHealthPoints(damage);	// Healthpoints - Schaden
-				DisplayManager.displayImage("hit_blood.png", enemyMapPosLeft, enemyMapPosUp, 190);
-				vigor--;
-				if(vigor<=0)
-					valid = false;
+		if(origin!="tracker" && valid) {
+			for(int a=0; a<Tracker.trackerList.size(); a++) {	// Wird für alle Tracker nacheinander überprüft
+				if(Tracker.isAlive(a) && isHitAlreadyReported("tracker" + a)==false) {
+					boolean colliding = Intersect.isCollidingWithTracker(a, getX(), getY(), imgSizeX, imgSizeY);
+					
+					if(colliding) {										// Wenn Gegner mit Gegner kollidiert:
+						int enemyMapPosLeft = Tracker.getX(a);
+						//int enemyMapPosRight = Tracker.getX(a) + Tracker.getImgSizeX(a);
+						int enemyMapPosUp = Tracker.getY(a);
+						//int enemyMapPosDown = Tracker.getY(a) + Enemy.getImgSizeY(a);
+						
+						Tracker.trackerList.get(a).reduceHealthPoints(damage);	// Healthpoints - Schaden
+						DisplayManager.displayImage(getHitImage(), enemyMapPosLeft, enemyMapPosUp, 190);
+						vigor--;
+						if(vigor<=0)
+							valid = false;
+						else
+							addHitReport("tracker" + a);
+					}
+				}
 			}
 		}
-		// TODO Überprüfen der Player
 		
+		// Überprüfen der Player
+		if(origin!="player" && valid) {
+			for(int a=0; a<Player.playerList.size(); a++) {	// Wird für alle Spieler nacheinander überprüft
+				
+				if(isHitAlreadyReported("player" + a)==false) {
+					boolean colliding = Intersect.isCollidingWithPlayer(a, getX(), getY(), imgSizeX, imgSizeY);
+					
+					if(colliding) {										// Wenn Gegner mit Gegner kollidiert:				
+						Player.playerList.get(a).reduceHealthPoints(damage);	// Healthpoints - Schaden
+						DisplayManager.displayImage(getHitImage(), Player.playerList.get(a).getX(), Player.playerList.get(a).getY(), 190);
+						vigor--;
+						if(vigor<=0)
+							valid = false;
+						else
+							addHitReport("player" + a);
+					}
+				}
+			}
+		}
+		
+		// Überprüfen der Traps
+		if(origin!="trap" && valid) {
+			for(int a=0; a<Traps.trapList.size(); a++) {	// Wird für alle Spieler nacheinander überprüft
+				if(Traps.getType(a)>0 && Traps.getValid(a) && isHitAlreadyReported("traps" + a)==false) {	// Minen sind somit ausgeschlossen und alle Traps, die nicht mehr gültig sind
+					boolean colliding = Intersect.isCollidingWithTrap(a, getX(), getY(), imgSizeX, imgSizeY);
+					
+					if(colliding) {										// Wenn Gegner mit Gegner kollidiert:				
+						Traps.trapList.get(a).reduceHealthPoints(damage);	// Healthpoints - Schaden
+						DisplayManager.displayImage(getHitImage(), Traps.getX(a), Traps.getY(a), 190);
+						vigor--;
+						if(vigor<=0)
+							valid = false;
+						else
+							addHitReport("trap" + a);
+					}
+				}
+			}
+		}
 	}
 	
-	private double getGradient(double dirx, double diry) {
-		
-		double gradient = 0;
-		xIsRelevantAxis = false;
-		if(dirx==0 || diry==0) {
-			directAxisFlag = true;
-		} else {
-			gradient = diry / dirx;					// Steigungsberechnung (y/x)
-			if(gradient<1 && gradient>(-1)) {		// Steigungsberechnung (x/y)
-				gradient = dirx / diry;	
-				xIsRelevantAxis = true;
-			}
-		}
-		
-		if(dirx<0)
-			isRight = false;
-		else
-			isRight = true;
-		if(diry<0)
-			isUp = true;
-		else
-			isUp = false;
-		
-		System.out.println(gradient);
-		
-		return gradient;
+	private void addHitReport(String tag) {
+		alreadyList.add(tag);
 	}
+	
+	private boolean isHitAlreadyReported(String tag) {	// überprüft, ob Objekt bereits getroffen wurde, um doppelten Schadensabzug zu verhindern
+		for(int a=0; a<alreadyList.size(); a++) {
+			if(alreadyList.get(a).equals(tag))
+				return true;
+		}
+		return false;
+	}
+	
+	/**     REQUESTS     */
+	public int getX() {
+		return (int)x;
+	}
+	public int getY() {
+		return (int)y;
+	}
+	public boolean isValid() {
+		return valid;
+	}
+	
 }

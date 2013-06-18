@@ -30,6 +30,8 @@ public class Controls {
 	private boolean isUp = false;
 	private boolean isRight = false;
 	
+	private double angle = 0;
+	
 	private Controls() {
 		// Steuerung - Bewegung
 		p1_Up = KeyEvent.VK_W;
@@ -64,14 +66,14 @@ public class Controls {
         	/**		BEWEGUNG	*/
         	// x-Achse
         	if(key==p1_Le)
-	        	Player.playerList.get(0).setMoveStatusX(-1, 1);
+	        	Player.playerList.get(0).setMoveStatusX(-1);
         	else if(key==p1_Ri)
-	        	Player.playerList.get(0).setMoveStatusX(1, 2);
+	        	Player.playerList.get(0).setMoveStatusX(1);
         	// y-Achse
         	if(key==p1_Up)
-	        	Player.playerList.get(0).setMoveStatusY(-1, 3);
+	        	Player.playerList.get(0).setMoveStatusY(-1);
         	else if(key==p1_Do)
-	        	Player.playerList.get(0).setMoveStatusY(1, 4);
+	        	Player.playerList.get(0).setMoveStatusY(1);
         	
         	/**		WAFFEN		*/
         	if(key==p1_Fire)
@@ -114,14 +116,14 @@ public class Controls {
         /**		BEWEGUNG	*/
     	// x-Achse
     	if(key==p1_Le)
-        	Player.playerList.get(0).setMoveStatusX(0, -1);
+        	Player.playerList.get(0).setMoveStatusX(0);
     	else if(key==p1_Ri)
-        	Player.playerList.get(0).setMoveStatusX(0, -2);
+        	Player.playerList.get(0).setMoveStatusX(0);
     	// y-Achse
     	if(key==p1_Up)
-        	Player.playerList.get(0).setMoveStatusY(0, -3);
+        	Player.playerList.get(0).setMoveStatusY(0);
     	else if(key==p1_Do)
-        	Player.playerList.get(0).setMoveStatusY(0, -4);
+        	Player.playerList.get(0).setMoveStatusY(0);
     	
     	/**		WAFFEN		*/
     	if(key==p1_Fire) {
@@ -136,11 +138,23 @@ public class Controls {
     			setMouseIsController(true);	// Maus zentrieren und zur Spielersteuerung benutzen (an/aus)
     		} else
     			setMouseIsController(!isMouseControlled);	// Maus zentrieren und zur Spielersteuerung benutzen (an/aus)
+    	} else if(key==KeyEvent.VK_ENTER) {
+    		System.out.println(NPC.npcPermission);
+    		if(NPC.shopPermission) {
+    			setMouseIsController(false);		// Maus zentrieren und zur Spielersteuerung benutzen (an/aus)
+    			new Shop();
+    		} else if(NPC.npcPermission) {
+    			NPC.setCollidedPicture();
+    		}
     	} else if(key==KeyEvent.VK_M) {
     		setMouseIsController(false);		// Maus zentrieren und zur Spielersteuerung benutzen (an/aus)
     		new Shop();
     	} else if(key==KeyEvent.VK_N) {
     		Tracker.trackerList.get(0).pathFinding();
+    	} else if(key==KeyEvent.VK_B) {
+    		Savegame.savegame();
+    	} else if(key==KeyEvent.VK_G) {
+    		ManaManager.useMana(0, 0);
     	}
     }
 	
@@ -161,7 +175,6 @@ public class Controls {
 		// TODO Auto-generated method stub
 		if(Shop.show)
 			Shop.receiveMouseKlick(e.getX(), e.getY());
-		
 	}
 	
 	public void mouseEntered(MouseEvent e) {
@@ -203,8 +216,10 @@ public class Controls {
 	
 	private void updatePlayerControlsData(MouseEvent e) {
 		if(isMouseControlled) {
-				captureMouseDirection(e);
-				mousePositionReset();
+			captureMouseDirection(e);
+			angle = setAngle(mousex, mousey);
+			mousePositionReset();
+			Player.playerList.get(0).setPlayerImage();
 		}
 	}
 	
@@ -224,13 +239,17 @@ public class Controls {
 		if((mousey+my)<100 && (mousey+my)>(-100))
 			mousey += my;
 		
+				
 		if(startCounter<1) {
+			angle = 0;
 			mousex = 0;
 			mousey = 0;
 			startCounter++;
 		}
 		
-		//System.out.println(Math.at);
+		getGradient(mousex, mousey);
+		
+		//System.out.println(angle);
 		//System.out.println(mousex +" | "+ mousey);
 		
 	}
@@ -243,6 +262,82 @@ public class Controls {
 		if(Double.isNaN(getangle))
 			getangle = 0;
         return getangle;
+	}
+	
+private double getGradient(double dirx, double diry) {
+		
+		double gradient = 0;
+		/*
+		boolean xIsRelevantAxis = false;
+		boolean directAxisFlag = false;
+		if(dirx==0 || diry==0) {
+			directAxisFlag = true;
+		} else {
+			gradient = diry / dirx;					// Steigungsberechnung (y/x)
+			if(gradient<1 && gradient>(-1)) {		// Steigungsberechnung (x/y)
+				gradient = dirx / diry;	
+				xIsRelevantAxis = true;
+			}
+		}
+		*/
+		
+		
+		
+		gradient = Math.toDegrees(Math.atan((double)(diry*(-1)) / dirx));
+		
+		if(dirx<0) {
+			isRight = false;
+		} else {
+			isRight = true;
+		} if(diry<0) {
+			isUp = true;
+		} else {
+			isUp = false;
+		}
+		
+		if(isRight && isUp) {
+			
+		} else if(isRight==false && isUp) {
+			gradient += 180;
+		} else if(isRight==false && isUp==false) {
+			gradient += 180;
+		} else if(isRight && isUp==false) {
+			gradient += 360;
+		}
+		
+		//System.out.println(gradient);
+		
+		return gradient;
+	}
+
+private double setAngle(double dirx, double diry) {
+	
+	double angle = Math.toDegrees(Math.atan((double)(diry*(-1)) / dirx));
+	
+	if(dirx<0)
+		isRight = false;
+	else
+		isRight = true;
+	if(diry<0)
+		isUp = true;
+	else
+		isUp = false;
+	
+	if(isRight==false && isUp) {
+		angle += 180;
+	} else if(isRight==false && isUp==false) {
+		angle += 180;
+	} else if(isRight && isUp==false) {
+		angle += 360;
+	}
+	
+	//System.out.println(angle);
+	
+	return angle;
+}
+	
+	public static int getAngle() {
+        return (int)controls.angle;
 	}
 /*
 	private void setCurrentDirection() {

@@ -15,7 +15,7 @@ public class Score {
 	public int scr;  //Score des Spielers
 	
 	private Score() {
-		scr = 6500;
+		scr = 100;
 	}
 	
 	public static List<Score> scoreList = new ArrayList<Score>();
@@ -34,6 +34,10 @@ public class Score {
 		}else{
 			scr=0;								// nur 0 oder positive Punktestände möglich
 		}
+	}
+	
+	public void setAbsoluteScore(int newScore) {
+		scr = newScore;
 	}
 	
 	/*public static void main(String[] args){

@@ -14,12 +14,25 @@ public class DisplayLine {
 	public int magCount;
 	public Image img;
 	private ImageIcon ii;
+	private String txt;
 	
 	private DisplayLine(int posx, int posy, String path) {
 		x = posx;
 		y = posy;
-		img = setImagePath(path);
+		img = DisplayManager.getImage(path);
 		isString = false;
+	}
+	private DisplayLine(int posx, int posy, Image i) {
+		x = posx;
+		y = posy;
+		img = i;
+		isString = false;
+	}
+	private DisplayLine(int posx, int posy, boolean dIsString, String msg) {
+		x = posx;
+		y = posy;
+		isString = true;
+		txt = msg;
 	}
 	private DisplayLine(int posx, int posy, boolean dIsString, int dMagCount) {
 		x = posx;
@@ -30,9 +43,15 @@ public class DisplayLine {
 	
 	public static void setDisplay() {
 		displayLineList.clear();
-		if(WeaponManager.weaponManagerList.get(0).weaponInUseList.get(WeaponManager.weaponManagerList.get(0).weaponInUseID).weaponID>0) {
-			setWeapon();
-			setBullets();
+		
+		if(Runner.codeRunning==false)
+			return;
+		
+		if(WeaponManager.weaponManagerList.get(0).weaponInUseList.size()>0) {
+			if(WeaponManager.weaponManagerList.get(0).weaponInUseList.get(WeaponManager.weaponManagerList.get(0).weaponInUseID).weaponID>0) {
+				setWeapon();
+				setBullets();
+			}
 		}
 		setHearts();
 	}
@@ -65,15 +84,9 @@ public class DisplayLine {
 	}
 	
 	private static void setHearts() {
-		for(int a=0; a<Player.playerList.get(0).getLives(); a++) {
+		for(int a=0; a<Player.playerList.get(0).getLives() && a<6; a++) {
 			displayLineList.add(new DisplayLine(a*20, 0, "heart.png"));
 		}
 	}
-	// TODO: HEARTS Lebensanzeige
-	
-    private Image setImagePath(String path) {	// bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
-    	ii = new ImageIcon(this.getClass().getResource(path));
-    	Image img = ii.getImage();
-    	return img;
-    }
+
 }
