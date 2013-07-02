@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
+import level.creator.java.*;
 
 public class Editor extends JFrame implements ActionListener {
 
@@ -65,7 +66,7 @@ public class Editor extends JFrame implements ActionListener {
     //private Image bg = setImagePath("bg.png");
 	
 	public Editor(){
-		addKeyListener(new TAdapter());		// Fügt KeyListener hinzu und erstellt ein neues Objekt der Klasse TAdapter, welches die Methoden 'keyReleased' und 'keyPressed' überschreibt
+		//addKeyListener(new TAdapter());		// Fügt KeyListener hinzu und erstellt ein neues Objekt der Klasse TAdapter, welches die Methoden 'keyReleased' und 'keyPressed' überschreibt
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//setSize(966, 900);
@@ -262,7 +263,7 @@ public class Editor extends JFrame implements ActionListener {
 		//repaint();
 		
 	}
-
+/*
     private class TAdapter extends KeyAdapter {
         public void keyReleased(KeyEvent event) {		// Wenn Taste losgelassen wird:
         	currentpos.keyReleased(event);
@@ -272,6 +273,6 @@ public class Editor extends JFrame implements ActionListener {
         	currentpos.keyPressend(event);
         }
     }
-	
+	*/
 	
 }

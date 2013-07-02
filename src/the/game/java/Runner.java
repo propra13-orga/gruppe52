@@ -4,6 +4,7 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import javax.swing.JFrame;
 
@@ -26,6 +27,8 @@ public class Runner extends JFrame {
 	public static int borderUp = 20;
 	public static int borderDo = height;
 	public static boolean codeRunning = true;
+	
+	public static Random random = new Random();
 	//private static Cursor defaultCursor = StartWindow.getRunner().getCursor();
 
 	public Runner(int level) {	// Konstruktor #1 mit Levelwahl
@@ -103,10 +106,3 @@ public class Runner extends JFrame {
 		}
 	}
 }
-
-
-
-
-
-
-

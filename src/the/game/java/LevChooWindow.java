@@ -70,9 +70,9 @@ public class LevChooWindow extends JFrame implements ActionListener {
 			
 			//Welches Level wurde ausgewählt?
 			if(eins.isSelected()==true){
-				StartWindow.fenster(2);  				// Level 1
+				StartWindow.fenster(3);  				// Level 1
 			}else if(zwei.isSelected()==true){
-				StartWindow.fenster(7);  				// Level 2
+				StartWindow.fenster(6);  				// Level 2
 			}else{
 				StartWindow.fenster(9);  				// Level 3
 			}

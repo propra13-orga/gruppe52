@@ -73,41 +73,41 @@ public class SaxParser extends DefaultHandler {
         	   }
         	   
         	   break;
-           case "dalek":
+           case "dalek":	// TODO: EINSTELLEN WELCHER FEUERTYP!
         	   Traps.createDalek(
             			   Integer.parseInt(attributes.getValue("x")),
             			   Integer.parseInt(attributes.getValue("y")));
         	   break;
            case "enemy":
         	   if(attributes.getValue("movex")!=null && attributes.getValue("movey")!=null) { //TODO:
-        		   Enemy.createMonster(
-            			   Integer.parseInt(attributes.getValue("x")),
-            			   Integer.parseInt(attributes.getValue("y")),
-            			   Integer.parseInt(attributes.getValue("movex")),
-            			   Integer.parseInt(attributes.getValue("movey")));
+        		   Enemy.createEnemy(
+        				   Double.parseDouble(attributes.getValue("x")),
+            			   Double.parseDouble(attributes.getValue("y")),
+            			   Double.parseDouble(attributes.getValue("movex")),
+            			   Double.parseDouble(attributes.getValue("movey")));
         	   } else {
-        		   Enemy.createMonster(
-            			   Integer.parseInt(attributes.getValue("x")),
-            			   Integer.parseInt(attributes.getValue("y")));
+        		   Enemy.createEnemy(
+        				   Double.parseDouble(attributes.getValue("x")),
+        				   Double.parseDouble(attributes.getValue("y")));
         	   }
         	   break;
            case "bouncy":
         	   if(attributes.getValue("movex")!=null && attributes.getValue("movey")!=null) { //TODO:
         		   Enemy.createBouncy(
-            			   Integer.parseInt(attributes.getValue("x")),
-            			   Integer.parseInt(attributes.getValue("y")),
-            			   Integer.parseInt(attributes.getValue("movex")),
-            			   Integer.parseInt(attributes.getValue("movey")));
+        				   Double.parseDouble(attributes.getValue("x")),
+        				   Double.parseDouble(attributes.getValue("y")),
+        				   Double.parseDouble(attributes.getValue("movex")),
+        				   Double.parseDouble(attributes.getValue("movey")));
         	   } else {
         		   Enemy.createBouncy(
-            			   Integer.parseInt(attributes.getValue("x")),
-            			   Integer.parseInt(attributes.getValue("y")));
+        				   Double.parseDouble(attributes.getValue("x")),
+        				   Double.parseDouble(attributes.getValue("y")));
         	   }
         	   break;
            case "tracker":
-        	   Tracker.createTracker(
-        			   Integer.parseInt(attributes.getValue("x")),
-        			   Integer.parseInt(attributes.getValue("y")));
+        	   Enemy.createTracker(
+        			   Double.parseDouble(attributes.getValue("x")),
+        			   Double.parseDouble(attributes.getValue("y")));
         	   break;
            case "npc":
         	   NPC.createNPC(
@@ -156,11 +156,11 @@ public class SaxParser extends DefaultHandler {
 	        				   Integer.parseInt(attributes.getValue("hp")));			// Spieler als Healthpoints zuweisen
         	   }
         	   if(attributes.getValue("mana")!=null)							// Mana auslesen und zuweisen
-        		   Mana.manaList.get(0).setAbsoluteMana(
+        		   Player.getMana(0).setAbsoluteMana(
         				   Integer.parseInt(attributes.getValue("mana")));
-        	   if(attributes.getValue("credits")!=null)							// Credits auslesen und zuweisen
-        		   Score.scoreList.get(0).setAbsoluteScore(
-        				   Integer.parseInt(attributes.getValue("credits")));	   
+        	   if(attributes.getValue("score")!=null)							// Credits auslesen und zuweisen
+        		   Player.playerList.get(0).score.setAbsoluteScore(
+        				   Integer.parseInt(attributes.getValue("score")));	   
         	   break;
            case "checkpoint":
         	   if(attributes.getValue("activated")==null) {
@@ -194,7 +194,7 @@ public class SaxParser extends DefaultHandler {
         	   }
         	   break;
            case "weapon":																			// WAFFEN
-        	   WeaponManager.weaponManagerList.get(Integer.parseInt(attributes.getValue("playerid"))).addWeaponPrecisely(	// dem jeweiligen Spieler ansprechen
+        	   Player.playerList.get(Integer.parseInt(attributes.getValue("playerid"))).addWeaponPrecisely(	// dem jeweiligen Spieler ansprechen
         			   Integer.parseInt(attributes.getValue("weaponid")),													// Waffe auswählen
         			   Integer.parseInt(attributes.getValue("magcount")),													// Magazinanzahl angeben
         			   Integer.parseInt(attributes.getValue("magsize")));													// Magazininhalt angeben

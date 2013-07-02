@@ -35,7 +35,7 @@ public class Item {
 	private void setConsequence() {
 		switch(itemID) {
 		case 0:	// Rüstung
-			Player.setResistance(playerID, 0.5);
+			Player.playerList.get(playerID).setResistance(0.5);
 			break;
 		}
 	}

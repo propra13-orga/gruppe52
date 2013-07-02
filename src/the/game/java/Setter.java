@@ -31,6 +31,7 @@ public class Setter extends JPanel implements ActionListener {
     public static List<Image> imageList = new ArrayList<Image>();
     public static List<Integer> positionList = new ArrayList<Integer>();
     public static List<Long> timingList = new ArrayList<Long>();
+    public static long timeStamp = System.currentTimeMillis();
     
     private static JPanel jp;
     
@@ -57,10 +58,13 @@ public class Setter extends JPanel implements ActionListener {
         setBackground(Color.GRAY);			// Setzt Hintergrund auf Grau
         setDoubleBuffered(true);			// verhindert mögliches Flackern
         setOpaque(true);					// setzt ein JPanel undurchsichtig
-
+        
+        Controls.createControls();	// erstellt einen Controller (Für Steuerung zuständig)
+        
         new LevelCaller();					// erzeugt Objekt der Klasse LevelCaller
         
-        Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY());		// erzeugt Objekt der Klasse Player: Fügt einen Spieler in das Spielfeld ein, an der durch die Parameter festgelegte Stelle
+        Player.createPlayer();
+        //Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY());		// erzeugt Objekt der Klasse Player: Fügt einen Spieler in das Spielfeld ein, an der durch die Parameter festgelegte Stelle
         //Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY()+16);	// (noch) zu Testzwecken wird ein zweiter Spieler erzeugt
         
         LevelCaller.setLevel(levelNumber);	// Leveldaten werden initialisiert; Parameter legt fest welches Level gestartet wird
@@ -71,7 +75,7 @@ public class Setter extends JPanel implements ActionListener {
         // JPanel
         jp = this;
         
-        Controls.createControls();	// erstellt einen Controller (Für Steuerung zuständig)
+        
     }
 
 
@@ -84,14 +88,11 @@ public class Setter extends JPanel implements ActionListener {
         g2d.drawImage(background, 0, 0, this); 	// Hintergrundbild
         
         // Monster
-		for(int a=0; a<Enemy.monsterList.size(); a++) { // Setzt ein Icon für jeden erstellten Gegner
+        for(int a=0; a<Enemy.enemyList.size(); a++) { // Setzt ein Icon für jeden erstellten Gegner
 			g2d.drawImage(Enemy.getImg(a), Enemy.getX(a), Enemy.getY(a), this);
+			//System.out.println("Enemy: " + Enemy.getX(a));
 		}
-        // Tracker
-		for(int a=0; a<Tracker.trackerList.size(); a++) { // Setzt ein Icon für jeden erstellten Tracker
-			g2d.drawImage(Tracker.getImg(a), Tracker.getX(a), Tracker.getY(a), this);
-		}
-		
+
         
 		
 		
@@ -140,12 +141,14 @@ public class Setter extends JPanel implements ActionListener {
 
     public void actionPerformed(ActionEvent event) {	// Positionsdaten der bewegbaren Objekte aktualisieren und im Anschluss neu zeichnen
     	Enemy.move();
-    	Tracker.move();
 	    Player.move();
 	    TemporaryItem.updater();
-	    ProjectileManager.controlProjectiles();
+	    //ProjectileManager.controlProjectiles();
+	    Projectile.move();
 	    DisplayManager.updateDisplayTimers();
 	    Traps.updater();
+	
+	    Controls.controls.updateGamePad();
     	repaint();		// neu zeichnen
     }
 

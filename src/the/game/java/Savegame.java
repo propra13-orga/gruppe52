@@ -59,11 +59,11 @@ public class Savegame {
 				element.setAttributeNode(hp);
 				
 				Attr mana = doc.createAttribute("mana");
-				mana.setValue(String.valueOf(Mana.manaList.get(0).getMana()));
+				mana.setValue(String.valueOf(Player.getMana(0).getMana()));
 				element.setAttributeNode(mana);
 				
 				Attr score = doc.createAttribute("score");
-				score.setValue(String.valueOf(Score.scoreList.get(0).getScore()));
+				score.setValue(String.valueOf(Player.playerList.get(0).score.getScore()));
 				element.setAttributeNode(score);
 			}
 			
@@ -71,7 +71,7 @@ public class Savegame {
 			// Alle Spieler durchgehen
 			for(int playerID=0; playerID<Player.playerList.size(); playerID++) {
 				// Alle Waffen im Inventar (alle Waffen die in Benutzung sind) durchgehen
-				for(int weaponInUseID=0; weaponInUseID<WeaponManager.weaponManagerList.get(playerID).weaponInUseList.size(); weaponInUseID++) {
+				for(int weaponInUseID=0; weaponInUseID<Player.playerList.get(playerID).getWeaponInUseCount(); weaponInUseID++) {
 					// ELEMENT
 					Element element = doc.createElement("weapon");
 					rootElement.appendChild(element);
@@ -82,15 +82,15 @@ public class Savegame {
 					element.setAttributeNode(playerid);
 					
 					Attr weaponid = doc.createAttribute("weaponid");
-					weaponid.setValue(String.valueOf(WeaponManager.getWeaponID(playerID, weaponInUseID)));
+					weaponid.setValue(String.valueOf(Player.playerList.get(playerID).getWeaponID(weaponInUseID)));
 					element.setAttributeNode(weaponid);
 					
 					Attr magcount = doc.createAttribute("magcount");
-					magcount.setValue(String.valueOf(WeaponManager.getMagCount(playerID, weaponInUseID)));
+					magcount.setValue(String.valueOf(Player.playerList.get(playerID).getMagCount(weaponInUseID)));
 					element.setAttributeNode(magcount);
 					
 					Attr magsize = doc.createAttribute("magsize");
-					magsize.setValue(String.valueOf(WeaponManager.getCurrentMagSize(playerID, weaponInUseID)));
+					magsize.setValue(String.valueOf(Player.playerList.get(playerID).getCurrentMagSize(weaponInUseID)));
 					element.setAttributeNode(magsize);
 				}
 			}
@@ -178,34 +178,14 @@ public class Savegame {
 				type.setValue(String.valueOf(Checkpoints.checkList.get(a).getIsActivated()));
 				element.setAttributeNode(type);
 			}
-			
-			// TRACKER
-			// alle Tracker durchgehen
-			for(int a=0; a<Tracker.trackerList.size(); a++) {
-				if(Tracker.isAlive(a)) {		// nur speichern, wenn noch am Leben. Leichen werden also nicht übernommen !
-					// ELEMENT
-					Element element = doc.createElement("tracker");
-					rootElement.appendChild(element);
-					
-					// ATTRIBUTES
-					Attr x = doc.createAttribute("x");
-					x.setValue(String.valueOf(Tracker.getX(a)));
-					element.setAttributeNode(x);
-					
-					Attr y = doc.createAttribute("y");
-					y.setValue(String.valueOf(Tracker.getY(a)));
-					element.setAttributeNode(y);
-				}
-			}
-			
+						
 			// ENEMY
 			// alle Enemies durchgehen
-			for(int a=0; a<Enemy.monsterList.size(); a++) {
+			for(int a=0; a<Enemy.enemyList.size(); a++) {
 				if(Enemy.isAlive(a)) {
+					
 					// ELEMENT
-					Element enemy = doc.createElement("enemy");
-					if(Enemy.getType(a)==1)
-						enemy = doc.createElement("bouncy");
+					Element enemy = doc.createElement(Enemy.getType(a));
 					rootElement.appendChild(enemy);
 					
 					// ATTRIBUTES
@@ -224,6 +204,7 @@ public class Savegame {
 					Attr my = doc.createAttribute("movey");
 					my.setValue(String.valueOf(Enemy.getMY(a)));
 					enemy.setAttributeNode(my);
+					
 				}
 			}
 			

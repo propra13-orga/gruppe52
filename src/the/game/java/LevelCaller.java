@@ -63,6 +63,8 @@ public class LevelCaller {
 			parseLevel("3.3");
 			//setLevel9();
 			break;
+		default:
+			setFinalGoal();
 		}
 		Savegame.savegame();
 		DisplayManager.displayMap();
@@ -88,8 +90,7 @@ public class LevelCaller {
 	
 	private static void settingData() {
 		LevelCreator.resetItemMap();			// Array leeren
-		Enemy.monsterList.clear();				// Monsterbestand wird auf 0 gesetzt
-		Tracker.trackerList.clear();			// Trackerbestand wird auf 0 gesetzt
+		Enemy.clearAllLists();					// Monsterbestand wird auf 0 gesetzt
 		Weapon.loadWeapons();					// Alle Waffen laden
 		NPC.removeAllNPCs();
 		Goodies.removeAllGoodies();
@@ -114,7 +115,7 @@ public class LevelCaller {
 	
 	public static void resetLevel() {
 		settingData();
-		WeaponManager.resetWeaponInUseLists();
+		SpriteArmed.resetWeaponIULists();
 		//setLevel(level);						// Level nr level wird gestartet (Das gleiche Level)
 		resetting = true;
 		loadSavegame();
@@ -127,9 +128,8 @@ public class LevelCaller {
 	public static void shutdownLevel() {
 		Runner.codeRunning = false;				// Flag, die verhindert, dass Codereste ausgeführt werden, wenn bereits keine Objekte mehr existieren
 		settingData();
-		Player.playerList.clear();				// Position der Spieler wird neu gesetzt
+		Player.playerList.clear();				// Spieler werden gelöscht
 		Weapon.weaponList.clear();				// Alle Waffen löschen
-		WeaponManager.weaponManagerList.clear();// Alle eingesammelten Waffen werden gelöscht
 		Item.itemList.clear();
 		Setter.timer.stop();					// Timer ausschalten
 		Runner.shutRunnerDown();				// beendet das Speilfenster
@@ -150,6 +150,6 @@ public class LevelCaller {
 	public static void setPlayerDefaultPos(int defX, int defY) {	// ändert die Startposition des Players
 		defaultX = defX*20;
 		defaultY = defY*20;
-		Player.playerList.get(0).setDefaultStartPos(defaultX, defaultY);
+		Player.playerList.get(0).setPosition(defaultX, defaultY);
 	}
 }

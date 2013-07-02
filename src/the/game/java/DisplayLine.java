@@ -46,27 +46,28 @@ public class DisplayLine {
 		
 		if(Runner.codeRunning==false)
 			return;
-		
-		if(WeaponManager.weaponManagerList.get(0).weaponInUseList.size()>0) {
-			if(WeaponManager.weaponManagerList.get(0).weaponInUseList.get(WeaponManager.weaponManagerList.get(0).weaponInUseID).weaponID>0) {
+		//System.out.println(Player.playerList.get(0).weaponInUseList.size());
+		if(Player.playerList.get(0).getWeaponInUseCount()>0) {
+			//if(WeaponManager.weaponManagerList.get(0).weaponInUseList.get(WeaponManager.weaponManagerList.get(0).weaponInUseID).weaponID>0) {
 				setWeapon();
 				setBullets();
-			}
+			//}
 		}
+		
 		setHearts();
 	}
 	
 	private static void setWeapon() {
 		int posx = 200;
 		int posy = 0;
-		String path = WeaponManager.weaponManagerList.get(0).weaponInUseList.get(WeaponManager.weaponManagerList.get(0).weaponInUseID).imgPath;
+		//String path = WeaponManager.weaponManagerList.get(0).weaponInUseList.get(WeaponManager.weaponManagerList.get(0).weaponInUseID).imgPath;
 		
-		displayLineList.add(new DisplayLine(posx, posy, path));
+		displayLineList.add(new DisplayLine(posx, posy, Player.playerList.get(0).getCurrentWeapon().img));
 	}
 	
 	private static void setBullets() {
-		int count = WeaponManager.weaponManagerList.get(0).weaponInUseList.get(WeaponManager.weaponManagerList.get(0).weaponInUseID).currentMagSize;
-		int magCount = WeaponManager.weaponManagerList.get(0).weaponInUseList.get(WeaponManager.weaponManagerList.get(0).weaponInUseID).magCount - 1; // -1, da ein Magazin bereits in Benutzung
+		int count = Player.playerList.get(0).getCurrentWeapon().currentMagSize;
+		int magCount = Player.playerList.get(0).getCurrentWeapon().magCount - 1; // -1, da ein Magazin bereits in Benutzung
 		if(count>50)	// falls magazin überaus groß
 			count=50;
 		boolean bool=true;

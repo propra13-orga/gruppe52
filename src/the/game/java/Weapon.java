@@ -1,13 +1,22 @@
 package the.game.java;
 
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Weapon {
+	/**
+	 * LISTEN
+	 */
 	public static List<Weapon> weaponList = new ArrayList<Weapon>();
-	public int weaponIDCounter = 0;
+	
+	/**
+	 * ObjektVariablen
+	 */
+	private static int weaponIDCounter;
+	
 	public int weaponID;
-	public int fireRate;
+	public double fireRate;
 	public int bulletSpeed;
 	public int magSize;
 	public int magCount;
@@ -15,8 +24,8 @@ public class Weapon {
 	public int shotsPerRound;
 	public int damage;
 	public boolean melee;
-	public String imgPath;
-	public String imgPathProjectile;
+	public Image img;
+	public Image imgProjectile;
 	public boolean shotgun;
 	public int bulletSpread;
 	public String name;
@@ -26,6 +35,15 @@ public class Weapon {
 	public int magPackPrice;
 	public int vigor;
 	
+	public int currentMagSize;
+	public long measureForDelay;
+	public long measureForReload;
+	public boolean magEmpty;
+	public int currentShotOfRound;
+	
+	/**
+	 * Variablen für die Initialisierung
+	 */
 	private static int sFireRate;
 	private static int sBulletSpeed;
 	private static int sMagSize;
@@ -53,7 +71,7 @@ public class Weapon {
 		name = wName;
 		price = wPrice;
 		
-		fireRate = wFireRate;
+		fireRate = 60000 / wFireRate;
 		bulletSpeed = wBulletSpeed;
 		bulletSpread = wBulletSpread;
 		magSize = wMagSize;
@@ -70,13 +88,25 @@ public class Weapon {
 		magPackSize = wMagPackSize;
 		magPackPrice = wMagPackPrice;
 		
-		imgPath = wImgPath;
-		imgPathProjectile = wImgPathProjectile;
+		img = DisplayManager.getImage(wImgPath);
+		if(wImgPathProjectile!=null)
+			imgProjectile = DisplayManager.getImage(wImgPathProjectile);
+		
+		// Vorbereitende Variablen
+		currentMagSize = magSize;
+		measureForDelay = 0;
+		measureForReload = 0;
+		magEmpty = false;
+		currentShotOfRound = 0;
 	}
 	
+	public static Weapon getWeapon(int weaponID) {
+		return weaponList.get(weaponID);
+	}
 	
 	public static void loadWeapons() {
 		weaponList.clear();
+		weaponIDCounter = 0;
 		fist();			// #0
 		knife();		// #1
 		pistol();		// #2
@@ -98,7 +128,7 @@ public class Weapon {
 		sName = "Fists";
 		sPrice = 0;
 		
-		sFireRate = 4;
+		sFireRate = 240;
 		sBulletSpeed = 4;
 		sBulletSpread = 0;
 		sMagSize = 8;
@@ -119,7 +149,7 @@ public class Weapon {
 		sName = "Knife";
 		sPrice = 50;
 		
-		sFireRate = 4;
+		sFireRate = 240;
 		sBulletSpeed = 4;
 		sBulletSpread = 0;
 		sMagSize = 8;
@@ -144,7 +174,7 @@ public class Weapon {
 		sName = "Pistol";
 		sPrice = 100;
 		
-		sFireRate = 4;
+		sFireRate = 240;
 		sBulletSpeed = 4;
 		sBulletSpread = 0;
 		sMagSize = 15;
@@ -169,7 +199,7 @@ public class Weapon {
 		sName = "MP";
 		sPrice = 900;
 		
-		sFireRate = 20;
+		sFireRate = 1200;
 		sBulletSpeed = 6;
 		sBulletSpread = 0;
 		sMagSize = 32;
@@ -195,7 +225,7 @@ public class Weapon {
 		sName = "Rifle";
 		sPrice = 1800;
 		
-		sFireRate = 8;
+		sFireRate = 280;
 		sBulletSpeed = 6;
 		sBulletSpread = 0;
 		sMagSize = 32;
@@ -221,7 +251,7 @@ public class Weapon {
 		sName = "Big Rifle";
 		sPrice = 2500;
 		
-		sFireRate = 7;
+		sFireRate = 420;
 		sBulletSpeed = 6;
 		sBulletSpread = 0;
 		sMagSize = 32;
@@ -247,7 +277,7 @@ public class Weapon {
 		sName = "Small Bore Rifle";
 		sPrice = 3500;
 		
-		sFireRate = 22;
+		sFireRate = 1320;
 		sBulletSpeed = 7;
 		sBulletSpread = 2;
 		sMagSize = 42;
@@ -273,7 +303,7 @@ public class Weapon {
 		sName = "Shotgun";
 		sPrice = 5000;
 		
-		sFireRate = 2;
+		sFireRate = 120;
 		sBulletSpeed = 7;
 		sBulletSpread = 5;
 		sMagSize = 8;
@@ -299,7 +329,7 @@ public class Weapon {
 		sName = "The Grim Reaper";
 		sPrice = 7000;
 		
-		sFireRate = 5;
+		sFireRate = 300;
 		sBulletSpeed = 7;
 		sBulletSpread = 5;
 		sMagSize = 20;

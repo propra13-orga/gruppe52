@@ -12,11 +12,11 @@ public class ManaManager {
 		if(isEnoughMana(playerID, manaAmount)==false)					// Überprüfen ob Guthaben ausreicht
 			return;														// Wenn nicht, beenden
 		if(startProcess(spellID, playerID))								// Spruch ausführen
-			Mana.manaList.get(playerID).setMana(manaAmount * (-1));		// Wenn erfolgreich, Kosten von Mana abziehen
+			Player.getMana(playerID).setMana(manaAmount * (-1));		// Wenn erfolgreich, Kosten von Mana abziehen
 	}
 	
 	private static boolean isEnoughMana(int playerID, int amount) {
-		if(Mana.manaList.get(playerID).zauberkraft-amount>=0)
+		if(Player.getMana(playerID).zauberkraft-amount>=0)
 			return true;
 		else
 			return false;

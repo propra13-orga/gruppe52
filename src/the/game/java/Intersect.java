@@ -37,7 +37,7 @@ public class Intersect {
 	 */
 	public static boolean isCollidingWithPlayer(int playerID, int objPosx, int objPosy, int objFieldWidth, int objFieldHeight) {
 		// Objekt = Objekt1; Player = Objekt2;
-		return checkCollide(objPosx, objPosy, objFieldWidth, objFieldHeight, Player.playerList.get(playerID).getX(), Player.playerList.get(playerID).getY(), Player.playerList.get(playerID).imageSizeX, Player.playerList.get(playerID).imageSizeY);
+		return checkCollide(objPosx, objPosy, objFieldWidth, objFieldHeight, Player.playerList.get(playerID).getX(), Player.playerList.get(playerID).getY(), Player.playerList.get(playerID).imgSizeX, Player.playerList.get(playerID).imgSizeY);
 	}
 	
 	/*
@@ -58,22 +58,7 @@ public class Intersect {
 	public static boolean isCollidingWithTrap(int trapID, int objPosx, int objPosy, int objFieldWidth, int objFieldHeight) {
 		return checkCollide(objPosx, objPosy, objFieldWidth, objFieldHeight, Traps.getX(trapID), Traps.getY(trapID), Traps.getImgSizeX(trapID), Traps.getImgSizeY(trapID));
 	}
-	
-	/*
-	 * Überprüft, ob ein ausgewähltes Objekt mit dem Tracker kollidiert und gibt true zurück, wenn dies
-	 * der Fall ist.
-	 * @param trackerID = nr des Trackers in TrackerList
-	 * @param objPosx = xPos des Objekts
-	 * @param objPosy = yPos des Objekts
-	 * @param objFieldWidth = Breite des Objekts
-	 * @param objFieldHeight = Höhe des Objekts
-	 * @return true, wenn Objekt und Tracker kollidieren
-	 */
-	public static boolean isCollidingWithTracker(int trackerID, int objPosx, int objPosy, int objFieldWidth, int objFieldHeight) {
-		// Objekt = Objekt1; Tracker = Objekt 2
-		return checkCollide(objPosx, objPosy, objFieldWidth, objFieldHeight, Tracker.getX(trackerID), Tracker.getY(trackerID), Tracker.getImgSizeX(trackerID), Tracker.getImgSizeY(trackerID));
-	}
-	
+		
 	/*
 	 * Überprüft, ob ein Spieler mit einem Goodie (zB shield) kollidiert und gibt true zurück, wenn dies
 	 * der Fall ist.
@@ -83,7 +68,7 @@ public class Intersect {
 	 */
 	public static boolean isPlayerCollidingWithGoodies(int playerID, int goodieID) {
 		//Goodie = Objekt1; Player = Objekt2
-		return checkCollide(Goodies.getX(goodieID), Goodies.getY(goodieID), Goodies.getImgSizeX(goodieID), Goodies.getImgSizeY(goodieID), Player.playerList.get(playerID).getX(), Player.playerList.get(playerID).getY(), Player.playerList.get(playerID).imageSizeX, Player.playerList.get(playerID).imageSizeY);
+		return checkCollide(Goodies.getX(goodieID), Goodies.getY(goodieID), Goodies.getImgSizeX(goodieID), Goodies.getImgSizeY(goodieID), Player.playerList.get(playerID).getX(), Player.playerList.get(playerID).getY(), Player.playerList.get(playerID).imgSizeX, Player.playerList.get(playerID).imgSizeY);
 	}
 	
 	/*
@@ -99,7 +84,7 @@ public class Intersect {
 		int width = Traps.getImgSizeX(trapID) - (Traps.getOffsetX(trapID) * 2);
 		int height = Traps.getImgSizeY(trapID) - (Traps.getOffsetY(trapID) * 2);
 		// trap = Objekt 1; Player = Objekt 2
-		return checkCollide(ulx, uly, width, height, Player.playerList.get(playerID).getX(), Player.playerList.get(playerID).getY(), Player.playerList.get(playerID).imageSizeX, Player.playerList.get(playerID).imageSizeY);
+		return checkCollide(ulx, uly, width, height, Player.playerList.get(playerID).getX(), Player.playerList.get(playerID).getY(), Player.playerList.get(playerID).imgSizeX, Player.playerList.get(playerID).imgSizeY);
 	}
 	
 	/*

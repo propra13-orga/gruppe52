@@ -12,7 +12,7 @@ public class Goodies {
 	
 	public static List<Goodies> goodiesList = new ArrayList<Goodies>();
 	
-	private boolean valid;
+	//private boolean valid;
 	private int x;
 	private int y;
 	private int amount; // TODO: amount
@@ -30,7 +30,7 @@ public class Goodies {
 	public final static String goodie4 = "vest";
 	
 	private Goodies(int posx, int posy, String goodieType, int goodieAmount) {
-		valid = true;
+		//valid = true;
 		x = posx;
 		y = posy;
 		type = goodieType;
@@ -87,7 +87,7 @@ public class Goodies {
 	}
 	
 	private void removeGoodie(int index) {
-		valid = false;
+		//valid = false;
     	DisplayManager.removeChangeableImages(goodiesList.get(index).tag);
     	goodiesList.remove(index);
 	}
@@ -102,7 +102,7 @@ public class Goodies {
 	private void setAcquirementConsequence(int playerID) {
 		switch(type) {
 		case goodie0:
-			Score.scoreList.get(playerID).setScore(amount);
+			Player.playerList.get(playerID).score.setScore(amount);
 			break;
 		case goodie1:
 			Player.playerList.get(playerID).receiveLives(amount);
@@ -111,7 +111,7 @@ public class Goodies {
 			TemporaryItem.activateInvincibility(playerID);
 			break;
 		case goodie3:
-			Mana.manaList.get(playerID).setMana(20); // TODO: AMOUNT
+			Player.getMana(playerID).setMana(20); // TODO: AMOUNT
 			break;
 		case goodie4:
 			Item.addItem(0, playerID);

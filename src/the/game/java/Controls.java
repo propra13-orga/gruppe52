@@ -5,7 +5,15 @@ import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import net.java.games.input.Component.Identifier;
+import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Event;
+
 public class Controls {
+	
+	// TODO: Angle berechnung für Controller und Maus verknüpfen
+	// TODO: isMouseControlled durch Settings ersetzen
 	
 	public static Controls controls;
 	
@@ -22,15 +30,21 @@ public class Controls {
 	// Steuerungsmechanik
 	private Robot robot;
 	private boolean isMouseControlled = true;
-	private int mx;
-	private int my;
-	private int mousex = 0;
-	private int mousey = 0;
+	private double mx;
+	private double my;
+	private double px;
+	private double py;
+	private double mousex = 10;
+	private double mousey = 0;
 	private int startCounter = 0;
 	private boolean isUp = false;
 	private boolean isRight = false;
 	
 	private double angle = 0;
+	
+	private Controller joystick;
+	private Event event;
+	public boolean isJoystickAvailable = false;
 	
 	private Controls() {
 		// Steuerung - Bewegung
@@ -47,13 +61,157 @@ public class Controls {
 		// Robot erstellen
 		try {
 			robot = new Robot();
-	    } catch (AWTException e) {
+		} catch (AWTException e) {
 	    	e.printStackTrace();
 	    }
+		
+		// GAMEPAD
+		joystick = null;																			// joystick auf Null setzen
+		event = new Event();																		// neues Event für updateGamePad()
+		for (Controller c : ControllerEnvironment.getDefaultEnvironment().getControllers()) {		// Alle Steuerungsgeräte des Computers durchgehen und jeweils in variable c schreiben
+			//System.out.println("I tried this one: " + c + " and it's a: " + c.getType());
+			if (c.getType() == Controller.Type.STICK || c.getType() == Controller.Type.GAMEPAD) {	// Wenn der Controller in c ein Joystick oder ein Gamepad ist:
+				joystick = c;																		// c wird in joystick geschrieben
+				System.out.println(joystick.getName());												
+				break;																				// wenn Gerät gefunden, Schleife abbrechen, da ohnehin nur ein Gerät verwendet werden kann (zurzeit)
+			}
+        }
+		
+		if (joystick == null) {																		// Wenn kein Joystick gefunden wurde:
+			System.err.println("No joystick was found.");											// Meldung printen
+			isJoystickAvailable = false;															// Status setzen
+			Settings.setControlsToMouse();															// Mouse als Standardsteuerung bezeichnen
+		} else {
+			isJoystickAvailable = true;																// Status setzen
+			Settings.setControlsToGamePad();														// Gamepad als Standardsteuerung bezeichnen
+        }
+        
 	}
 	
 	public static void createControls() {
 		controls = new Controls();
+	}
+	
+	/**     GAMEPAD     */
+	public void updateGamePad() {
+		if(Settings.isControledByGamePad()==false || isJoystickAvailable==false)
+			return;
+		
+		joystick.poll();
+		
+		while(joystick.getEventQueue().getNextEvent(event)) {
+    		//System.out.println(event.getComponent().getIdentifier());
+			//System.out.println(joystick.getComponent(Identifier.Axis.RX));
+    		
+    		if(event.getComponent().getIdentifier().equals(Identifier.Axis.X)) {
+    			px = event.getValue();
+    		} else if(event.getComponent().getIdentifier().equals(Identifier.Axis.Y)) {
+    			py = event.getValue();
+    			
+    		} else if(event.getComponent().getIdentifier().equals(Identifier.Axis.Z)) {	// entspricht X
+    			mx = event.getValue();
+    		} else if(event.getComponent().getIdentifier().equals(Identifier.Axis.RZ)) { // entspricht Y
+    			my = event.getValue();
+    		} else if(event.getComponent().getIdentifier().equals(Identifier.Button._5)) { // FEUERN
+    			if(joystick.getComponent(Identifier.Button._5).getPollData()>0)	// Wenn gedrückt, feuer
+    				Player.playerList.get(0).setFireStatus(true);
+    			else															// Wenn losgelassen, feuer stoppen
+    				Player.playerList.get(0).setFireStatus(false);
+    			
+    		} else if(event.getComponent().getIdentifier().equals(Identifier.Axis.POV)) { // FEUERN
+    			double val = joystick.getComponent(Identifier.Axis.POV).getPollData();
+    			if(val==0.25) {				// oben
+    				
+    			} else if(val==0.50) {		// rechts
+    				Player.playerList.get(0).chooseNextWeapon();		// Nächste Waffe
+    			} else if(val==0.75) {		// unten
+    				
+    			} else if(val==1.00) {		// links
+    				Player.playerList.get(0).choosePrevWeapon();		// Vorherige Waffe
+    			}
+    			
+    		} else if(event.getComponent().getIdentifier().equals(Identifier.Button._2)) { // USE (Für NPC, YouDiedScreen, ...)
+    			exeUse();
+    		} else if(event.getComponent().getIdentifier().equals(Identifier.Button._7)) { // MANA
+    			ManaManager.useMana(0, 0);
+    		}
+    		
+    		//System.out.println(joystick.getComponent(Identifier.Button._5).getPollData());
+    		if(mx>-0.01 && mx<0.01)
+    			mx = 0.0;
+    		if(my>-0.01 && my<0.01)
+    			my = 0.0;
+    		if(px>-0.01 && px<0.01)
+    			px = 0.0;
+    		if(py>-0.01 && py<0.01)
+    			py = 0.0;
+    		
+    		//System.out.println(mx + "  und  "+ my);
+    		Player.setPlayerMovementX(0, px);
+    		Player.setPlayerMovementY(0, py);	
+    	}
+		
+    	captureDirection();
+    	setAngle();
+    	Player.playerList.get(0).rotatePlayerImg();
+    	//System.out.println(angle);    	
+    }
+
+	
+	private static double getDistance(double posx, double posy) {
+		return Math.sqrt(Math.pow(posx, 2) + Math.pow(posy, 2));
+    }
+	
+	private void captureDirection() {
+		int speed = 4;
+		mousex += mx*speed;
+		mousey += my*speed;
+		
+		// Zeigerkontrolle: Wenn Zeiger außerhalb des erlaubten Kreises ODER innerhalb des nicht erlaubten Mittelkreises, dann: (Kontrolle durch Radius)
+		if(getDistance(mousex, mousey)>35 || getDistance(mousex, mousey)<4) {					
+			double dis = getDistance(mousex, mousey);
+					//Math.sqrt(Math.pow(mousex, 2) + Math.pow(mousey, 2));	// Aktuellen Radius bestimmen
+			mousex = mousex / dis * 35;											// Solldistanz anpassen	(Achse / Radius * Sollradius)
+			mousey = mousey / dis * 35;											// Solldistanz anpassen	// TODO nachrechnen, ob Quadrat weggelassen werden darf / ob sich Quadrat lohnt
+		}
+		
+		// Startdelay
+		if(startCounter<1) {
+			angle = 0;
+			mousex = 10;
+			mousey = 0;
+			startCounter++;
+		}
+		
+	}
+	
+	private void setAngle() {
+		if(mousey==0 && mousex==0)
+			return;
+		angle = Math.toDegrees(Math.atan((double)(mousey*(-1)) / mousex));
+		
+		// Richtung ermitteln
+		if(mousex<0)
+			isRight = false;
+		else
+			isRight = true;
+		if(mousey<0)
+			isUp = true;
+		else
+			isUp = false;
+		
+		// Grad errechnen
+		if(isRight==false && isUp) {
+			angle += 180;
+		} else if(isRight==false && isUp==false) {
+			angle += 180;
+		} else if(isRight && isUp==false) {
+			angle += 360;
+		}
+		
+		if(Double.isNaN(angle)) {
+			angle = 0;
+		}
 	}
 	
 	/**     KEYS		*/
@@ -66,45 +224,45 @@ public class Controls {
         	/**		BEWEGUNG	*/
         	// x-Achse
         	if(key==p1_Le)
-	        	Player.playerList.get(0).setMoveStatusX(-1);
+	        	Player.setPlayerMovementLe(0);
         	else if(key==p1_Ri)
-	        	Player.playerList.get(0).setMoveStatusX(1);
+	        	Player.setPlayerMovementRi(0);
         	// y-Achse
         	if(key==p1_Up)
-	        	Player.playerList.get(0).setMoveStatusY(-1);
+	        	Player.setPlayerMovementUp(0);
         	else if(key==p1_Do)
-	        	Player.playerList.get(0).setMoveStatusY(1);
+	        	Player.setPlayerMovementDo(0);
         	
         	/**		WAFFEN		*/
         	if(key==p1_Fire)
 	        	Player.playerList.get(0).setFireStatus(true);
 	        if(key==p1_NextW)
-	        	WeaponManager.weaponManagerList.get(0).chooseNextWeapon();
+	        	Player.playerList.get(0).chooseNextWeapon();
 	        else if(key==p1_PrevW)
-	        	WeaponManager.weaponManagerList.get(0).choosePrevWeapon();       	
+	        	Player.playerList.get(0).choosePrevWeapon();       	
         	
         	/**		WAFFEN BEKOMMEN (NUR ZUM TESTEN !!!)		*/
         	switch(key) {
 	        	case KeyEvent.VK_NUMPAD1:
-	        		WeaponManager.weaponManagerList.get(0).chooseWeapon(2);
+	        		Player.playerList.get(0).chooseWeapon(2);
 	        		break;
 	        	case KeyEvent.VK_NUMPAD2:
-	            	WeaponManager.weaponManagerList.get(0).chooseWeapon(3);
+	            	Player.playerList.get(0).chooseWeapon(3);
 	            	break;
 	            case KeyEvent.VK_NUMPAD3:
-	            	WeaponManager.weaponManagerList.get(0).chooseWeapon(4);
+	            	Player.playerList.get(0).chooseWeapon(4);
 	            	break;
 	            case KeyEvent.VK_NUMPAD4:
-	            	WeaponManager.weaponManagerList.get(0).chooseWeapon(5);
+	            	Player.playerList.get(0).chooseWeapon(5);
 	            	break;
             	case KeyEvent.VK_NUMPAD5:
-            		WeaponManager.weaponManagerList.get(0).chooseWeapon(6);
+            		Player.playerList.get(0).chooseWeapon(6);
             		break;
             	case KeyEvent.VK_NUMPAD6:
-                	WeaponManager.weaponManagerList.get(0).chooseWeapon(7);
+                	Player.playerList.get(0).chooseWeapon(7);
                 	break;
                 case KeyEvent.VK_NUMPAD7:
-                	WeaponManager.weaponManagerList.get(0).chooseWeapon(8);
+                	Player.playerList.get(0).chooseWeapon(8);
                 	break;
         	}
         }      
@@ -128,7 +286,7 @@ public class Controls {
     	/**		WAFFEN		*/
     	if(key==p1_Fire) {
         	Player.playerList.get(0).setFireStatus(false);
-        	Player.playerList.get(0).setYouDiedScreenStatus(false);
+        	Player.setYouDiedScreenStatus(false);
     	}
     	
     	/**		FENSTER		*/
@@ -139,28 +297,33 @@ public class Controls {
     		} else
     			setMouseIsController(!isMouseControlled);	// Maus zentrieren und zur Spielersteuerung benutzen (an/aus)
     	} else if(key==KeyEvent.VK_ENTER) {
-    		System.out.println(NPC.npcPermission);
-    		if(NPC.shopPermission) {
-    			setMouseIsController(false);		// Maus zentrieren und zur Spielersteuerung benutzen (an/aus)
-    			new Shop();
-    		} else if(NPC.npcPermission) {
-    			NPC.setCollidedPicture();
-    		}
+    		//System.out.println(NPC.npcPermission);
+    		exeUse();
     	} else if(key==KeyEvent.VK_M) {
     		setMouseIsController(false);		// Maus zentrieren und zur Spielersteuerung benutzen (an/aus)
     		new Shop();
-    	} else if(key==KeyEvent.VK_N) {
-    		Tracker.trackerList.get(0).pathFinding();
     	} else if(key==KeyEvent.VK_B) {
     		Savegame.savegame();
     	} else if(key==KeyEvent.VK_G) {
     		ManaManager.useMana(0, 0);
     	}
     }
+    
+    
+    /**     AKTIVITÄTEN     */
+    private void exeUse() {
+    	if(NPC.shopPermission) {
+			setMouseIsController(false);		// Maus zentrieren und zur Spielersteuerung benutzen (an/aus)
+			new Shop();
+		} else if(Player.showYouDiedImage) {
+			Player.setYouDiedScreenStatus(false);
+		} else if(NPC.npcPermission) {
+			NPC.setCollidedPicture();
+		}
+    }
 	
     
     /**     MOUSE     */
-    
     private void setMouseIsController(boolean arg0) {
     	if(arg0) {
     		isMouseControlled = true;
@@ -203,165 +366,52 @@ public class Controls {
 
 	public void mouseDragged(MouseEvent e) {
 		// TODO Auto-generated method stub
-		updatePlayerControlsData(e);
+		//if(Settings.isControledByMouse())
+			updatePlayerControlsData(e);
 	}
 
 	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
-		//System.out.println(Shop.isInItemSquare(e.getX(), e.getY()));
 		if(Shop.show)
 			Shop.receiveMouseMovement(e.getX(), e.getY());
 		updatePlayerControlsData(e);
 	}
 	
 	private void updatePlayerControlsData(MouseEvent e) {
-		if(isMouseControlled) {
-			captureMouseDirection(e);
-			angle = setAngle(mousex, mousey);
+		if(Settings.isControledByMouse() && isMouseControlled) {
+			setMoveMYFromMouse(e);
+			captureDirection();
+			setAngle();
 			mousePositionReset();
-			Player.playerList.get(0).setPlayerImage();
+			Player.playerList.get(0).rotatePlayerImg();
 		}
 	}
 	
-	private void captureMouseDirection(MouseEvent e) {
+	private void setMoveMYFromMouse(MouseEvent e) {
 		int stax = Runner.getOnScreenFrameCenterX();
 		int stay = Runner.getOnScreenFrameCenterY();
 		int tarx = e.getXOnScreen();
 		int tary = e.getYOnScreen();
 		
-		//double gradient = getGradient(stax, stay, tarx, tary);
-		mx = tarx - stax;
-		my = tary - stay;
-		
-		
-		if((mousex+mx)<100 && (mousex+mx)>(-100))
-			mousex += mx;
-		if((mousey+my)<100 && (mousey+my)>(-100))
-			mousey += my;
-		
-				
-		if(startCounter<1) {
-			angle = 0;
-			mousex = 0;
-			mousey = 0;
-			startCounter++;
-		}
-		
-		getGradient(mousex, mousey);
-		
-		//System.out.println(angle);
-		//System.out.println(mousex +" | "+ mousey);
-		
+		mx = (tarx - stax) * 0.25;
+		my = (tary - stay) * 0.25;
 	}
 	
-	public static double getangle() {
-		double getangle;
-		getangle = Math.toDegrees(Math.atan((double)controls.mousey / controls.mousex));
-		if(controls.mousex<0)
-			getangle += 180;
-		if(Double.isNaN(getangle))
-			getangle = 0;
-        return getangle;
-	}
-	
-private double getGradient(double dirx, double diry) {
-		
-		double gradient = 0;
-		/*
-		boolean xIsRelevantAxis = false;
-		boolean directAxisFlag = false;
-		if(dirx==0 || diry==0) {
-			directAxisFlag = true;
-		} else {
-			gradient = diry / dirx;					// Steigungsberechnung (y/x)
-			if(gradient<1 && gradient>(-1)) {		// Steigungsberechnung (x/y)
-				gradient = dirx / diry;	
-				xIsRelevantAxis = true;
-			}
-		}
-		*/
-		
-		
-		
-		gradient = Math.toDegrees(Math.atan((double)(diry*(-1)) / dirx));
-		
-		if(dirx<0) {
-			isRight = false;
-		} else {
-			isRight = true;
-		} if(diry<0) {
-			isUp = true;
-		} else {
-			isUp = false;
-		}
-		
-		if(isRight && isUp) {
-			
-		} else if(isRight==false && isUp) {
-			gradient += 180;
-		} else if(isRight==false && isUp==false) {
-			gradient += 180;
-		} else if(isRight && isUp==false) {
-			gradient += 360;
-		}
-		
-		//System.out.println(gradient);
-		
-		return gradient;
-	}
-
-private double setAngle(double dirx, double diry) {
-	
-	double angle = Math.toDegrees(Math.atan((double)(diry*(-1)) / dirx));
-	
-	if(dirx<0)
-		isRight = false;
-	else
-		isRight = true;
-	if(diry<0)
-		isUp = true;
-	else
-		isUp = false;
-	
-	if(isRight==false && isUp) {
-		angle += 180;
-	} else if(isRight==false && isUp==false) {
-		angle += 180;
-	} else if(isRight && isUp==false) {
-		angle += 360;
-	}
-	
-	//System.out.println(angle);
-	
-	return angle;
-}
-	
-	public static int getAngle() {
-        return (int)controls.angle;
-	}
-/*
-	private void setCurrentDirection() {
-		AffineTransformOp op = new AffineTransformOp(AffineTransform.getRotateInstance(
-				Math.toRadians(degrees),
-				(double)originalImage.getWidth()/2.0, 
-				(double)originalImage.getHeight()/2.0), 
-				AffineTransformOp.TYPE_BILINEAR);
-		BufferedImage rotatedImage = op.filter(originalImage, null);  
-	}
-	*/
 	private void mousePositionReset() {
-			robot.mouseMove(Runner.getOnScreenFrameCenterX(), Runner.getOnScreenFrameCenterY());
+		robot.mouseMove(Runner.getOnScreenFrameCenterX(), Runner.getOnScreenFrameCenterY());
 	}
 	public static int getDirectionMarkerX() {
-		return controls.mousex;
+		return (int)controls.mousex;
 	}
 	public static int getDirectionMarkerY() {
-		return controls.mousey;
+		return (int)controls.mousey;
 	}
 	public static boolean getIsUp() {
 		return controls.isUp;
 	}
 	public static boolean getIsRight() {
 		return controls.isRight;
+	}
+	public static double getAngle() {
+        return controls.angle;
 	}
 }

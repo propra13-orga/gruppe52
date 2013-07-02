@@ -87,7 +87,7 @@ public class DisplayManager {
 		
 		// Player
 	    for(int a=0; a<Player.playerList.size(); a++) {	// Setzt ein Icon für jeden erstellten Spieler
-	    	g2d.drawImage(Player.playerList.get(a).getPlayerImage(), Player.playerList.get(a).getX(), Player.playerList.get(a).getY(), jp);
+	    	g2d.drawImage(Player.playerList.get(a).getImg(), Player.playerList.get(a).getX(), Player.playerList.get(a).getY(), jp);
 	    }
 	    
 	    // Projectiles
@@ -112,7 +112,7 @@ public class DisplayManager {
 	    g2d.setColor(Color.red);
 	    g2d.fill(new Rectangle2D.Double(480, 2, Player.playerList.get(0).getHealthPoints(), 7));
 	    g2d.setColor(Color.blue);
-	    g2d.fill(new Rectangle2D.Double(480, 10, Mana.manaList.get(0).getMana(), 7));
+	    g2d.fill(new Rectangle2D.Double(480, 10, Player.getMana(0).getMana(), 7));
 	    g2d.setColor(Color.DARK_GRAY);
 	    
 	    // Display Line
@@ -265,6 +265,7 @@ public class DisplayManager {
 			img = ImageIO.read(new File("src/the/game/java/" + path));
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.err.println("Pfad: src/the/game/java/" + path);
 		}
 		return img;
 	}

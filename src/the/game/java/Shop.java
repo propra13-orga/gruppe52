@@ -202,14 +202,7 @@ public class Shop {
 	}
 	
 	private static boolean isWeaponAlreadyInUse(int itemNo) {
-		boolean isInUse = false;
-		for(int a=0; a<WeaponManager.weaponManagerList.get(0).weaponInUseList.size(); a++) {		// Überprüfen ob bereits in Besitz
-			if(WeaponManager.weaponManagerList.get(0).weaponInUseList.get(a).weaponID==(itemNo+1)) {
-				
-				isInUse = true;
-			}
-		}
-		return isInUse;
+		return Player.playerList.get(0).isInUse(itemNo+1);
 	}
 	
 	private static boolean isEnoughMoney(int itemNo) {
@@ -460,7 +453,7 @@ public class Shop {
 				zeile++;
 			}
 			
-			DisplayManager.displayImage(Weapon.weaponList.get(a).imgPath, fixPointX+spalte*iconFieldWidth, fixPointY+zeile*iconFieldHeight+10, imageTagIcons, true);
+			DisplayManager.displayImage(Weapon.weaponList.get(a).img, fixPointX+spalte*iconFieldWidth, fixPointY+zeile*iconFieldHeight+10, imageTagIcons, true);
 			spalte++;
 			itemCount++;
 		}
@@ -482,7 +475,7 @@ public class Shop {
 				zeile++;
 			}
 			
-			DisplayManager.displayImage(Weapon.weaponList.get(a).imgPath, fixPointX+spalte*iconFieldWidth, fixPointY+zeile*iconFieldHeight+10, imageTagIcons, true);
+			DisplayManager.displayImage(Weapon.weaponList.get(a).img, fixPointX+spalte*iconFieldWidth, fixPointY+zeile*iconFieldHeight+10, imageTagIcons, true);
 			spalte++;
 			itemCount++;
 		}
@@ -509,7 +502,7 @@ public class Shop {
 		//int posx = fixPointX + shopWidth - iconFieldWidth;
 		//int posy = fixPointY + 10;
 		
-		currentCredits = Score.scoreList.get(0).getScore();
+		currentCredits = Player.playerList.get(0).score.getScore();
 		displayCreditsNumberCheck();			
 	}
 	private static void displayCreditsNumberCheck() {
@@ -612,12 +605,12 @@ public class Shop {
 			int price = getPrice(currentSelection);
 			switch(currentCat) {
 			case 1:
-				Score.scoreList.get(0).setScore(price * (-1));
-				WeaponManager.weaponManagerList.get(0).chooseWeapon(currentSelection+1);
+				Player.playerList.get(0).score.setScore(price * (-1));
+				Player.playerList.get(0).chooseWeapon(currentSelection+1);
 				break;
 			case 2:
-				Score.scoreList.get(0).setScore(price * (-1));
-				WeaponManager.weaponManagerList.get(0).addAmmo(currentSelection+1, getMagPackSize(currentSelection));
+				Player.playerList.get(0).score.setScore(price * (-1));
+				Player.playerList.get(0).addAmmo(currentSelection+1, getMagPackSize(currentSelection));
 				break;
 			}
 			updateScreen();

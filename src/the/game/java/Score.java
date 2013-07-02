@@ -1,8 +1,5 @@
 package the.game.java;
 
-import java.util.ArrayList;
-import java.util.List;
-
 	/**
 	 * 
 	 *  In dieser Klasse kann der Punktestand eines Spielers abgefragt und verändert werden.
@@ -12,17 +9,17 @@ import java.util.List;
 
 public class Score {
 
-	public int scr;  //Score des Spielers
+	private int scr;  //Score des Spielers
 	
-	private Score() {
-		scr = 100;
+	public Score() {
+		scr = 10000;
 	}
 	
-	public static List<Score> scoreList = new ArrayList<Score>();
+	/*public static List<Score> scoreList = new ArrayList<Score>();
 	
 	public static void createScore() {			// für jeden Spieler einen
 		scoreList.add(new Score());
-	}
+	}*/
 	
 	public int getScore(){						// Gibt den aktuellen score zurück
 		return scr;
@@ -39,13 +36,4 @@ public class Score {
 	public void setAbsoluteScore(int newScore) {
 		scr = newScore;
 	}
-	
-	/*public static void main(String[] args){
-		Score test= new Score();
-		test.setScore(200);
-		test.setScore(700);
-		test.setScore(-800);
-		test.setScore(-200);
-		System.out.println(test.getStore());
-	}*/
 }

@@ -7,7 +7,7 @@ import java.util.Random;
 
 // eventuell setDirection der Tracker mitverwenden falls Ziel gegeben
 
-public class Projectile {		// steuert alle einzelnen Projektile und überprüft Treffer
+public class Projectile extends Intersect{		// steuert alle einzelnen Projektile und überprüft Treffer
 	
 	public static List<Projectile> projectileList = new ArrayList<Projectile>();
 	public List<String> alreadyList = new ArrayList<String>();
@@ -29,7 +29,7 @@ public class Projectile {		// steuert alle einzelnen Projektile und überprüft Tr
     private double mx;
     private double my;
     private int speed;
-	private int angle;
+	private double angle;
 	
 	private Image hitWall = DisplayManager.getImage("hit_wall.png");
 	private Image hitBlood = DisplayManager.getImage("hit_blood.png");
@@ -42,7 +42,7 @@ public class Projectile {		// steuert alle einzelnen Projektile und überprüft Tr
     public static Random random = new Random();
     
     /**     KONSTRUKTOR     */
-	private Projectile(int startx, int starty, int bulletSpeed, int bulletDamage, int bulletVigor, int spread, Image imgProjectile, int bulletAngle, String bulletOrigin) {
+	private Projectile(int startx, int starty, int bulletSpeed, int bulletDamage, int bulletVigor, int spread, Image imgProjectile, double bulletAngle, String bulletOrigin) {
 		valid = true;							// Gültigkeit
 		speed = bulletSpeed;					// Geschwindikeit (Multiplikator)
 		damage = bulletDamage;					// Schadenspunkte
@@ -86,7 +86,7 @@ public class Projectile {		// steuert alle einzelnen Projektile und überprüft Tr
 	}
 	
 	/**     PROJEKTIL ERZEUGEN     */
-	public static void createProjectile(int startx, int starty, int speed, int sDamage, int sVigor, int spread, Image imgProjectile, int angle, String bulletOrigin) {
+	public static void createProjectile(int startx, int starty, int speed, int sDamage, int sVigor, int spread, Image imgProjectile, double angle, String bulletOrigin) {
 		projectileList.add(new Projectile(startx, starty, speed, sDamage, sVigor, spread, imgProjectile, angle, bulletOrigin));
 	}
 	
@@ -149,10 +149,10 @@ public class Projectile {		// steuert alle einzelnen Projektile und überprüft Tr
 		return colliding;
 	}
 	
-	private void checkCollide() {
+	private void checkCollide() { // TODO: Parteien einführen!
 		// Überprüfen der Gegner
 		if(origin!="enemy" && valid) {
-			for(int a=0; a<Enemy.monsterList.size(); a++) {	// Wird für alle Gegner nacheinander überprüft
+			for(int a=0; a<Enemy.enemyList.size(); a++) {	// Wird für alle Gegner nacheinander überprüft
 				if(Enemy.isAlive(a) && isHitAlreadyReported("enemy" + a)==false) {
 					boolean colliding = Intersect.isCollidingWithEnemy(a, getX(), getY(), imgSizeX, imgSizeY);
 					
@@ -162,7 +162,7 @@ public class Projectile {		// steuert alle einzelnen Projektile und überprüft Tr
 						int enemyMapPosUp = Enemy.getY(a);
 						int enemyMapPosDown = Enemy.getY(a) + Enemy.getImgSizeY(a);
 						
-						Enemy.monsterList.get(a).reduceHealthPoints(damage);	// Healthpoints - Schaden
+						Enemy.enemyList.get(a).reduceHealthPoints(damage);	// Healthpoints - Schaden
 						
 						// TODO: Blutposition korrigieren
 						DisplayManager.displayImage(getHitImage(), (enemyMapPosLeft-4+(enemyMapPosRight-enemyMapPosLeft)/2), (enemyMapPosUp-4+(enemyMapPosDown-enemyMapPosUp)/2), 190);
@@ -175,31 +175,7 @@ public class Projectile {		// steuert alle einzelnen Projektile und überprüft Tr
 				}
 			}
 		}
-		
-		// Überprüfen der Tracker
-		if(origin!="tracker" && valid) {
-			for(int a=0; a<Tracker.trackerList.size(); a++) {	// Wird für alle Tracker nacheinander überprüft
-				if(Tracker.isAlive(a) && isHitAlreadyReported("tracker" + a)==false) {
-					boolean colliding = Intersect.isCollidingWithTracker(a, getX(), getY(), imgSizeX, imgSizeY);
-					
-					if(colliding) {										// Wenn Gegner mit Gegner kollidiert:
-						int enemyMapPosLeft = Tracker.getX(a);
-						//int enemyMapPosRight = Tracker.getX(a) + Tracker.getImgSizeX(a);
-						int enemyMapPosUp = Tracker.getY(a);
-						//int enemyMapPosDown = Tracker.getY(a) + Enemy.getImgSizeY(a);
-						
-						Tracker.trackerList.get(a).reduceHealthPoints(damage);	// Healthpoints - Schaden
-						DisplayManager.displayImage(getHitImage(), enemyMapPosLeft, enemyMapPosUp, 190);
-						vigor--;
-						if(vigor<=0)
-							valid = false;
-						else
-							addHitReport("tracker" + a);
-					}
-				}
-			}
-		}
-		
+				
 		// Überprüfen der Player
 		if(origin!="player" && valid) {
 			for(int a=0; a<Player.playerList.size(); a++) {	// Wird für alle Spieler nacheinander überprüft

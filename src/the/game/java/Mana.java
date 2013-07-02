@@ -16,27 +16,27 @@ import javax.swing.ImageIcon;
 
 public class Mana {
 
-	private ImageIcon ii;
 	public int zauberkraft;  									// Zauberkraft des Spielers
 	
-	private Image manaSymbol = setImagePath("mana.png");		// Mana-Symbol, das auf der Karte eingesammelt werden kann
+	private Image manaSymbol = DisplayManager.getImage("mana.png");		// Mana-Symbol, das auf der Karte eingesammelt werden kann
 	
 	int x;
 	int y;
-	static boolean hilfCollide;
+	private static boolean hilfCollide;
 	
-	private Mana(){
+	public Mana(){
 		zauberkraft = 20;
 	}
 	
-	public static List<Mana> manaList = new ArrayList<Mana>();	// Der Manastand wird in einer Liste verwaltet
+	//public static List<Mana> manaList = new ArrayList<Mana>();	// Der Manastand wird in einer Liste verwaltet
 	
 	/*
 	 * Ein Objekt der Klasse Mana kann für jeden Spieler erstellt werden
-	 */
+	 
 	public static void createMana() {			
 		manaList.add(new Mana());
-	}
+	}*/
+	
 	/*
 	 * Gibt den aktuellen Manastand zurück
 	 */
@@ -61,11 +61,11 @@ public class Mana {
 	
 	/*
 	 * bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
-	 */
+	 
     public Image setImagePath(String path) {						
     	ii = new ImageIcon(this.getClass().getResource(path));
     	Image img = ii.getImage();
     	return img;
-    }
+    }*/
 	
 }
