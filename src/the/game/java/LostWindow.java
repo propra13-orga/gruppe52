@@ -7,12 +7,12 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 //import javax.swing.JOptionPane;
 
-
+/**
+ * Stellt das Fenster dar, dass sich öffnet, wenn man endgültig verloren hat.
+ * @author Kapie
+ *
+ */
 public class LostWindow extends JFrame implements ActionListener{
-    
-	/**
-	 *  Dieses Fenster öffnet sich nachdem man "Game Over" verloren hat
-	 */
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -21,6 +21,10 @@ public class LostWindow extends JFrame implements ActionListener{
 	private JButton nochmal;
 	private JButton choose;		
 			
+	/**
+	 * Konstruktor der Klasse LostWindow
+	 * @param title Titel des Fensters
+	 */
 	public LostWindow(String title){ //Konstruktor
 		//Titel einstellen
 		super(title);
@@ -46,31 +50,36 @@ public class LostWindow extends JFrame implements ActionListener{
 		}
 		
 	    //Was passiert wenn ein Button gedrückt wird?
-		public void actionPerformed (ActionEvent e){ //wenn eine Aktion passiert bekommt ActionListener das mit und löst methode aus
+	/**
+	 * Was pasiiert, wenn ein Button gedrückt wird?
+	 */
+	public void actionPerformed (ActionEvent e){ //wenn eine Aktion passiert bekommt ActionListener das mit und löst methode aus
 				
-			if (e.getSource()==zurueck){
-				this.dispose();
-				StartWindow.main(null); 		// Hauptmenü
-			}
-			if (e.getSource()==nochmal){
-				this.dispose();
-				StartWindow.fenster(); 			// Spiel
-			}
-			if (e.getSource()==choose){
-				this.dispose();
-				LevChooWindow.main(null); 		// Levelwahl
-			}
-		 }
-			
-			
-		public static void main(String[] args) {
-			LostWindow frame = new LostWindow("You Lost! HAHAHAHA. Was möchtest du jetzt tun?"); 
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  			// Schliessen mit x
-			frame.setSize(880, 120);    
-				
-			frame.setLayout(null); 											// Kein vorgefertigtes Layout vewenden
-			frame.setVisible(true); 										// Frame ist sichtbar
-			frame.setLocationRelativeTo(null);								// Fenster startet in der Mitte
-			frame.setResizable(false);										// Fenstergröße manuell nicht veränderbar
+		if (e.getSource()==zurueck){
+			this.dispose();
+			StartWindow.main(null); 		// Hauptmenü
 		}
+		if (e.getSource()==nochmal){
+			this.dispose();
+			StartWindow.fenster(); 			// Spiel
+		}
+		if (e.getSource()==choose){
+			this.dispose();
+			LevChooWindow.main(null); 		// Levelwahl
+		}
+	}
+			
+	/**
+	 * Main-Methode der Klasse. Erstellt das entsprechende Fenster.		
+	 */
+	public static void main(String[] args) {
+		LostWindow frame = new LostWindow("You Lost! HAHAHAHA. Was möchtest du jetzt tun?"); 
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  			// Schliessen mit x
+		frame.setSize(880, 120);    
+				
+		frame.setLayout(null); 											// Kein vorgefertigtes Layout vewenden
+		frame.setVisible(true); 										// Frame ist sichtbar
+		frame.setLocationRelativeTo(null);								// Fenster startet in der Mitte
+		frame.setResizable(false);										// Fenstergröße manuell nicht veränderbar
+	}
 }

@@ -14,7 +14,15 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * Sorgt dafür, dass Spielstände gespeichert und geladen werden können.
+ *
+ */
 public class Savegame {
+	
+	/**
+	 * Methode zum speichern des Spielstandes
+	 */
 	public static void savegame() {
 		try {
 			
@@ -67,6 +75,12 @@ public class Savegame {
 				element.setAttributeNode(score);
 			}
 			
+			if(Settings.isMultiplayer()) {
+				for(int a=0; a<LevelCaller.spawnMap.size(); a++) {
+					
+				}
+			}
+			
 			// Weapon
 			// Alle Spieler durchgehen
 			for(int playerID=0; playerID<Player.playerList.size(); playerID++) {
@@ -95,6 +109,56 @@ public class Savegame {
 				}
 			}
 			
+			// Items
+			// Alle Spieler durchgehen
+			for(int playerID=0; playerID<Player.playerList.size(); playerID++) {
+				for(int index=0; index<Item.itemList.size(); index++) {
+					// ELEMENT
+					Element element = doc.createElement("item");
+					rootElement.appendChild(element);
+					
+					// ATTRIBUTES
+					Attr playerid = doc.createAttribute("playerid");
+					playerid.setValue(String.valueOf(playerID));
+					element.setAttributeNode(playerid);
+					
+					Attr itemid = doc.createAttribute("itemid");
+					itemid.setValue(String.valueOf(Item.itemList.get(index).getItemID()));
+					element.setAttributeNode(itemid);
+				}
+			}
+			
+			// DOOR
+			for(int a=0; a<Door.doorList.size(); a++){
+				// ELEMENT
+				Element element = doc.createElement("door");
+				rootElement.appendChild(element);
+				
+				// ATTRIBUTES
+				Attr x = doc.createAttribute("x");
+				x.setValue(String.valueOf(Door.doorList.get(a).getX()));
+				element.setAttributeNode(x);
+				
+				Attr y = doc.createAttribute("y");
+				y.setValue(String.valueOf(Door.doorList.get(a).getY()));
+				element.setAttributeNode(y);
+				
+				Attr goalX = doc.createAttribute("goalX");
+				goalX.setValue(String.valueOf(Door.doorList.get(a).getGoalX()));
+				element.setAttributeNode(goalX);
+				
+				Attr goalY = doc.createAttribute("goalY"); 
+				goalY.setValue(String.valueOf(Door.doorList.get(a).getGoalY()));
+				element.setAttributeNode(goalY);
+				
+				Attr alignment = doc.createAttribute("alignment");
+				alignment.setValue(Door.doorList.get(a).getAlignment());
+				element.setAttributeNode(alignment);
+				
+				Attr walking = doc.createAttribute("walkingDirection");
+				walking.setValue(Door.doorList.get(a).getWalkingDirection());
+				element. setAttributeNode(walking);
+			}
 			// NPC
 			// alle NPCs durchgehen
 			for(int a=0; a<NPC.npcList.size(); a++) {
@@ -256,11 +320,11 @@ public class Savegame {
 						element.setAttributeNode(x);
 						
 						Attr y = doc.createAttribute("y");
-						y.setValue(String.valueOf(b));
+						y.setValue(String.valueOf(b-1));
 						element.setAttributeNode(y);
 					}
 						break;
-					case 4:		// GOAL
+					case 3:		// GOAL
 					{
 						// ELEMENT
 						Element element = doc.createElement("goal");
@@ -276,6 +340,28 @@ public class Savegame {
 						element.setAttributeNode(y);
 					}
 						break;
+					default:
+						// MULTIPLAYER GOAL
+						for(int c=0; c<10; c++) {
+							if(LevelCreator.itemMap[a][b]>=50 && LevelCreator.itemMap[a][b]<=59) {
+								// ELEMENT
+								Element element = doc.createElement("mpgoal");
+								rootElement.appendChild(element);
+								
+								// ATTRIBUTES
+								Attr x = doc.createAttribute("x");
+								x.setValue(String.valueOf(a));
+								element.setAttributeNode(x);
+								
+								Attr y = doc.createAttribute("y");
+								y.setValue(String.valueOf(b));
+								element.setAttributeNode(y);
+								
+								Attr team = doc.createAttribute("team");
+								team.setValue(String.valueOf(LevelCreator.itemMap[a][b]-50));
+								element.setAttributeNode(team);
+							}
+						}
 					}
 					
 				}

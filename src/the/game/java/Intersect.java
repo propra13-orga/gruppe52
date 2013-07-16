@@ -25,7 +25,7 @@ public class Intersect {
 		
 	}
 	
-	/*
+	/**
 	 * Überprüft, ob ein ausgewähltes Objekt mit dem Player kollidiert und gibt true zurück, wenn dies
 	 * der Fall ist.
 	 * @param playerID = nr des Players in PlayerList
@@ -40,7 +40,7 @@ public class Intersect {
 		return checkCollide(objPosx, objPosy, objFieldWidth, objFieldHeight, Player.playerList.get(playerID).getX(), Player.playerList.get(playerID).getY(), Player.playerList.get(playerID).imgSizeX, Player.playerList.get(playerID).imgSizeY);
 	}
 	
-	/*
+	/**
 	 * Überprüft, ob ein ausgewähltes Objekt mit dem Enemy kollidiert und gibt true zurück, wenn dies
 	 * der Fall ist.
 	 * @param enemyID = nr des Enemys in EnemyList
@@ -54,12 +54,21 @@ public class Intersect {
 		// Objekt = Objekt1, Enemy = Objekt 2
 		return checkCollide(objPosx, objPosy, objFieldWidth, objFieldHeight, Enemy.getX(enemyID), Enemy.getY(enemyID), Enemy.getImgSizeX(enemyID), Enemy.getImgSizeY(enemyID));
 	}
-	
+	/**
+	 * Überprüft, ob ein ausgewähltes Objekt mit deeiner Trap kollidiert und gibt true zurück, wenn dies
+	 * der Fall ist.
+	 * @param trapID Nr der Trap
+	 * @param objPosx = xPos des Objekts
+	 * @param objPosy = yPos des Objekts
+	 * @param objFieldWidth = Breite des Objekts
+	 * @param objFieldHeight = Höhe des Objekts
+	 * @return true, wenn Objekt und Enemy kollidieren
+	 */
 	public static boolean isCollidingWithTrap(int trapID, int objPosx, int objPosy, int objFieldWidth, int objFieldHeight) {
 		return checkCollide(objPosx, objPosy, objFieldWidth, objFieldHeight, Traps.getX(trapID), Traps.getY(trapID), Traps.getImgSizeX(trapID), Traps.getImgSizeY(trapID));
 	}
 		
-	/*
+	/**
 	 * Überprüft, ob ein Spieler mit einem Goodie (zB shield) kollidiert und gibt true zurück, wenn dies
 	 * der Fall ist.
 	 * @param playerID = nr des Players in PlayerList
@@ -71,7 +80,7 @@ public class Intersect {
 		return checkCollide(Goodies.getX(goodieID), Goodies.getY(goodieID), Goodies.getImgSizeX(goodieID), Goodies.getImgSizeY(goodieID), Player.playerList.get(playerID).getX(), Player.playerList.get(playerID).getY(), Player.playerList.get(playerID).imgSizeX, Player.playerList.get(playerID).imgSizeY);
 	}
 	
-	/*
+	/**
 	 * Überprüft, ob ein Spieler mit einer Falle kollidiert und gibt true zurück, wenn dies
 	 * der Fall ist.
 	 * @param playerID = nr des Players in PlayerList
@@ -87,7 +96,7 @@ public class Intersect {
 		return checkCollide(ulx, uly, width, height, Player.playerList.get(playerID).getX(), Player.playerList.get(playerID).getY(), Player.playerList.get(playerID).imgSizeX, Player.playerList.get(playerID).imgSizeY);
 	}
 	
-	/*
+	/**
 	 * Überprüft, ob zwei Objekte kollidieren. Alle boolean is[...]CollidingWith[...] Methoden verweisen auf diese Methode.
 	 * Hierbei wird überprüft, ob das erste Objekt mit dem Zweiten in Berührung kommt. Der Mittelpunkt wird zusätzlich zu den
 	 * Rändern überprüft, falls die Objekte unterschiedliche größen haben, speziell falls das zweite Objekt größer ist als das erste.

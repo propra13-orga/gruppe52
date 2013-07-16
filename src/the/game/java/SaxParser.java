@@ -10,12 +10,34 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * Sorgt dafür, dass Leveldateien im xml-Format ausgelesen werden können
+ * Durchsucht Leveldatei nach Schlagworten und belegt die Map dementsprechend.
+ */
 public class SaxParser extends DefaultHandler {
 
     //private String temp;
-    
-    /**     Parsen starten. Parameter legt (den Rest vom) Dateipfad fest     */
-    public static void parse(String file) throws IOException, SAXException, ParserConfigurationException {
+    /**
+     * Parsen von festgelegten Dateien
+     * @param file Dateiname im Ordner src/the/game/java/ 
+     */
+	public static void parse(String file) throws IOException, SAXException, ParserConfigurationException {
+		doPparse("src/the/game/java/" + file);	
+	}
+	/**
+	 * Parsen von Dateien
+	 * @param file Datei, die geparst werden soll
+	 */
+	public static void parse(String file, boolean isAbsolut) throws IOException, SAXException, ParserConfigurationException {
+		doPparse(file);
+		
+	}
+	
+	/**
+	 * Parsen starten
+	 * @param file (Rest vom) Dateipfad
+	 */
+    public static void doPparse(String file) throws IOException, SAXException, ParserConfigurationException {
         
     	// Flag für Layer zurücksetzen
     	DisplayManager.darkness = false;
@@ -30,7 +52,7 @@ public class SaxParser extends DefaultHandler {
         SaxParser handler = new SaxParser();
         
         // Dateipfad und Handler (obiges Objekt) an Parser übergeben und parsen starten
-        sp.parse("src/the/game/java/" + file, handler);
+        sp.parse(file, handler);
         
     }
 
@@ -42,7 +64,10 @@ public class SaxParser extends DefaultHandler {
            //temp = new String(buffer, start, length);
     }
    
-    /**     Wird aufgerufen, wenn der Parser ein neues Element einliest (z.B. "<wall ...>")     */
+    /**     
+     * Wird aufgerufen, wenn der Parser ein neues Element einliest (z.B. "<wall ...>")     
+     * 
+     */
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
            //temp = "";																			// temp (charbuffer) zurücksetzen
            switch(qName) {																		// Name des Elementes auf erwartete Tags prüfen
@@ -58,6 +83,23 @@ public class SaxParser extends DefaultHandler {
             			   Integer.parseInt(attributes.getValue("x")),								// X-Position (string zu int parsen)
             			   Integer.parseInt(attributes.getValue("y")));								// Y-Position (string zu int parsen)
         	   }																				// REST ANALOG ZU WALL!
+        	   break;
+           case "door":
+        	   if(attributes.getValue("alignment")!= null){
+        		   Door.createDoor(
+        				   Integer.parseInt(attributes.getValue("x")),								// X-Position (string zu int parsen)
+            			   Integer.parseInt(attributes.getValue("y")),
+            			   Integer.parseInt(attributes.getValue("goalX")),
+            			   Integer.parseInt(attributes.getValue("goalY")),
+            			   attributes.getValue("alignment"),
+        		   		   attributes.getValue("walkingDirection"));
+        	   } else {
+        		   Door.createDoor(
+					   Integer.parseInt(attributes.getValue("x")),								
+	    			   Integer.parseInt(attributes.getValue("y")),
+	    			   Integer.parseInt(attributes.getValue("goalX")),
+	    			   Integer.parseInt(attributes.getValue("goalY")));
+        	   }
         	   break;
            case "mine":
         	   if(attributes.getValue("width")!=null && attributes.getValue("height")!=null) {
@@ -76,7 +118,8 @@ public class SaxParser extends DefaultHandler {
            case "dalek":	// TODO: EINSTELLEN WELCHER FEUERTYP!
         	   Traps.createDalek(
             			   Integer.parseInt(attributes.getValue("x")),
-            			   Integer.parseInt(attributes.getValue("y")));
+            			   Integer.parseInt(attributes.getValue("y")),
+			   				attributes.getValue("type"));
         	   break;
            case "enemy":
         	   if(attributes.getValue("movex")!=null && attributes.getValue("movey")!=null) { //TODO:
@@ -143,10 +186,23 @@ public class SaxParser extends DefaultHandler {
         			   Integer.parseInt(attributes.getValue("x")), 
         			   Integer.parseInt(attributes.getValue("y")));
         	   break;
+           case "item":
+        	   Item.addItem(
+        			   Integer.parseInt(attributes.getValue("itemid")), 
+        			   Integer.parseInt(attributes.getValue("playerid")));
+        	   break;
            case "spawn":														// Eigenschaften des Spielers zum Startzeitpunkt:
-        	   LevelCaller.setPlayerDefaultPos(										// Startposition festlegen
-        			   Integer.parseInt(attributes.getValue("x")),
-        			   Integer.parseInt(attributes.getValue("y")));
+        	   if(attributes.getValue("team")!=null) {
+        		   LevelCaller.setPlayerDefaultPos(										// Startposition festlegen
+            			   Integer.parseInt(attributes.getValue("x")),
+            			   Integer.parseInt(attributes.getValue("y")),
+            			   Integer.parseInt(attributes.getValue("team")));
+        	   } else {
+        		   LevelCaller.setPlayerDefaultPos(										// Startposition festlegen
+            			   Integer.parseInt(attributes.getValue("x")),
+            			   Integer.parseInt(attributes.getValue("y")));
+        	   }
+        	   
         	   if(LevelCaller.resetting==false) {								// Wenn das Spiel NICHT resetted wird:
 	        	   if(attributes.getValue("life")!=null)							// Wenn Attribut life vorhanden:
 	        		   Player.playerList.get(0).setAbsoluteLives(						// Attribut life auslesen, in int parsen und dem
@@ -193,6 +249,22 @@ public class SaxParser extends DefaultHandler {
             			   Integer.parseInt(attributes.getValue("y")));
         	   }
         	   break;
+           case "mpgoal":
+        	   
+        	   if(attributes.getValue("width")!=null && attributes.getValue("height")!=null) {
+        		   LevelCreator.createMPGoal(
+            			   Integer.parseInt(attributes.getValue("x")),
+            			   Integer.parseInt(attributes.getValue("y")),
+            			   Integer.parseInt(attributes.getValue("width")),
+            			   Integer.parseInt(attributes.getValue("height")),
+            			   Integer.parseInt(attributes.getValue("team")));
+        	   } else {
+        		   LevelCreator.createMPGoal(
+            			   Integer.parseInt(attributes.getValue("x")),
+            			   Integer.parseInt(attributes.getValue("y")),
+            			   Integer.parseInt(attributes.getValue("team")));
+        	   }
+        	   break;
            case "weapon":																			// WAFFEN
         	   Player.playerList.get(Integer.parseInt(attributes.getValue("playerid"))).addWeaponPrecisely(	// dem jeweiligen Spieler ansprechen
         			   Integer.parseInt(attributes.getValue("weaponid")),													// Waffe auswählen
@@ -205,7 +277,9 @@ public class SaxParser extends DefaultHandler {
            }
     }
 
-    /**     Wird aufgerufen, wenn der Parser das Ende eines Elementes erreicht hat     */
+    /**     
+     * Wird aufgerufen, wenn der Parser das Ende eines Elementes erreicht hat     
+     */
     public void endElement(String uri, String localName, String qName) throws SAXException {
     	/**
     	 * Bislang nicht benötigt, da nur Attribute verwendet werden

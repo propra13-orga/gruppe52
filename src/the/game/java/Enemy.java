@@ -116,7 +116,7 @@ public class Enemy extends Sprite{
 		for(int playerID=0; playerID<Player.playerList.size(); playerID++) {
 			
 			if(Intersect.isCollidingWithPlayer(playerID, getX(), getY(), imgSizeX, imgSizeY)) {										// Wenn Gegner mit Spieler kollidiert:
-				Player.playerList.get(playerID).reduceHealthPoints(damage);	// Lebenspunkte abziehen -> wenn keine mehr übrig Spieler tot
+				Player.playerList.get(playerID).reduceHealthPoints(damage, damageType);	// Lebenspunkte abziehen -> wenn keine mehr übrig Spieler tot
 			}
 		}
     }

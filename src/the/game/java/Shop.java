@@ -7,16 +7,14 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-
+/**
+ *  SHOP
+ *  Aufzurufen über: 	new Shop();
+ *  Schließen über:		ESCAPE
+ *  Funktion:			Zeigt einen Shop, der Items zusammen mit einigen Infos auflistet
+ *  					Diese Items kann der Spieler(1) kaufen. Er bezahlt mit Punkten.
+ */
 public class Shop {
-	
-	/**
-	 *  SHOP
-	 *  Aufzurufen über: 	new Shop();
-	 *  Schließen über:		ESCAPE
-	 *  Funktion:			Zeigt einen Shop, der Items zusammen mit einigen Infos auflistet
-	 *  					Diese Items kann der Spieler(1) kaufen. Er bezahlt mit Punkten.
-	 */
 	
 	
 	public static boolean show = false;
@@ -68,6 +66,10 @@ public class Shop {
 	private static Image buttonBuyHoverNV;
 	//private static Image buttonBuySelected;
 	
+	/**
+	 * Konstruktor der Klasse Shop.
+	 * Stellt das Shopfenster dar.
+	 */
 	public Shop() {
 		if(show==false) {
 			shopMap = new int[getShopDimensions(0)][getShopDimensions(1)];
@@ -77,6 +79,11 @@ public class Shop {
 		}
 	}
 		
+	/**
+	 * Ermittelt Arraygröße
+	 * @param axis <=0 für Breite, >0 für Höhe
+	 * @return die Arraygröße
+	 */
 	private static int getShopDimensions(int axis) {	// Ermittelt Arraygröße
 		int value;
 		if(axis<=0)
@@ -88,7 +95,9 @@ public class Shop {
 			value++;
 		return value;
 	}
-	
+	/**
+	 * Stellt (Teil 1) der Shopanzeige dar
+	 */
 	private void setVariable() {
 		fixPointX = (Runner.getWidthF() / 2) - (shopWidth / 2);
 		fixPointY = (Runner.getHeightF() / 2) - (shopHeight / 2);
@@ -109,6 +118,9 @@ public class Shop {
 		buttonBuyBorderDo = buttonBuyBorderUp + buttonBuy.getHeight(null);
 	}
 	
+	/**
+	 * Stellt (Teil 2) der Shopanzeige dar
+	 */
 	private static void setShopDisplay() {
 		if(show) {
 			DisplayManager.displayImage("transparentLayer.png", 0, 0, imageTagShop, true);
@@ -128,7 +140,9 @@ public class Shop {
 		}
 	}
 	
-	/**     Select Item     */
+	/**     
+	 * Sorgt dafür, dass Items ausgewählt werden können   
+	 */
 	private static void selectItem(int fieldNo) {
 		
 			if(fieldNo<itemCount)	// Wenn gewähltes Feld ein Item enthält:
@@ -143,16 +157,27 @@ public class Shop {
 			
 		
 	}
-	
+	/**
+	 * Waffe in Feld nr (parameter) wird ausgewählt
+	 * @param fieldNo Feldnummer
+	 */
 	private static void selectItem_Weapon(int fieldNo) {
 		displaySelectionFrame(fieldNo, false);
 		displaySelectedItemInfo_Weapon(fieldNo);
 	}
+	/**
+	 * Munition in FeldNr (parameter) wird ausgewählt
+	 * @param fieldNo Feldnummer
+	 */
 	private static void selectItem_Ammo(int fieldNo) {
 		displaySelectionFrame(fieldNo, false);
 		displaySelectedItemInfo_Ammo(fieldNo);
 	}
-	
+	/**
+	 * Stellt das Auswahlfenster dar
+	 * @param fieldNo Feldnummer
+	 * @param isHover Schwebt die Maus über Bild?
+	 */
 	private static void displaySelectionFrame(int fieldNo, boolean isHover) {
 		if(show) {
 			
@@ -170,7 +195,7 @@ public class Shop {
 			}
 		}
 	}
-	
+	//TODO: Kommentar
 	private static void setDisplayItemAttachment() {
 		boolean already = false;
 		
@@ -200,11 +225,19 @@ public class Shop {
 			already = false;
 		}
 	}
-	
+	/**
+	 * Gibt an, ob sich die Waffe bereits in Benutzung befindet
+	 * @param itemNo Nr des Items
+	 * @return befindet sich die Waffe bereits in benutzung?
+	 */
 	private static boolean isWeaponAlreadyInUse(int itemNo) {
 		return Player.playerList.get(0).isInUse(itemNo+1);
 	}
-	
+	/**
+	 * Gibt an ob man genug Credits für ein Item hat
+	 * @param itemNo Nr des Items das gekauft werden soll
+	 * @return kann die Waffe finanziell gesehen gekauft werden?
+	 */
 	private static boolean isEnoughMoney(int itemNo) {
 		boolean isEnough = false;
 		if(getPrice(itemNo)<=currentCredits) {		// Überprüfen ob genug Geld vorhanden
@@ -212,7 +245,12 @@ public class Shop {
 		}
 		return isEnough;
 	}
-	
+	/**
+	 * gibt den Preis eines bestimmten Items zurück 
+	 * wenn keine Kategorie vorhanden oder Item nicht vorhanden oder Price nicht vorhanden, dann Rückgabe = 0
+	 * @param itemNo Nr des Items
+	 * @return Preis des Items
+	 */
 	private static int getPrice(int itemNo) {	// gibt den Preis eines bestimmten Items zurück, wenn keine Kategorie vorhanden oder Item nicht vorhanden oder Price nicht vorhanden, dann Rückgabe = 0
 		int price = 0;
 		switch(currentCat) {
@@ -227,7 +265,7 @@ public class Shop {
 		}
 		return price;
 	}
-	
+	//TODO: Kommentar
 	private static void displayAtIcon(int fieldNo, String imgPath, String imageTag, boolean isMoreThanOne) {	// zeigt Bild für angegebenes IconFeld dar. isMoreThanOne=true, können mehrere dargestellt werden, wenn isMoreThanOne=false, werden jedesmal alle vorherigen mit dem angegebenen Tag gelöscht
 		if(show) {
 	
@@ -241,7 +279,10 @@ public class Shop {
 			DisplayManager.displayImage(imgPath, POSX, POSY, imageTag, true);
 		}
 	}
-	
+	/**
+	 * Stellt alle Informationen zu der ausgewählten Waffe dar
+	 * @param fieldNo Feldnummer
+	 */
 	private static void displaySelectedItemInfo_Weapon(int fieldNo) {
 		// fieldNo sollte bei 0 beginnen
 		
@@ -264,7 +305,10 @@ public class Shop {
 		
 		displaySelectedItemInfo(titel, info);
 	}
-	
+	/**
+	 * Stellt alle Informationen zu der ausgewählten Munition dar
+	 * @param fieldNo Feldnummer
+	 */
 	private static void displaySelectedItemInfo_Ammo(int fieldNo) {
 		// fieldNo sollte bei 0 beginnen
 		
@@ -279,7 +323,7 @@ public class Shop {
 		
 		displaySelectedItemInfo(titel, info);
 	}
-	
+	//TODO: Kommentar
 	private static void displaySelectedItemInfo(String[] titel, String[] info) {
 		int infoAreaFixPointX = fixPointX + ((itemAreaFixPointX + itemAreaWidth) * iconFieldWidth);
 		int infoAreaFixPointY = fixPointY + (itemAreaFixPointY * iconFieldHeight) + 10;
@@ -296,7 +340,12 @@ public class Shop {
 			}
 		}
 	}
-	
+	/**
+	 * Gibt die Nr des Feldes an, dass getroffen wird
+	 * @param posx x-Position der Maus
+	 * @param posy x-Position der Maus
+	 * @return Rückgabewert <0 wenn kein Bereich betroffen; wenn Feld getroffen, dann Rückgabewert = feldnummer
+	 */
 	private static int isInItemSquare(int posx, int posy) {	// Rückgabewert <0 wenn kein Bereich betroffen; wenn Feld getroffen, dann Rückgabewert = feldnummer
 		int hitFieldNo = -1;
 
@@ -311,7 +360,12 @@ public class Shop {
 		//System.out.println(borderLe + "  " + borderRi + "  " + borderUp + "  " + borderDo + "  |  " + asd + "  " + asdf + "  |  " + hitFieldNo);
 		return hitFieldNo;
 	}
-	
+	/**
+	 * Gibt an, ob der KaufButton gedrückt wird
+	 * @param posx x-Position der Maus
+	 * @param posy x-Position der Maus
+	 * @return false wenn der KaufButton bereich nicht getroffen; wenn Feld getroffen, dann Rückgabewert true
+	 */
 	private static boolean isInButtonBuy(int posx, int posy) {	// Rückgabewert false wenn kein Bereich betroffen; wenn Feld getroffen, dann Rückgabewert true
 		boolean hit = false;
 
@@ -320,6 +374,12 @@ public class Shop {
 		
 		return hit;
 	}
+	/**
+	 * Gibt an, ob der obere Button zum Wechsel zwischen Waffe und Munition gedrückt wurde
+	 * @param posx x-Position der Maus
+	 * @param posy x-Position der Maus
+	 * @return false wenn der WEchselbuttonbereich nicht getroffen; wenn Feld getroffen, dann Rückgabewert true
+	 */
 	private static boolean isInUpperButtonCatMenu(int posx, int posy) {	// Rückgabewert false wenn kein Bereich betroffen; wenn Feld getroffen, dann Rückgabewert true
 		boolean hit = false;
 
@@ -327,6 +387,12 @@ public class Shop {
 			hit = true;
 		return hit;
 	}
+	/**
+	 * Gibt an, ob der untere Button zum Wechsel zwischen Waffe und Munition gedrückt wurde
+	 * @param posx x-Position der Maus
+	 * @param posy x-Position der Maus
+	 * @return false wenn der WEchselbuttonbereich nicht getroffen; wenn Feld getroffen, dann Rückgabewert true
+	 */
 	private static boolean isInLowerButtonCatMenu(int posx, int posy) {	// Rückgabewert false wenn kein Bereich betroffen; wenn Feld getroffen, dann Rückgabewert true
 		boolean hit = false;
 
@@ -334,7 +400,11 @@ public class Shop {
 			hit = true;
 		return hit;
 	}
-	
+	/**
+	 * Verarbeitet den Mouseklick
+	 * @param posx x-Position der Maus
+	 * @param posy x-Position der Maus
+	 */
 	public static void receiveMouseKlick(int posx, int posy) {
 		{	// Icon Selection
 			int fieldNo = isInItemSquare(posx, posy);
@@ -355,7 +425,11 @@ public class Shop {
 			}
 		}
 	}
-	
+	/**
+	 * Verarbeitet die Mausbewegung
+	 * @param posx x-Position der Maus
+	 * @param posy x-Position der Maus
+	 */
 	public static void receiveMouseMovement(int posx, int posy) {
 		//boolean already = false;	// um weitere überprüfungen überflüssig zu machen
 		
@@ -371,7 +445,11 @@ public class Shop {
 		setCatMenuHover(posx, posy);
 	}
 	
-	/**     Hover     */
+	/**
+	 * Verarbeitet den Hover
+	 * @param posx x-Position der Maus
+	 * @param posy x-Position der Maus
+	 */
 	public static boolean setItemHover(int posx, int posy) {
 		int fieldNo = isInItemSquare(posx, posy);
 		boolean hit = false;
@@ -381,6 +459,12 @@ public class Shop {
 		}
 		return hit;
 	}
+	/**
+	 * Hoveranzige des Kaufbuttons
+	 * @param posx x-Position der Maus
+	 * @param posy x-Position der Maus
+	 * @return TODO: return?
+	 */
 	public static boolean setButtonBuyHover(int posx, int posy) {
 		boolean hit = isInButtonBuy(posx, posy);
 			if(hit) {
@@ -396,6 +480,12 @@ public class Shop {
 			}
 		return hit;
 	}
+	/**
+	 * Hoveranzige des WEchselbuttons
+	 * @param posx x-Position der Maus
+	 * @param posy x-Position der Maus
+	 * @return TODO: return?
+	 */
 	public static boolean setCatMenuHover(int posx, int posy) {
 		boolean hit = false;
 		
@@ -416,7 +506,10 @@ public class Shop {
 		return hit;		
 	}
 	
-	/**     Choose ItemKategorie     */
+	/**
+	 * Wählt eine Kategorie (Waffe oder Munition)
+	 * @param catID Nr der Kategorie
+	 */
 	private static void chooseItemCat(int catID) {
 		switch(catID) {
 		case 1:
@@ -431,6 +524,7 @@ public class Shop {
 			break;
 		}
 	}
+	//TODO: kommentar
 	private static void chooseItemCatActions(int catID) {
 		if(currentCat>0) {
 			unloadItemImages();
@@ -438,6 +532,9 @@ public class Shop {
 		currentCat = catID;
 	}
 	
+	/**
+	 * Stellt das Waffenmenü dar
+	 */
 	private static void displayItemCat_Weapon() {
 		if(imageTagIcons!="")	// wenn bereits eine Kategorie geladen wurde:
 			unloadItemImages();	// Bilder löschen
@@ -461,7 +558,9 @@ public class Shop {
 		// Titelleiste anpassen
 		displayCatMenuTitle("weapon");
 	}
-	
+	/**
+	 * Stellt das Munitionsmenü dar
+	 */
 	private static void displayItemCat_Ammo() {
 		if(imageTagIcons!="")	// wenn bereits eine Kategorie geladen wurde:
 			unloadItemImages();	// Bilder löschen
@@ -484,20 +583,31 @@ public class Shop {
 		displayCatMenuTitle("ammo");
 	}
 	
+	/**
+	 * Ändert den angezeigten Kategorietitel
+	 * @param category Waffe oder Munition
+	 */
 	private static void displayCatMenuTitle(String category) {
 		DisplayManager.removeChangeableImages("catMenu");
 		DisplayManager.displayImage("shop/catMenu_" + category + ".png", fixPointX-5, fixPointY-5, "catMenu", true);
 	}
 	
+	/**
+	 * Nächste Kategorie wird gewählt
+	 */
 	private static void setCatNext() {
 		chooseItemCat(currentCat+1);
 	}
-
+	/**
+	 * Vorherige Kategorie wird gewählt
+	 */
 	private static void setCatPrev() {
 		chooseItemCat(currentCat-1);
 	}
 	
-	/**     Display: Credits     */
+	/**
+	 * Credits werden dargestellt
+	 */
 	private static void displayCredits() {	// zeigt den aktuellen CreditStand oben rechts in der Ecke an
 		//int posx = fixPointX + shopWidth - iconFieldWidth;
 		//int posy = fixPointY + 10;
@@ -505,6 +615,9 @@ public class Shop {
 		currentCredits = Player.playerList.get(0).score.getScore();
 		displayCreditsNumberCheck();			
 	}
+	/**
+	 * Creditsziffern werden dargestellt
+	 */
 	private static void displayCreditsNumberCheck() {
 		DisplayManager.removeChangeableImages(imageTagCredits);	// löschen, falls dies nicht der erste Aufruf ist, sondern eine Aktualisierung
 		
@@ -521,6 +634,11 @@ public class Shop {
 			displayCreditsNumberCheckDisplay(0, 0);
 		}
 	}
+	/**
+	 * Ziffern werden ausgesucht, die dargestellt werden sollen
+	 * @param number Zahl die an Position von ziffer steht
+	 * @param ziffer Wievielte Ziffer wird betrachtet
+	 */
 	private static void displayCreditsNumberCheckDisplay(int number, int ziffer) {
 		int imgSizeX = 15;
 		String path = "numbers/";
@@ -563,7 +681,9 @@ public class Shop {
 		DisplayManager.displayImage(path, fixPointX+shopWidth-(imgSizeX*(ziffer+2)), fixPointY-5, imageTagCredits, true);
 	}
 	
-	/**     Unload/Close Operations     */
+	/**
+	 * Entfernt die Itemsbilder
+	 */
 	private static void unloadItemImages() {
 		DisplayManager.removeChangeableImages(imageTagIcons);
 		DisplayManager.removeChangeableStrings(imageTagInfos);
@@ -574,21 +694,29 @@ public class Shop {
 		DisplayManager.removeChangeableImages(imageTagButtonCatMenuHover);
 		currentSelection = -1;
 	}
-	
+	/**
+	 * Entfernt alle Basic-Shopbilder
+	 */
 	private static void unloadShopImages() {
 		DisplayManager.removeChangeableImages(imageTagShop);
 		DisplayManager.removeChangeableStrings(imageTagCredits);
 		DisplayManager.removeChangeableImages(imageTagButtonBuyHover);
 		DisplayManager.removeChangeableImages(imageTagCredits);
 	}
-	
+	/**
+	 * Schließt den Shop
+	 */
 	public static void closeShop() {
 		show = false;
 		unloadItemImages();
 		unloadShopImages();
 	}
 	
-	/**     HILFSMETHODEN     */
+	/**
+	 * bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
+	 * @param path Bildpfad
+	 * @return Bild
+	 */
 	private static Image getImage(String path) {	// bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
 		Image img = null;
 		try {
@@ -599,7 +727,9 @@ public class Shop {
 		return img;
 	}
 	
-	/**     KAUFEN     */
+	/**
+	 * Kaufen eines Items
+	 */
 	private static void buyItem() {
 		if(isSelectionValid()) {
 			int price = getPrice(currentSelection);
@@ -616,11 +746,18 @@ public class Shop {
 			updateScreen();
 		}
 	}
-	
+	/**
+	 * Gibt die Zahl der Magazine an, die man bei einem Kauf erwirbt
+	 * @param fieldNo Feldnummer
+	 * @return Zahl der Magazine
+	 */
 	private static int getMagPackSize(int fieldNo) {
 		return Weapon.weaponList.get(fieldNo+1).magPackSize;
 	}
-	
+	/**
+	 * Überprüft ob Auswahl den Itemfeldes gültig ist
+	 * @return wenn ja, valid = flase
+	 */
 	private static boolean isSelectionValid() {
 		boolean valid=false;
 		
@@ -640,7 +777,9 @@ public class Shop {
 			valid = isEnoughMoney(currentSelection);				// Überprüft ob genug Geld vorhanden ist, um das Item zu bezahlen
 		return valid;
 	}
-	
+	/**
+	 * Updated den Bildschirm
+	 */
 	private static void updateScreen() {
 		displayCredits();
 		unloadItemImages();

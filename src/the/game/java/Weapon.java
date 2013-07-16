@@ -4,6 +4,9 @@ import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Verwaltet alle Objekte, die die Eigenschaften einer Waffe erhalten.
+ */
 public class Weapon {
 	/**
 	 * LISTEN
@@ -41,6 +44,8 @@ public class Weapon {
 	public boolean magEmpty;
 	public int currentShotOfRound;
 	
+	public static Image standardBullet = DisplayManager.getImage("projectile.png");
+	
 	/**
 	 * Variablen für die Initialisierung
 	 */
@@ -63,7 +68,28 @@ public class Weapon {
 	private static int sMagPackPrice;
 	private static int sVigor;
 	
-	// Konstruktor
+	/**
+	 * Konstruktor der Klasse Weapon
+	 * Parameter sind alle Eigenschaften, die eine Waffe haben kann
+	 * @param wName
+	 * @param wFireRate
+	 * @param wBulletSpeed
+	 * @param wBulletSpread
+	 * @param wMagSize
+	 * @param wMagCount
+	 * @param wReloadTime
+	 * @param wShotsPerRound
+	 * @param wDamage
+	 * @param wVigor
+	 * @param wMelee
+	 * @param wRadius
+	 * @param wImgPath
+	 * @param wImgPathProjectile
+	 * @param wShotgun
+	 * @param wPrice
+	 * @param wMagPackSize
+	 * @param wMagPackPrice
+	 */
 	private Weapon(String wName, int wFireRate, int wBulletSpeed, int wBulletSpread, int wMagSize, int wMagCount, int wReloadTime, int wShotsPerRound, int wDamage, int wVigor, boolean wMelee, int wRadius, String wImgPath, String wImgPathProjectile, boolean wShotgun, int wPrice, int wMagPackSize, int wMagPackPrice) {
 		weaponID = weaponIDCounter;
 		weaponIDCounter++;
@@ -99,11 +125,17 @@ public class Weapon {
 		magEmpty = false;
 		currentShotOfRound = 0;
 	}
-	
+	/**
+	 * Gibt die Waffe zurück
+	 * @param weaponID ID der Waffe
+	 * @return weapon
+	 */
 	public static Weapon getWeapon(int weaponID) {
 		return weaponList.get(weaponID);
 	}
-	
+	/**
+	 * Lädt die gewünschte Waffe
+	 */
 	public static void loadWeapons() {
 		weaponList.clear();
 		weaponIDCounter = 0;
@@ -117,13 +149,18 @@ public class Weapon {
 		shotgun();		// #7
 		shotgunFast();	// #8
 	}
-
+	/**
+	 * Fügt die Waffe einer weaponList hinzu
+	 */
 	private static void addWeapon() {
 		weaponList.add(new Weapon(sName, sFireRate, sBulletSpeed, sBulletSpread, sMagSize, sMagCount, sReloadTime, sShotsPerRound, sDamage, sVigor, sMelee, sRadius, sImgPath, sImgPathProjectile, sShotgun, sPrice, sMagPackSize, sMagPackPrice));
 	}
 	
 	/**     HIER SIND ALLE WAFFEN AUFGELISTET     */
 	
+	/**
+	 * Waffe: fist
+	 */
 	private static void fist() {
 		sName = "Fists";
 		sPrice = 0;
@@ -144,7 +181,9 @@ public class Weapon {
 		
 		addWeapon();
 	}
-	
+	/**
+	 * Waffe: Knife
+	 */
 	private static void knife() {
 		sName = "Knife";
 		sPrice = 50;
@@ -169,7 +208,9 @@ public class Weapon {
 		
 		addWeapon();
 	}
-	
+	/**
+	 * Waffe: Pistol
+	 */
 	private static void pistol() {
 		sName = "Pistol";
 		sPrice = 100;
@@ -194,7 +235,9 @@ public class Weapon {
 		
 		addWeapon();
 	}
-	
+	/**
+	 * Waffe: MP
+	 */
 	private static void mp() {
 		sName = "MP";
 		sPrice = 900;
@@ -220,7 +263,9 @@ public class Weapon {
 		
 		addWeapon();
 	}
-	
+	/**
+	 * Waffe: Rifle
+	 */
 	private static void rifle() {
 		sName = "Rifle";
 		sPrice = 1800;
@@ -246,7 +291,9 @@ public class Weapon {
 		
 		addWeapon();
 	}
-	
+	/**
+	 * Waffe: RifleBig
+	 */
 	private static void rifleBig() {
 		sName = "Big Rifle";
 		sPrice = 2500;
@@ -272,7 +319,9 @@ public class Weapon {
 		
 		addWeapon();
 	}
-	
+	/**
+	 * Waffe: RifleFast
+	 */
 	private static void rifleFast() {
 		sName = "Small Bore Rifle";
 		sPrice = 3500;
@@ -298,7 +347,9 @@ public class Weapon {
 		
 		addWeapon();
 	}
-	
+	/**
+	 * Waffe: Shotgun
+	 */
 	private static void shotgun() {
 		sName = "Shotgun";
 		sPrice = 5000;
@@ -324,7 +375,9 @@ public class Weapon {
 		
 		addWeapon();
 	}
-	
+	/**
+	 * Waffe: ShotgunFast
+	 */
 	private static void shotgunFast() {
 		sName = "The Grim Reaper";
 		sPrice = 7000;

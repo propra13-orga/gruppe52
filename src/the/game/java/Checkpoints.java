@@ -28,9 +28,12 @@ public class Checkpoints {
 	private String tag;
 	private static int marker = 0;
 	
-	/*
-	 * Konstruktor der Klasse Checkpoints. Wenn ein Objekt der Klasse Checkpoint erstellt wird, wird dieses an position (posx, posy) mit dem
+	/**
+	 * Konstruktor der Klasse Checkpoints. 
+	 * Wenn ein Objekt der Klasse Checkpoint erstellt wird, wird dieses an position (posx, posy) mit dem
 	 * Bild eines unaktivierten Checkpoints dargestellt und die boolean-Variable isActivated wird vorerst auf false gesetzt
+	 * @param posx x-Position an der der Checkpoint dargestellt werden soll
+	 * @param posy y-Position an der der Checkpoint dargestellt werden soll
 	 */
 	public Checkpoints(int posx, int posy){
 		x=posx;
@@ -40,6 +43,15 @@ public class Checkpoints {
 		tag = "checkpoint" + marker;
 		DisplayManager.displayImage(check, x, y, tag);
 	}
+	/**
+	 * Konstruktor der Klasse Checkpoints für den Fall, dass ein aktivierter Checkpoint erstellt werden soll.
+	 * Wenn ein Objekt der Klasse Checkpoint erstellt wird, wird dieses an position (posx, posy) mit dem
+	 * Bild eines (un-)aktivierten Checkpoints dargestellt und die boolean-Variable isActivated wird auf activated gesetzt.
+	 * Dies wird hauptsächlich zum Laden von Speicherständen benötigt.
+	 * @param posx x-Position an der der Checkpoint dargestellt werden soll
+	 * @param posy y-Position an der der Checkpoint dargestellt werden soll
+	 * @param activated Status des Chechpoints. Bereits aktiviert oder noch unaktiviert.
+	 */
 	public Checkpoints(int posx, int posy, boolean activated){
 		x=posx;
 		y=posy;
@@ -52,13 +64,21 @@ public class Checkpoints {
 			DisplayManager.displayImage(check, x, y, tag);
 	}
 	
-	/*
-	 *  Fügt ein Objekt der Klasse Checkpoints der Liste aller Checkpoints hinzu
+	/**
+	 * Fügt ein Objekt der Klasse Checkpoints der Liste aller Checkpoints hinzu.
+	 * @param posx x-Position an der der Checkpoint dargestellt werden soll
+	 * @param posy y-Position an der der Checkpoint dargestellt werden soll. Abgezogen wird noch die Differenz durch die Menüleiste.
 	 */
 	public static void createCheckpoint(int posx, int posy) {
 		posy += LevelCreator.distancePix;							// Wegen Menuleiste oben
 		checkList.add(new Checkpoints(posx, posy));
 	}
+	/**
+	 * Fügt ein Objekt der Klasse Checkpoints der Liste aller Checkpoints hinzu. Der Checkpoint ist (un-)aktiviert.
+	 * @param posx x-Position an der der Checkpoint dargestellt werden soll
+	 * @param posy y-Position an der der Checkpoint dargestellt werden soll. Abgezogen wird noch die Differenz durch die Menüleiste.
+	 * @param isActivated Status des Chechpoints. Bereits aktiviert oder noch unaktiviert.
+	 */
 	public static void createCheckpoint(int posx, int posy, int isActivated) {
 		posy += LevelCreator.distancePix;							// Wegen Menuleiste oben
 		if(isActivated>0)
@@ -67,7 +87,8 @@ public class Checkpoints {
 			checkList.add(new Checkpoints(posx, posy, false));
 	}
 	
-	/*
+	/**
+	 * Regelt den Effekt einer Kollision durch Checkpoint und Player.
 	 * Stellt Bild des Checkpoints dar, nachdem dieser aktiviert wurde.
 	 * Die Startposition des Spielers wird auf die Position des Checkpoints geändert
 	 */
@@ -80,8 +101,9 @@ public class Checkpoints {
 		}
 	}
 	
-	/*
-	 *  Überprüft, ob der Spieler mit einem Checkpoint kollidiert
+	/**
+	 * Überprüft, ob ein Spieler mit einem Checkpoint kollidiert.
+	 * @param playerID Nr des Spielers in der playerList
 	 */
 	public static void checkPlayerCollideWithCheckpoint(int playerID){
 		for(int z=0; z<checkList.size(); z++){									// Jedes Objekt der Checkpoint-Liste muss überprüft werden
@@ -92,7 +114,11 @@ public class Checkpoints {
 			}						
 		}
 	}
-	    
+	
+	/**
+	 * Entfernt alle Checkpoints von der Karte.
+	 * Alle Checkpoints werden aus der checkList gelöscht.
+	 */
     public static void removeAllCheckpoints() {
     	for(int a=0; a<checkList.size(); a++) {
 			DisplayManager.removeChangeableImages(checkList.get(a).tag);
@@ -100,19 +126,26 @@ public class Checkpoints {
     	checkList.clear();
     }
     
-    /*
-     * gibt xPosition zurück
+    /**
+     * Gibt x-Position zurück
+     * @return x-Position
      */
     public int getX(){
     	return x;
     }
     
-    /*
-     * gibt yPosition zurück
+    /**
+     * Gibt y-Position zurück
+     * @return y-Position
      */
     public int getY(){
     	return y;
     }
+    
+    /**
+     * Gibt an, ob der Checkpoint aktiviert ist.
+     * @return isActivated
+     */
     public int getIsActivated(){
     	if(isActivated)
     		return 1;

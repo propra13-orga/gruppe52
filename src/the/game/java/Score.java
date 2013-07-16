@@ -14,17 +14,18 @@ public class Score {
 	public Score() {
 		scr = 10000;
 	}
-	
-	/*public static List<Score> scoreList = new ArrayList<Score>();
-	
-	public static void createScore() {			// für jeden Spieler einen
-		scoreList.add(new Score());
-	}*/
-	
+	/**
+	 * Gibt den aktuellen score zurück
+	 * @return score
+	 */
 	public int getScore(){						// Gibt den aktuellen score zurück
 		return scr;
 	}
 	
+	/**
+	 * Liest den Wert ein um den der score verändert werden soll und rechnet dementsprechend
+	 * @param wert Wert um den der Score verändert werden soll
+	 */
 	public void setScore(int wert){				// Liest den Wert ein um den der score verändert werden soll und rechnet dementsprechend
 		if(scr+wert>0){
 			scr=scr+wert;
@@ -33,6 +34,10 @@ public class Score {
 		}
 	}
 	
+	/**
+	 * Liest den Wert ein, den der Score erhalten soll und ersetzt dementsprechend
+	 * @param newScore neuer Scorestand
+	 */
 	public void setAbsoluteScore(int newScore) {
 		scr = newScore;
 	}

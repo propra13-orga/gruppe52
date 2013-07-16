@@ -12,15 +12,17 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+/**
+ * Verwaltet alle darstellbaren Objekte
+ */
 public class DisplayManager {
-	
-	
 	
 	public static List<DisplayManager> displayList = new ArrayList<DisplayManager>();
 	public static List<DisplayManager> animationList = new ArrayList<DisplayManager>();
 	public static List<DisplayManager> changeableList = new ArrayList<DisplayManager>();
 	public static List<DisplayManager> frontList = new ArrayList<DisplayManager>();
 	public static List<DisplayManager> stringList = new ArrayList<DisplayManager>();
+	
 	public boolean valid;
 	public Image img;
 	public int x;
@@ -36,23 +38,32 @@ public class DisplayManager {
 	// Initialisieren der benötigten Bilder
     private static Image wall = getImage("wall.png");
     private static Image trap = getImage("mine.gif");
-    //private static Image monster = getImage("enemy.gif");
     private static Image heart = getImage("heart.png");
-    //private static Image background = getImage("bg.png");
-    //private Image explosion = getImage("explosion.gif");
-    //private static Image menu = getImage("headmenu.png");
     private static Image finalGoal = getImage("goal.png");
-    //private static Image layer = getImage("transparentLayer.png");
-    //private static Image youDiedMenu = getImage("youdied.png");
     private static Image shield = getImage("shield.png");
     private static Image menu = getImage("misc/headmenu.png");
 	
+    /**
+     * Konstruktor(1) der Klasse DisplayManager.
+     * Wird verwendet, wenn ein Bild dargestellt werden soll.
+     * @param image Bild, das dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+     */
 	private DisplayManager(Image image, int posx, int posy) {
 		valid = true;
 		img = image;
 		x = posx;
 		y = posy;
 	}
+	/**
+	 * Konstruktor(2) der Klasse DisplayManager.
+	 * Wird verwendet, wenn ein Bild über einen bestimmten Zeitraum hinweg dargestellt werden soll.
+     * @param image Bild, das dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+	 * @param timeMillis Zeit, die das Bild dargestellt werden soll
+	 */
 	private DisplayManager(Image image, int posx, int posy, long timeMillis) {
 		valid = true;
 		img = image;
@@ -61,6 +72,14 @@ public class DisplayManager {
 		time = timeMillis;
 		timeStamp = System.currentTimeMillis();
 	}
+	/**
+	 * Konstruktor(3) der Klasse DisplayManager.
+	 * Wird verwendet, wenn ein Bild einer bestimmten Gruppe von Bildern zugeordnet werden kann.
+     * @param image Bild, das dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+	 * @param imageTag  Tag, der alle Bilder der Bildergruppe betrifft
+	 */
 	private DisplayManager(Image image, int posx, int posy, String imageTag) {
 		valid = true;
 		img = image;
@@ -68,6 +87,14 @@ public class DisplayManager {
 		y = posy;
 		tag = imageTag;
 	}
+	/**
+	 * Konstruktor(4) der Klasse DisplayManager.
+	 * Wird verwendet, wenn ein Text einer bestimmten Gruppe von Texten zugeordnet werden kann.
+	 * @param displayText Text der dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+	 * @param imageTag Tag, der alle Texte der Textgruppe betrifft
+	 */
 	private DisplayManager(String displayText, int posx, int posy, String imageTag) {
 		valid = true;
 		text = displayText;
@@ -76,7 +103,11 @@ public class DisplayManager {
 		tag = imageTag;
 	}
 	
-	
+	/**
+	 * Regelt alles darstellbare außerhalb der paint-Mathode.
+	 * Wird in paint aufgerufen.
+	 * @param g2d Graphic
+	 */
 	public static void draw(Graphics2D g2d) {
 		JPanel jp = Setter.getJPanel();
 		
@@ -132,43 +163,102 @@ public class DisplayManager {
 		// ChangeableStringList
 		for(int a=0; a<stringList.size(); a++) {
 		        g2d.drawString(stringList.get(a).text, stringList.get(a).x, stringList.get(a).y);
-		        //System.out.println(stringList.get(a).text+"   "+stringList.get(a).x+"   "+stringList.get(a).y);
 		}
-		
-		
 	}
 	
-	
-	
-	
+
 	// Display
+	/**
+	 * Stellt Bild mithilfe eines Images dar und Fügt das Bild in displayList.
+	 * @param image Bild, das dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+	 */
 	public static void displayImage(Image image, int posx, int posy) {
 		displayList.add(new DisplayManager(image, posx, posy));
 	}
+	/**
+	 * Stellt Bild mithilfe eines Pfades dar und Fügt das Bild in displayList.
+	 * @param imagePath Pfad des Bildes, das dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+	 */
 	public static void displayImage(String imagePath, int posx, int posy) {
 		displayList.add(new DisplayManager(getImage(imagePath), posx, posy));
 	}
 	// Animation
+	/**
+	 * Stellt Bild, welches nur über einen bestimmten Zeitraum angezeigt wird, mithilfe eines Images dar
+	 * und fügt das Bild in animationsList.
+	 * @param image Bild, das dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+	 * @param timeMillis Zeit, die das Bild dargestellt werden soll
+	 */
 	public static void displayImage(Image image, int posx, int posy, long timeMillis) {
 		animationList.add(new DisplayManager(image, posx, posy, timeMillis));
 	}
+	/**
+	 * Stellt Bild, welches nur über einen bestimmten Zeitraum angezeigt wird, mithilfe eines Pfades dar
+	 * und fügt des Bild in animationsList.
+	 * @param imagePath Pfad des Bildes, das dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+	 * @param timeMillis Zeit, die das Bild dargestellt werden soll
+	 */
 	public static void displayImage(String imagePath, int posx, int posy, long timeMillis) {
 		animationList.add(new DisplayManager(getImage(imagePath), posx, posy, timeMillis));
 	}
 	// Veränderbar
+	/**
+	 * Stellt Bild, welches Veränderbar ist, mithilfe eines Images dar
+	 * und fügt das Bild in changeableList.
+	 * @param image Bild, das dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+	 * @param imageTag Tag der allen Bildern der Bildgruppe entspricht
+	 */
 	public static void displayImage(Image image, int posx, int posy, String imageTag) {
 		changeableList.add(new DisplayManager(image, posx, posy, imageTag));
 	}
+	/**
+	 * Stellt Bild, welches Veränderbar ist, mithilfe eines Pfades dar
+	 * und fügt das Bild in changeableList.
+	 * @param imagePath Pfad des Bildes, das dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+	 * @param imageTag Tag der allen Bildern der Bildgruppe entspricht
+	 */
 	public static void displayImage(String imagePath, int posx, int posy, String imageTag) {
 		changeableList.add(new DisplayManager(getImage(imagePath), posx, posy, imageTag));
 	}
 	// Menus (Oberste Ebene)
+	/**
+	 * Stellt Bild, welches in DisplayLine dargestellt werden soll, mithilfe eines Images dar
+	 * und fügt das Bild in fontList. Wenn das Bild nicht in DisplayLine soll, kommt es in 
+	 * changeableList.
+	 * @param image Bild, das dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+	 * @param imageTag Tag der allen Bildern der Bildgruppe entspricht
+	 * @param isMenu true=DisplayLine, false=ChangeableImage
+	 */
 	public static void displayImage(Image image, int posx, int posy, String imageTag, boolean isMenu) {
 		if(isMenu)
 			frontList.add(new DisplayManager(image, posx, posy, imageTag));
 		else
 			changeableList.add(new DisplayManager(image, posx, posy, imageTag));
 	}
+	/**
+	 * Stellt Bild, welches in DisplayLine dargestellt werden soll, mithilfe eines Pfades dar
+	 * und fügt das Bild in fontList. Wenn das Bild nicht in DisplayLine soll, kommt es in 
+	 * changeableList.
+	 * @param imagePath Pfad des Bildes, das dargestellt werden soll
+     * @param posx x-Position an der das Bild dargestellt werden soll
+     * @param posy y-Position an der das Bild dargestellt werden soll
+	 * @param imageTag Tag der allen Bildern der Bildgruppe entspricht
+	 * @param isMenu true=DisplayLine, false=ChangeableImage
+	 */
 	public static void displayImage(String imagePath, int posx, int posy, String imageTag, boolean isMenu) {
 		if(isMenu)
 			frontList.add(new DisplayManager(getImage(imagePath), posx, posy, imageTag));
@@ -176,10 +266,20 @@ public class DisplayManager {
 			changeableList.add(new DisplayManager(getImage(imagePath), posx, posy, imageTag));
 	}
 	// Strings
+	/**
+	 * Stellt Text dar und fügt den Text in stringList.
+	 * @param text Text, der dargestellt werden soll
+     * @param posx x-Position an der der Text dargestellt werden soll
+     * @param posy y-Position an der der Text dargestellt werden soll
+	 * @param imageTag Tag der allen Texten der Textgruppe entspricht
+	 */
 	public static void displayString(String text, int posx, int posy, String imageTag) {
 		stringList.add(new DisplayManager(text, posx, posy, imageTag));
 	}
 	
+	/**
+	 * aktualisiert alles, was veränderbare Images betrifft
+	 */
 	public static void updateDisplayTimers() {
 		for(int a=0; a<animationList.size(); a++) {
         	if(System.currentTimeMillis() - animationList.get(a).timeStamp > animationList.get(a).time) {
@@ -189,6 +289,10 @@ public class DisplayManager {
         }
 	}
 	
+	/**
+	 * Entfernt alle Bilder, die einen der Vorgabe entsprechenden Tag haben
+	 * @param imageTag Alle dem Tag entsprechende Bilder sollen gelöscht werden
+	 */
 	public static void removeChangeableImages(String imageTag) {	// löscht alle Bilder, die einen der Vorgabe entsprechenden Tag haben
 		for(int a=0; a<changeableList.size(); a++) {
         	if(changeableList.get(a).tag==imageTag) {
@@ -203,6 +307,11 @@ public class DisplayManager {
         	}
         }
 	}
+	
+	/**
+	 * Entfernt alle Texte, die einen der Vorgabe entsprechenden Tag haben
+	 * @param imageTag Alle dem Tag entsprechende Texte sollen gelöscht werden
+	 */
 	public static void removeChangeableStrings(String imageTag) {	// löscht alle Bilder, die einen der Vorgabe entsprechenden Tag haben
 		for(int a=0; a<stringList.size(); a++) {
         	if(stringList.get(a).tag==imageTag) {
@@ -211,12 +320,18 @@ public class DisplayManager {
         	}
         }
 	}
+	
+	/**
+	 * Entfernt die DisplayLine
+	 */
 	public static void removeMenu() {
 		frontList.clear();
 	}
 	
 	
-	/**     Methoden zur dauerhaften Darstellung     */
+	/**
+	 * Stellt alle Bilder dar, die dauerhaft auf der Karte existieren sollen
+	 */
 	public static void displayMap() {
 		DisplayManager.removeChangeableImages("map");
 		// Geht die gesamte itemMap durch und stellt alles dar, was dort angegeben wurde; Jedes darzustellende Objekt hat eine ID
@@ -237,6 +352,10 @@ public class DisplayManager {
 					displayImage(heart, a*20, b*20, "map");
 					//g2d.drawImage(heart, a*20, b*20, this);		// Hearts
 					break;
+				case 3:
+					displayImage(finalGoal, a*20, b*20, "map");
+					//g2d.drawImage(finalGoal, a*20, b*20, this);	// Final Goal
+					break;
 				case 5:
 					displayImage(finalGoal, a*20, b*20, "map");
 					//g2d.drawImage(finalGoal, a*20, b*20, this);	// Final Goal
@@ -245,6 +364,10 @@ public class DisplayManager {
 					displayImage(shield, a*20, b*20, "map");
 					//g2d.drawImage(shield, a*20, b*20, this);	// Shield
 					break;
+				default:
+					if(LevelCreator.getItemMapData(a, b)>=50 && LevelCreator.getItemMapData(a, b)<=59) {
+						displayImage(finalGoal, a*20, b*20, "map");
+					}
 				}
 				if(LevelCreator.getItemMapData(a, b)>100 && LevelCreator.getItemMapData(a, b)<200) {
 					String str = (LevelCreator.getItemMapData(a, b)-100) + "s";	// verbleibende sekunden
@@ -256,9 +379,12 @@ public class DisplayManager {
 	    
 	    NPC.displayNPC();
 	}
-	/**     Methoden zur dauerhaften Darstellung ENDE */
 	
-	/**     HILFSMETHODEN     */
+	/**
+	 * Bekommt einen Pfad und gibt das entsprechende Bild zurück.
+	 * @param path an dem das Bild zu finden sein soll
+	 * @return Image, das dem Pfad entspricht
+	 */
 	public static Image getImage(String path) {	// bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
 		Image img = null;
 		try {

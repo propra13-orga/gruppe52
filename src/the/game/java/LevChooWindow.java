@@ -11,11 +11,10 @@ import javax.swing.JFrame;
 import javax.swing.JRadioButton;*/
 import javax.swing.*;
 
+/**
+ *  Diese Klasse erstellt das Fenster, in welchem mit Hilfe von RadioButtons ein Level ausgewählt werden kann.
+ */
 public class LevChooWindow extends JFrame implements ActionListener {
-	
-	/**
-	 *  Diese Klasse erstellt das Fenster, in welchem mit Hilfe von RadioButtons ein Level ausgewählt werden kann.
-	 */
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -30,6 +29,10 @@ public class LevChooWindow extends JFrame implements ActionListener {
 	private JButton zurueck;
 	
 	//Konstruktor
+	/**
+	 * Konstruktor der Klasse LevChooWindow
+	 * @param title Titel des Fensters
+	 */
 	public LevChooWindow(String title){
 		super(title);
 		
@@ -63,6 +66,9 @@ public class LevChooWindow extends JFrame implements ActionListener {
 	}
 	
 	//Was passiert bei Drücken der Buttons?
+	/**
+	 * Legt fest, was beim Drücken der Buttons passieren soll
+	 */
 	public void actionPerformed (ActionEvent e){ //wenn eine Aktion passiert bekommt ActionListener das mit und löst methode aus
 		
 		//Wurde der Los gehts Button gedrückt?
@@ -70,9 +76,9 @@ public class LevChooWindow extends JFrame implements ActionListener {
 			
 			//Welches Level wurde ausgewählt?
 			if(eins.isSelected()==true){
-				StartWindow.fenster(3);  				// Level 1
+				StartWindow.fenster(1);  				// Level 1
 			}else if(zwei.isSelected()==true){
-				StartWindow.fenster(6);  				// Level 2
+				StartWindow.fenster(4);  				// Level 2
 			}else{
 				StartWindow.fenster(9);  				// Level 3
 			}
@@ -87,6 +93,10 @@ public class LevChooWindow extends JFrame implements ActionListener {
 
 	}
 	
+	/**
+	 * Main-Methode: Erstellt das Fenster in dem ein Level ausgewählt werden kann.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 			
 		frame.setSize(300, 120);									// Fenstergröße wird festgelegt

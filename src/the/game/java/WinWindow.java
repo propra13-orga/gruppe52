@@ -6,19 +6,22 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-
+/**
+ * Dieses Fenster öffnet sich, wenn man das Spiel gewonnen hat, bzw wenn man das "FinalGoal" passiert hat. 
+ */
 public class WinWindow extends JFrame implements ActionListener{
 	
-	/**
-	 * Dieses Fenster öffnet sich, wenn man das Spiel gewonnen hat, bzw wenn man das "FinalGoal" passiert hat. 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	//Buttons werden deklariert
 	private JButton zurueck;
 	private JButton nochmal;
 	private JButton choose;		
-			
+	
+	/**
+	 * Konstruktor der Klasse WinWindow
+	 * @param title Titel des Fensters
+	 */
 	public WinWindow(String title){ //Konstruktor
 		//Titel einstellen
 		super(title);
@@ -43,7 +46,9 @@ public class WinWindow extends JFrame implements ActionListener{
 				
 		}
 		
-	      //Was passiert wenn Butten gedrückt wird?
+	      /**
+	       * Was passiert wenn Butten gedrückt wird? 
+	       */
 		  public void actionPerformed (ActionEvent e){ //wenn eine Aktion passiert bekommt ActionListener das mit und löst methode aus
 				
 				if (e.getSource()==zurueck){
@@ -61,7 +66,10 @@ public class WinWindow extends JFrame implements ActionListener{
 		   }
 			
 			
-			
+			/**
+			 * Main-Methode der Klasse WinWindow
+			 * Ein neues Fenster wird erstellt
+			 */
 			public static void main(String[] args) {
 				WinWindow frame = new WinWindow("You Won! JUHUUUUUUUU! Was möchtest du jetzt tun?"); 
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 		//Schliessen mit x

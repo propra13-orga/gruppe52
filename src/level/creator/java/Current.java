@@ -4,16 +4,23 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import the.game.java.Enemy;
-import level.creator.java.*;
-
-
-public class Current {
 /**
  *  In dieser Klasse wird alles verwaltet, was von dem aktuell gewählten Feld im Editor abhängt.
  */
-	int currentX=4;																// aktuelle Position der Auswahl
-	int currentY=101;
+public class Current {
+	public static int currentXPixel=4;																// aktuelle Position der Auswahl
+	public static int currentYPixel=101;
+	
+	static int defaultX=4;
+	static int defaultY=101;
+	
+	int currentXHilf;
+	int currentYHilf;
+	
+	int firstDoorX;
+	int firstDoorY;
+	
+	static boolean doorChooserActivated = false;
 	
 	public static List<Current> currentListX = new ArrayList<Current>();
 	public static List<Current> currentListY = new ArrayList<Current>();
@@ -27,25 +34,29 @@ public class Current {
 	 * Die aktuelle x-Position wird geändert	
 	 * @param chosenx = aktuelle x-Position in Pixeln. Beachte: immer +4 wegen Fensterrand
 	 */
-	public void setCurrentX(int chosenx){										
-		currentX=chosenx;
+	public void setcurrentXPixel(int chosenx){										
+		currentXPixel=chosenx;
 	}
 	/**
 	 * Die aktuelle y-Position wird geändert
 	 * @param choseny = aktuelle y-Position in Pixeln. Beachte: immer +101 wegen Fensterrand and Überschrift
 	 */
-	public void setCurrentY(int choseny){
-		currentY=choseny;
+	public void setcurrentYPixel(int choseny){
+		currentYPixel=choseny;
 	}
-	/** 
-	 * currentX und currentY können zurückgegeben werden
+	/**
+	 * currentXPixel wird zurückgegeben
+	 * @return currentXPixel
 	 */
-	public int getCurrentX(){
-		return currentX;
+	public int getcurrentXPixel(){
+		return currentXPixel;
 	}
-	
-	public int getCurrentY(){
-		return currentY;
+	/**
+	 * currentYPixel wird zurückgegeben
+	 * @return currentYPixel
+	 */
+	public int getcurrentYPixel(){
+		return currentYPixel;
 	}
 	
 	int imageType=0;
@@ -55,12 +66,13 @@ public class Current {
 	 */
 	public void setLoadingImage(int type){
 		imageType=type;
-		//if(0<=(currentX-4)/20 && (currentX-4)/20<=48 && 0<=(currentY-101)/20 && (currentY-101)/20<=25){
-			EditorSetter.map[(currentX-4)/20][(currentY-101)/20]=imageType;
+		//if(0<=(currentXPixel-4)/20 && (currentXPixel-4)/20<=48 && 0<=(currentYPixel-101)/20 && (currentYPixel-101)/20<=25){
+			EditorSetter.map[(currentXPixel-4)/20][(currentYPixel-101)/20]=imageType;
 		//}
 	}
 	/**
-	 *  gibt den imageType zurück
+	 * gibt den imageType zurück
+	 * @return imageType
 	 */
 	public int getLoadingImage(){
 		return imageType;
@@ -70,7 +82,10 @@ public class Current {
 	/**
 	 * 	Key Bindings
 	 */
-	
+	/**
+	 * KeyBinding : Pressed
+	 * @param event
+	 */
 	public void keyPressend(KeyEvent event){
 		int key = event.getKeyCode();
 	    //System.err.println("HEEE HIER BIN ICH !!");
@@ -94,19 +109,55 @@ public class Current {
 	        
 		}
 	}
-	
+	/**
+	 * KeyBinding : Released
+	 * @param event
+	 */
 	public void keyReleased(KeyEvent event){
 		int key = event.getKeyCode();
 
 		switch(key){
+		case KeyEvent.VK_ENTER:
+			if(doorChooserActivated==false){
+				System.out.println("DoorChooser ist deaktiviert");
+				currentXHilf = ((currentXPixel-defaultX)-((currentXPixel-defaultX)%20))/20;
+				currentYHilf = ((currentYPixel-defaultY)-((currentXPixel-defaultX)%20))/20;
+				if(EditorSetter.map[currentXHilf][currentYHilf]==20 || EditorSetter.map[currentXHilf][currentYHilf]==21 || EditorSetter.map[currentXHilf][currentYHilf]==22 || EditorSetter.map[currentXHilf][currentYHilf]==23){
+					System.out.println("Zahl entspricht einer Tür");
+					doorChooserActivated=true;
+					//Door.createDoor(currentXPixel, currentYPixel, -1, -1);
+					firstDoorX=currentXPixel-defaultX;
+					firstDoorY=currentYPixel-defaultY;
+					System.out.println("Du verbindest Tür in " +currentXPixel+ "/" +currentYPixel);
+				}else{
+					System.out.println("Zahl entspricht NICHT einer Tür, sondern: "+EditorSetter.map[currentXHilf][currentYHilf]);
+				}
+			}else{
+				System.out.println("DoorChooser ist aktiviert");
+				currentXHilf = ((currentXPixel-defaultX)-((currentXPixel-defaultX)%20))/20;
+				currentYHilf = ((currentYPixel-defaultY)-((currentXPixel-defaultX)%20))/20;
+				if(EditorSetter.map[currentXHilf][currentYHilf]==20 || EditorSetter.map[currentXHilf][currentYHilf]==21 || EditorSetter.map[currentXHilf][currentYHilf]==22 || EditorSetter.map[currentXHilf][currentYHilf]==23){
+					System.out.println("Zahl entspricht einer Tür");
+					if(firstDoorX!=currentXPixel || firstDoorY!=currentYPixel){
+						System.out.println("Türen sind unterschiedlich");
+						Door.createDoor(firstDoorX, firstDoorY, currentXPixel-defaultX, currentYPixel-defaultY);
+						System.out.println("mit Tür in " +currentXPixel+ "/" +currentYPixel);
+					}else{
+						System.out.println("Türen sind gleich:" + firstDoorX +"/"+ currentXPixel +" "+ firstDoorY +"/"+ currentYPixel );
+					}
+					doorChooserActivated=false; //TODO: richtig?
+				}
+
+			}
+			break;
 		case KeyEvent.VK_ESCAPE:
 			EditorSetter.currentList.clear();
 			break;
 		case KeyEvent.VK_DELETE:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					EditorSetter.map[(int)EditorSetter.currentList.get(y).getX()][(int)EditorSetter.currentList.get(y).getY()]=0;
 				}
 				EditorSetter.currentList.clear();
@@ -130,8 +181,8 @@ public class Current {
 		case KeyEvent.VK_1:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(1);
 				}
 				EditorSetter.currentList.clear();
@@ -142,8 +193,8 @@ public class Current {
 		case KeyEvent.VK_2:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(2);
 				}
 				EditorSetter.currentList.clear();
@@ -154,8 +205,8 @@ public class Current {
 		case KeyEvent.VK_3:	
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(3);
 				}
 				EditorSetter.currentList.clear();
@@ -166,8 +217,8 @@ public class Current {
 		case KeyEvent.VK_4:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(4);
 				}
 				EditorSetter.currentList.clear();
@@ -178,8 +229,8 @@ public class Current {
 		case KeyEvent.VK_5:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(5);
 				}
 				EditorSetter.currentList.clear();
@@ -190,8 +241,8 @@ public class Current {
 		case KeyEvent.VK_6:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(6);
 				}
 				EditorSetter.currentList.clear();
@@ -202,8 +253,8 @@ public class Current {
 		case KeyEvent.VK_7:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(7);
 				}
 				EditorSetter.currentList.clear();
@@ -219,11 +270,23 @@ public class Current {
 				System.out.println("Wie willst du denn bitte an zwei Stellen gleichzeitig starten?");
 			}
 			break;
+		case KeyEvent.VK_9:
+			if(!EditorSetter.currentList.isEmpty()){
+				for(int y=0; y<EditorSetter.currentList.size(); y++){
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					setLoadingImage(9);
+				}
+				EditorSetter.currentList.clear();
+				return;
+			}
+			setLoadingImage(9);			// :== Rüstung
+			break;
 		case KeyEvent.VK_Q:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(11);
 				}
 				EditorSetter.currentList.clear();
@@ -234,8 +297,8 @@ public class Current {
 		case KeyEvent.VK_W:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(12);
 				}
 				EditorSetter.currentList.clear();
@@ -246,8 +309,8 @@ public class Current {
 		case KeyEvent.VK_E:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(13);
 				}
 				EditorSetter.currentList.clear();
@@ -258,8 +321,8 @@ public class Current {
 		case KeyEvent.VK_R:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(14);
 				}
 				EditorSetter.currentList.clear();
@@ -270,8 +333,8 @@ public class Current {
 		case KeyEvent.VK_T:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(15);
 				}
 				EditorSetter.currentList.clear();
@@ -282,8 +345,8 @@ public class Current {
 		case KeyEvent.VK_Z:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(16);
 				}
 				EditorSetter.currentList.clear();
@@ -294,8 +357,8 @@ public class Current {
 		case KeyEvent.VK_U:
 			if(!EditorSetter.currentList.isEmpty()){
 				for(int y=0; y<EditorSetter.currentList.size(); y++){
-					currentX=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
-					currentY=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
 					setLoadingImage(17);
 				}
 				EditorSetter.currentList.clear();
@@ -303,22 +366,85 @@ public class Current {
 			}
 			setLoadingImage(17);		// :== Tracker
 			break;
+		case KeyEvent.VK_I:
+			if(!EditorSetter.currentList.isEmpty()){
+				for(int y=0; y<EditorSetter.currentList.size(); y++){
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					setLoadingImage(18);
+				}
+				EditorSetter.currentList.clear();
+				return;
+			}
+			setLoadingImage(18);			// :== Rüstung
+			break;
+		case KeyEvent.VK_A:
+			if(!EditorSetter.currentList.isEmpty()){
+				for(int y=0; y<EditorSetter.currentList.size(); y++){
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					setLoadingImage(20);
+				}
+				EditorSetter.currentList.clear();
+				return;
+			}
+			setLoadingImage(20);			// :== Door
+			break;
+		case KeyEvent.VK_S:
+			if(!EditorSetter.currentList.isEmpty()){
+				for(int y=0; y<EditorSetter.currentList.size(); y++){
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					setLoadingImage(22);
+				}
+				EditorSetter.currentList.clear();
+				return;
+			}
+			setLoadingImage(22);			// :== Door
+			break;
+		case KeyEvent.VK_D:
+			if(!EditorSetter.currentList.isEmpty()){
+				for(int y=0; y<EditorSetter.currentList.size(); y++){
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					setLoadingImage(21);
+				}
+				EditorSetter.currentList.clear();
+				return;
+			}
+			setLoadingImage(21);			// :== Door
+			break;
+		case KeyEvent.VK_F:
+			if(!EditorSetter.currentList.isEmpty()){
+				for(int y=0; y<EditorSetter.currentList.size(); y++){
+					currentXPixel=(int)EditorSetter.currentList.get(y).getX()*20+EditorSetter.offsetX;
+					currentYPixel=(int)EditorSetter.currentList.get(y).getY()*20+EditorSetter.offsetY;
+					setLoadingImage(23);
+				}
+				EditorSetter.currentList.clear();
+				return;
+			}
+			setLoadingImage(23);			// :== Door
+			break;
 		}
 		
+		
+	}
+	/**
+	 * Gibt zurück, ob der DoorChosser aktiviert ist
+	 * @return doorChooserActivated
+	 */
+	public static boolean isDoorChooserActivated(){
+		return doorChooserActivated;
 	}
 	/**
 	 * Legt die Bewegung der aktuellen Auswahl fest
 	 */
 	public void move(){
-		if(currentX+moveX*20<EditorSetter.offsetX || currentX+moveX*20>48*20+EditorSetter.offsetX-20 || currentY+moveY*20<EditorSetter.offsetY-20 || currentY+moveY*20>25*20+EditorSetter.offsetY-20){
+		if(currentXPixel+moveX*20<EditorSetter.offsetX || currentXPixel+moveX*20>EditorSetter.arrayLenghtX*20+EditorSetter.offsetX-20 || currentYPixel+moveY*20<EditorSetter.offsetY-20 || currentYPixel+moveY*20>EditorSetter.arrayLenghtY*20+EditorSetter.offsetY-20){
 			return;
 		}
-		currentX=currentX+moveX*20;
-		currentY=currentY+moveY*20;
+		currentXPixel=currentXPixel+moveX*20;
+		currentYPixel=currentYPixel+moveY*20;
 	}
-	
-
-	
-	
-
 }

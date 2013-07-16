@@ -8,6 +8,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -20,25 +22,26 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import the.game.java.Controls;
 import the.game.java.Savegame;
 
-
-
-
-
-
+/**
+ * Erstellt das Panel in dem der Creator läuft
+ * @author Kapie
+ *
+ */
 public class EditorSetter extends JPanel implements ActionListener {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	public static Timer timer;
@@ -50,11 +53,15 @@ public class EditorSetter extends JPanel implements ActionListener {
 	private JButton starten;												// "Ferig" Button um die map auszugeben
 	private JButton öffnen;
 	
+	public static JCheckBox darkness;
+	public static JCheckBox multi;
+	
 	static int arrayLenghtX=48;												// Map 48*20 Pixel breit
-	static int arrayLenghtY=25;												// Map 25*20 Pixel hoch
+	static int arrayLenghtY=26;												// Map 25*20 Pixel hoch
 	public static int[][] map;												// Zweidimensionales Array stellt Map dar
 	
-												// erzeugt eine Variable timer des Typs Timer
+	static boolean dark=false;
+	static boolean multiplay=false;
 	
 	int defaultx=3;															//	Startposition des Spielfelds
 	int defaulty=100;
@@ -70,10 +77,8 @@ public class EditorSetter extends JPanel implements ActionListener {
 	
 	int rueckFileChooser;
 	
-	public static int stabilisation=1;	
-	
-	JFileChooser chooser = new JFileChooser();
-	
+	public static int stabilisation=1;
+
 	/*
 	 * Initialisierung aller nötigen Bilder
 	 */
@@ -95,7 +100,16 @@ public class EditorSetter extends JPanel implements ActionListener {
     private Image l_u_monster = getImage("lu_monster.png");
     private Image credit = getImage("goodies/credits.png");
     private Image marker = getImageFromLC("marker.png");
+    private Image shop = getImage("npc/npcShop.png");
+    private Image dalek = getImage("traps/dalek.png");
+    private Image door_h_up = getImage("door/door_h_up.png");
+    private Image door_h_down = getImage("door/door_h_down.png");
+    private Image door_v_right = getImage("door/door_v_right.png");
+    private Image door_v_left = getImage("door/door_v_left.png");
 
+    /**
+     * Konstruktor der Klasse EditorSetter
+     */
     public EditorSetter() {	// Konstruktor
 		addKeyListener(new KAdapter());		// Fügt KeyListener hinzu und erstellt ein neues Objekt der Klasse TAdapter, welches die Methoden 'keyReleased' und 'keyPressed' überschreibt
         addMouseListener(new MAdapter());
@@ -124,13 +138,26 @@ public class EditorSetter extends JPanel implements ActionListener {
 		öffnen.addActionListener(this);
 		add(öffnen);
         
-		map = new int[arrayLenghtX][arrayLenghtY];						// 2D-Array mit arrayLenghtX(48)*arrayLenghtY(25) wird angelegt
+		darkness = new JCheckBox("Dunkelheit"); //TODO:
+		darkness.setSelected(false);
+		darkness.setBounds(760, 630, 100, 20);
+		add(darkness);
+		
+		multi = new JCheckBox("Multiplayer"); //TODO:
+		multi.setSelected(false);
+		multi.setBounds(760, 660, 100, 20);
+		add(multi);
+		
+		map = new int[arrayLenghtX+1][arrayLenghtY+2];						// 2D-Array mit arrayLenghtX(48)*arrayLenghtY(25) wird angelegt
 		resetMap();
 		
 			
     }
     
-    private void resetMap() {											// resetet Map
+    /**
+     * Setzt alle ArrayInhalte auf 0
+     */
+    public static void resetMap() {											// resetet Map
     	for(int a=0; a<arrayLenghtX; a++){
 			for(int b=0; b<arrayLenghtY; b++){
 				map[a][b] = 0;
@@ -138,6 +165,9 @@ public class EditorSetter extends JPanel implements ActionListener {
 		}
     }
     
+    /**
+     * paint Methode des LevelCreators
+     */
     public void paint(Graphics g){										// Zeichnet Map 
 		super.paint(g);
         
@@ -151,13 +181,13 @@ public class EditorSetter extends JPanel implements ActionListener {
          *  Streifen für Map werden gezeichnet
          */
         g2d.setColor(Color.GRAY);
-		for(int laufy=0; laufy<=stripesy;laufy++){
+		for(int laufy=0; laufy<=stripesy+1;laufy++){
 			drawy=defaulty-1+20*laufy;											// drawy = aktuell gezeichneter Streifen von < nach >
 			g2d.fillRect(defaultx-1, drawy, stripesx*20+1, 2);
 		}
 		for(int laufx=0; laufx<=stripesx; laufx++){
 			drawx=defaultx-1+20*laufx;											// drawx = aktuell gezeichneter Streifen von ^ nach v
-			g2d.fillRect(drawx, defaulty-1, 2, stripesy*20+1);
+			g2d.fillRect(drawx, defaulty-1, 2, stripesy*20+1+20);
 			
 		}
 		g2d.setColor(Color.BLACK);
@@ -165,40 +195,59 @@ public class EditorSetter extends JPanel implements ActionListener {
 		 *  Legende für Leveleditor
 		 */
 		
-		g2d.drawImage(wall, 23, 620, this);																	// Wand
-		g2d.drawString("Drücke '1' um eine Wand einzufügen", 63, 635);
-		g2d.drawImage(credit, 23, 650, this);																	// Falle
-		g2d.drawString("Drücke '2' um einen Credit einzufügen", 63, 665);
-		g2d.drawImage(heart, 23, 680, this);																// Leben
-		g2d.drawString("Drücke '3' um ein Leben einzufügen", 63, 695);
-		g2d.drawImage(finalGoal, 23, 710, this);															// Ziel
-		g2d.drawString("Drücke '4' um ein Ziel einzufügen", 63, 725);
-		g2d.drawImage(shield, 23, 740, this);																// Rüstung
-		g2d.drawString("Drücke '5' um eine Rüstung einzufügen", 63, 755);
-		g2d.drawImage(mana, 23, 770, this);																// Zaubertrank
-		g2d.drawString("Drücke '6' um einen Manatrank einzufügen", 63, 785);
-		g2d.drawImage(checkpoint, 23, 800, this);																// Checkpoint
-		g2d.drawString("Drücke '7' um einen Checkpoint einzufügen", 63, 815);
-		g2d.drawImage(spawn, 23, 830, this);																// Checkpoint
-		g2d.drawString("Drücke '8' um einen Startpunkt einzufügen", 63, 845);
-		g2d.fillRect(323, 620, 2, 200);																		// Trennlinie
-		g2d.drawImage(horiMonster, 345, 620, this);															// Horizontales Monster
-		g2d.drawString("Drücke 'q' um einen horizontalen Feind einzufügen", 385, 635);
-		g2d.drawImage(vertiMonster, 345, 650, this);														// Vertikales Monster
-		g2d.drawString("Drücke 'w' um einen vertikalen Feind einzufügen", 385, 665);
-		g2d.drawImage(r_u_monster, 345, 680, this);															// right-up Monster
-		g2d.drawString("Drücke 'e' um einen rechts-oben-diagonalen Feind einzufügen", 385, 695);
-		g2d.drawImage(l_u_monster, 345, 710, this);															// left-up Monster
-		g2d.drawString("Drücke 'r' um einen links-oben-diagonalen Feind einzufügen", 385, 725);
-		g2d.drawImage(bouncy, 345, 740, this);																// Bouncy
-		g2d.drawString("Drücke 't' um einen Bouncy einzufügen", 385, 755);
-		g2d.drawImage(tracker, 345, 770, this);																// Tracker
-		g2d.drawString("Drücke 'z' um einen Tracker einzufügen", 385, 785);
-		g2d.drawImage(trap, 345, 800, this);																	// Falle
-		g2d.drawString("Drücke 'u' um eine Falle einzufügen", 385, 815);
-		//g2d.fillRect(740, 620, 2, 200);	
-		//System.out.println(currentpos.getCurrentX());
-		//System.out.println(currentpos.getCurrentY());
+		g2d.drawImage(wall, 23, 630, this);																	// Wand
+		g2d.drawString("Drücke '1' um eine Wand einzufügen", 63, 645);
+		g2d.drawImage(credit, 23, 660, this);																	// Falle
+		g2d.drawString("Drücke '2' um einen Credit einzufügen", 63, 675);
+		g2d.drawImage(heart, 23, 690, this);																// Leben
+		g2d.drawString("Drücke '3' um ein Leben einzufügen", 63, 705);
+		g2d.drawImage(finalGoal, 23, 720, this);															// Ziel
+		g2d.drawString("Drücke '4' um ein Ziel einzufügen", 63, 735);
+		g2d.drawImage(shield, 23, 750, this);																// Rüstung
+		g2d.drawString("Drücke '5' um eine Rüstung einzufügen", 63, 765);
+		g2d.drawImage(mana, 23, 780, this);																// Zaubertrank
+		g2d.drawString("Drücke '6' um einen Manatrank einzufügen", 63, 795);
+		g2d.drawImage(checkpoint, 23, 810, this);																// Checkpoint
+		g2d.drawString("Drücke '7' um einen Checkpoint einzufügen", 63, 825);
+		g2d.drawImage(spawn, 23, 840, this);																// Checkpoint
+		g2d.drawString("Drücke '8' um einen Startpunkt einzufügen", 63, 855);
+		g2d.drawImage(shop, 23, 870, this);
+		g2d.drawString("Drücke '9' um einen Shop einzufügen" , 63, 885);
+		
+		g2d.fillRect(323, 630, 2, 270);																		// Trennlinie
+		
+		g2d.drawImage(horiMonster, 345, 630, this);															// Horizontales Monster
+		g2d.drawString("Drücke 'q' um einen horizontalen Feind einzufügen", 385, 645);
+		g2d.drawImage(vertiMonster, 345, 660, this);														// Vertikales Monster
+		g2d.drawString("Drücke 'w' um einen vertikalen Feind einzufügen", 385, 675);
+		g2d.drawImage(r_u_monster, 345, 690, this);															// right-up Monster
+		g2d.drawString("Drücke 'e' um einen rechts-oben-diagonalen Feind einzufügen", 385, 705);
+		g2d.drawImage(l_u_monster, 345, 720, this);															// left-up Monster
+		g2d.drawString("Drücke 'r' um einen links-oben-diagonalen Feind einzufügen", 385, 735);
+		g2d.drawImage(bouncy, 345, 750, this);																// Bouncy
+		g2d.drawString("Drücke 't' um einen Bouncy einzufügen", 385, 765);
+		g2d.drawImage(tracker, 345, 780, this);																// Tracker
+		g2d.drawString("Drücke 'z' um einen Tracker einzufügen", 385, 795);
+		g2d.drawImage(trap, 345, 810, this);																	// Falle
+		g2d.drawString("Drücke 'u' um eine Falle einzufügen", 385, 825);
+		g2d.drawImage(dalek, 345, 840, this);																	// Falle
+		g2d.drawString("Drücke 'i' um einen Dalek einzufügen", 385, 855);
+		
+		g2d.fillRect(740, 620, 2, 270);	
+		
+		g2d.drawImage(door_h_up, 760, 710, this);
+		g2d.drawString("'a'", 800, 725);
+		g2d.drawImage(door_h_down, 830, 710, this);
+		g2d.drawString("'s'", 870, 725);
+		g2d.drawString("Horizontale Türen", 760, 755);
+		g2d.drawImage(door_v_right, 760, 770, this);
+		g2d.drawString("'d'", 800, 785);
+		g2d.drawImage(door_v_left, 830, 770, this);
+		g2d.drawString("'f'", 870, 785);
+		g2d.drawString("Vertikale Türen", 760, 815);
+		
+		//System.out.println(currentpos.getcurrentXPixel());
+		//System.out.println(currentpos.getcurrentYPixel());
 		
 		/**
 		 *  Images einfügen
@@ -235,6 +284,9 @@ public class EditorSetter extends JPanel implements ActionListener {
 					case 8:
 						g2d.drawImage(spawn, a*20+defaultx, b*20+defaulty, this);
 						break;
+					case 9:
+						g2d.drawImage(shop, a*20+defaultx, b*20+defaulty, this);
+						break;
 					case 11:																			// Array Inhalt = 11 => horizontales Monster
 						g2d.drawImage(horiMonster,a*20+defaultx,b*20+defaulty, this);
 						break;	
@@ -256,12 +308,50 @@ public class EditorSetter extends JPanel implements ActionListener {
 					case 17:																			// Array Inhalt = 16 => Tracker
 						g2d.drawImage(trap,a*20+defaultx,b*20+defaulty, this);
 						break;
+					case 18:
+						g2d.drawImage(dalek, a*20+defaultx-1, b*20+defaulty-5, this);
+						break;
+					case 20:
+						g2d.drawImage(door_h_up, a*20+defaultx, b*20+defaulty, this);
+						break;
+					case 21:
+						g2d.drawImage(door_v_right, a*20+defaultx, b*20+defaulty, this);
+						break;
+					case 22:
+						g2d.drawImage(door_h_down, a*20+defaultx, b*20+defaulty, this);
+						break;
+					case 23:
+						g2d.drawImage(door_v_left, a*20+defaultx, b*20+defaulty, this);
+						break;
 				}
 			}
 		}
 		
+		
+		
 		g2d.setColor(Color.red);
-		g2d.drawRect(currentpos.getCurrentX(), currentpos.getCurrentY(),17, 17);							// Aktuell ausgewähltes Feld wird mit rotem Rechteck markiert
+		
+		if(Current.isDoorChooserActivated()){
+			g2d.drawString("Türwahl aktiviert", 850, 93);
+		}
+		
+		int index=Door.findDoorInList(Door.pixelToArray(Current.currentXPixel-defaultx), Door.pixelToArray(Current.currentYPixel-defaulty));
+		if(index>=0){
+			g2d.drawString("Verbunden ist: " + Door.doorList.get(index).x +"/"+ Door.doorList.get(index).y +" mit "+ Door.doorList.get(index).goalx +"/"+ Door.doorList.get(index).goaly, 750, 93);
+
+		}
+		
+		for(int a=0; a<Door.doorList.size(); a++) {
+			if(Door.doorList.get(a).goalx>=0 && Door.doorList.get(a).goaly>=0) {
+				int x1 = Door.doorList.get(a).x + defaultx;
+				int x2 = Door.doorList.get(a).goalx + defaultx;
+				int y1 = Door.doorList.get(a).y + defaulty;
+				int y2 = Door.doorList.get(a).goaly + defaulty;
+				g2d.drawLine(x1, y1, x2, y2);
+			}
+		}
+		
+		g2d.drawRect(currentpos.getcurrentXPixel(), currentpos.getcurrentYPixel(),17, 17);							// Aktuell ausgewähltes Feld wird mit rotem Rechteck markiert
 		
 		
 		// AUSWAHL DARSTELLEN
@@ -276,6 +366,9 @@ public class EditorSetter extends JPanel implements ActionListener {
 		g2d.dispose();
 	}
     
+    /**
+     * Sorgt für den Effekt nach Button drücken
+     */
 	public void actionPerformed(ActionEvent event) {		
 		
 		if(stabilisation >= 2){
@@ -290,14 +383,14 @@ public class EditorSetter extends JPanel implements ActionListener {
 		 */
 		
 		if (event.getSource()==starten){
-			for(int a=0; a<arrayLenghtX; a++){
+			/*for(int a=0; a<arrayLenghtX; a++){
 				for(int b=0; b<arrayLenghtY; b++){
 					switch(map[a][b]){
 						case 1:																				// Array Inhalt = 1 => Wand
 							System.out.println("<wall x=\"" + a + "\" y=\"" + b + "\" width=\"1\" height=\"1\"");
 							break;
 						case 2:																				// Array Inhalt = 2 => Falle
-							System.out.println("<credits x=\"" + a + "\" y=\"" + b + "\"");
+							System.out.println("<credits x=\"" + a*20 + "\" y=\"" + b*20 + "\"");
 							break;
 						case 3:																				// Array Inhalt = 3 => Leben
 							System.out.println("<life x=\"" + a*20 + "\" y=\"" + b*20 + "\"");
@@ -340,10 +433,21 @@ public class EditorSetter extends JPanel implements ActionListener {
 							break;
 					}
 				}
+			}*/
+			
+			
+			if(darkness.isSelected()){
+				dark=true;
 			}
+			
+			if(multi.isSelected()){
+				multiplay=true;
+			}
+			
+			JFileChooser chooser = new JFileChooser();
 			//chooser.showSaveDialog(null);
 			String pfad = "maps";
-			chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+			chooser.setDialogType(JFileChooser.SAVE_DIALOG);									// Fenster zum 'Speichern unter'
 			chooser.removeChoosableFileFilter(chooser.getAcceptAllFileFilter());
 			chooser.setVisible(true);
 			File file = new File(pfad.trim());
@@ -355,8 +459,10 @@ public class EditorSetter extends JPanel implements ActionListener {
 				pfad = chooser.getSelectedFile().toString();
 				file = new File(pfad);
 				if(plainFilter.accept(file)){
-					//System.out.println(pfad + " kann gespeichert werden");
+					// Map wird als .xml gespeichert
+					Save.savegame(pfad);
 				}else{
+					// Datei entspricht nicht .xml
 					System.out.println(pfad + " ist der falsche Datentyp");
 				}
 			}
@@ -365,9 +471,18 @@ public class EditorSetter extends JPanel implements ActionListener {
 		}
 		
 		if (event.getSource()==öffnen){
-			rueckFileChooser=chooser.showOpenDialog(null);
+			JFileChooser chooser = new JFileChooser();
+			rueckFileChooser=chooser.showOpenDialog(null);										// Fenster zum 'Öffnen'
 			if(rueckFileChooser==JFileChooser.APPROVE_OPTION){
 				System.out.println("Die zu öffnende Datei ist: " + chooser.getSelectedFile().getName());
+				try {
+					// Öffnet die dem Pfad entsprechende Datei.
+					Open.open(chooser.getSelectedFile().getPath());
+				} catch (IOException | SAXException
+						| ParserConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
     }
@@ -375,7 +490,12 @@ public class EditorSetter extends JPanel implements ActionListener {
 
     
     
-	/**     HILFSMETHODEN     */
+	/**
+	 * Bekommt einen Bildnamen und gibt das entsprechende Bild zurück
+	 * Nach dem Bild wird im game-Ordner gesucht
+	 * @param path Bildname
+	 * @return Bild
+	 */
 	public static Image getImage(String path) {	// bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
 		Image img = null;
 		try {
@@ -385,6 +505,12 @@ public class EditorSetter extends JPanel implements ActionListener {
 		}
 		return img;
 	}
+	/**
+	 * Bekommt einen Bildnamen und gibt das entsprechende Bild zurück
+	 * Nach dem Bild wird im levelCreator-Ordner gesucht
+	 * @param path Bildname
+	 * @return Bild
+	 */
 	public static Image getImageFromLC(String path) {	// bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
 		Image img = null;
 		try {
@@ -395,16 +521,27 @@ public class EditorSetter extends JPanel implements ActionListener {
 		return img;
 	}
     
+	/**
+	 * Tastenabfrage
+	 */
 	public class KAdapter extends KeyAdapter {
+		/**
+		 * Taste losgelassen
+		 */
         public void keyReleased(KeyEvent event) {		// Wenn Taste losgelassen wird:
         	currentpos.keyReleased(event);
         }
-
+        /**
+         * Taste gedrückt?
+         */
         public void keyPressed(KeyEvent event) {		// Wenn Taste gedrückt wird:
         	currentpos.keyPressend(event);
         }
     }
 	
+	/**
+	 * Mausabfrage
+	 */
     public class MAdapter implements MouseInputListener {
 
     	
@@ -427,6 +564,9 @@ public class EditorSetter extends JPanel implements ActionListener {
 		}
 		//Current current = new Current();
 		@Override
+		/**
+		 * Maus gedrückt?
+		 */
 		public void mousePressed(MouseEvent e) {
 			//int button = e.getButton();
 			if(e.getButton() == MouseEvent.BUTTON1){
@@ -436,12 +576,12 @@ public class EditorSetter extends JPanel implements ActionListener {
 					int feldx = (e.getX()-defaultx-((e.getX()-defaultx)%20))/20;
 					int feldy = (e.getY()-defaulty-((e.getY()-defaulty)%20))/20;
 					
-					if(feldx<0 || feldx+1>48 || feldy<0 || feldy+1>25){
+					if(feldx<0 || feldx+1>arrayLenghtX || feldy<0 || feldy+1>arrayLenghtY){
 						return;
 					}
 					System.out.println("Du klickst in Feld ["+feldx+"]["+feldy+"].");
-					currentpos.setCurrentX(defaultx+1+feldx*20);
-					currentpos.setCurrentY(defaulty+1+feldy*20);
+					currentpos.setcurrentXPixel(defaultx+1+feldx*20);
+					currentpos.setcurrentYPixel(defaulty+1+feldy*20);
 					repaint();
 				 }
 				
@@ -450,11 +590,14 @@ public class EditorSetter extends JPanel implements ActionListener {
 		}
 
 		@Override
+		/**
+		 * Maus losgelassen?
+		 */
 		public void mouseReleased(MouseEvent e) {
 			if(e.getButton() == MouseEvent.BUTTON1){
 				if(!currentList.isEmpty()){
-					currentpos.setCurrentX((int)currentList.get((currentList.size()-1)).getX()*20+offsetX);
-					currentpos.setCurrentY((int)currentList.get((currentList.size()-1)).getY()*20+offsetY);
+					currentpos.setcurrentXPixel((int)currentList.get((currentList.size()-1)).getX()*20+offsetX);
+					currentpos.setcurrentYPixel((int)currentList.get((currentList.size()-1)).getY()*20+offsetY);
 					//repaint();
 					
 				}
@@ -467,6 +610,9 @@ public class EditorSetter extends JPanel implements ActionListener {
 
 		
 		@Override
+		/**
+		 * Maus gedragged?
+		 */
 		public void mouseDragged(MouseEvent e) {
 			//if(e.getButton() == MouseEvent.BUTTON1){
 				System.out.println("Maus dragged, yeah, Alter!");
@@ -474,7 +620,7 @@ public class EditorSetter extends JPanel implements ActionListener {
 					//int restx = 
 					int feldx = (e.getX()-defaultx-((e.getX()-defaultx)%20))/20;
 					int feldy = (e.getY()-defaulty-((e.getY()-defaulty)%20))/20;
-					if(feldx<0 || feldx+1>48 || feldy<0 || feldy+1>25){
+					if(feldx<0 || feldx+1>arrayLenghtX || feldy<0 || feldy+1>arrayLenghtY){
 						return;
 					}
 					Point po = new Point(feldx, feldy);
@@ -490,7 +636,11 @@ public class EditorSetter extends JPanel implements ActionListener {
 			//}
 			
 		}
-		
+		/**
+		 * Prüft ob Punkt bereits in Liste existiert
+		 * @param po Punkt der zu überprüfen ist
+		 * @return Existiert der Punkt bereits in Liste?
+		 */
 		private boolean isAlreadyExistent(Point po) {
 			if(!currentList.isEmpty()){
 				for(int a=0; a<currentList.size(); a++){

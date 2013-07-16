@@ -11,7 +11,6 @@ import java.util.List;
  *  sobald sich Spieler und NPC nicht mehr berühren.
  *  NPC's erklären das Spiel, geben Ratschläge oder machen doofe Witze.
  */
-
 public class NPC {
 
 	private Image npc_pic_up = DisplayManager.getImage("npcLookingUp.png");				// NPC Bild auf Map
@@ -40,8 +39,12 @@ public class NPC {
 	
 	private String npc_direction = "down";
 	
-	/*
-	 *  Ein neuer NPC bekommt die Parameter nr (nötig für den Text), x und y (für die Position)
+	/**
+	 * Komplexer Konstruktor der Klasse NPC
+	 * @param nr Nr des NPCs. Nötig, damit nach Kollision das passende Bild dargestellt werden kann
+	 * @param posx x-Position des NPCs
+	 * @param posy y-Position des NPCs
+	 * @param lookingDirection Richtung in die der NPC schaut
 	 */
 	public NPC(int nr, int posx, int posy, String lookingDirection){
 		x=posx;
@@ -49,14 +52,20 @@ public class NPC {
 		npc_nr=nr;
 		npc_direction = lookingDirection;
 	}
-	
+	/**
+	 * Einfacher Konstruktor der Klasse NPC
+	 * NPC blickt immer nach unten.
+	 * @param posx x-Position des NPCs
+	 * @param posy y-Position des NPCs
+	 */
 	public NPC(int posx, int posy){
 		x=posx;
 		y=posy;
 	}
 
-	/*
-	 * Stellt Bild des NPC's dar
+	/**
+	 * Stellt Bild des entsprechenden NPC's auf Map dar
+	 * Es muss unterschieden werden, in welche Richtung der NPC schauen soll
 	 */
 	public static void displayNPC(){
 		for(int i=0; i<npcList.size(); i++){			// so viele NPC's existieren
@@ -83,15 +92,17 @@ public class NPC {
 		}
 	}
 	
-	
+	/**
+	 * Entfernt alle NPCs von der Map
+	 */
 	public static void removeAllNPCs() {
 		DisplayManager.removeChangeableImages("NPC");
 		npcList.clear();
 		npcShopList.clear();
 	}
 	
-	/*
-	 *  Stellt das der Nummer entsprechende Bild mit zugehörigem Text dar
+	/**
+	 * Stellt das der Nummer entsprechende Bild mit zugehörigem Text dar
 	 */
 	public static void setCollidedPicture(){
 		// Wenn Spieler mit einem NPC kollidiert & das Bild nicht bereits gemalt wird
@@ -103,8 +114,9 @@ public class NPC {
 		}
 	}
 	
-	/*
-	 *  Überprüft, ob der Spieler mit einem NPC kollidiert
+	/**
+	 * Prüft, ob der Spieler mit einem NPC kollidiert
+	 * @return true, wenn er kollidiert, false, wenn nicht
 	 */
 	public static boolean checkPlayerCollide(){
 		// Jeder Spieler muss zusammen mit jedem NPC überprüft werden
@@ -139,38 +151,47 @@ public class NPC {
 		return hilfCollide;
 	}
 	
-	/*
-	 *  erstellt in LevelCaller einen NPC mit Nummer ... an Position ...
+
+	/**
+	 * Erstellt einen komplexen NPC
+	 * @param nr Nr des NPCs. Nötig, damit nach Kollision das passende Bild dargestellt werden kann
+	 * @param posx x-Position des NPCs
+	 * @param posy y-Position des NPCs
+	 * @param lookingDirection Richtung in die der NPC schaut
 	 */
 	public static void createNPC(int nr, int posx, int posy, String lookingDirection) {
 		posy += LevelCreator.distancePix;							// Wegen Menuleiste oben
 		npcList.add(new NPC(nr, posx, posy, lookingDirection));
 	}
-	
+	/**
+	 * Erstellt einen einfachen NPC
+	 * @param posx x-Position des NPCs
+	 * @param posy y-Position des NPCs
+	 */
 	public static void createShopNPC(int posx, int posy){
 		posy += LevelCreator.distancePix;
 		npcShopList.add(new NPC(posx, posy));
 	}
 	    
-    /*
+    /**
      * gibt die x-Position zurück
      */
     public int getX(){
     	return x;
     }
-    /*
+    /**
      * gibt die y-Position zurück
      */
     public int getY(){
     	return y;
     }
-    /*
+    /**
      * gibt die Nr im Spielverlauf des NPCs zurück
      */
     public int getNr(){
     	return npc_nr;
     }
-    /*
+    /**
      * gibt die Richtung zurück, in welche der NPC schauen soll
      */
     public String getDirection(){

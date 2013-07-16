@@ -18,12 +18,13 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
-
+/**
+ * Verwaltet das Panel, dass auf das Frame gesetzt wird.
+ * Hier drin läuft das Hauptspiel
+ * Die Klasse beinhaltet die Paint-Methode, in welcher alles gezeichnet wird.
+ */
 public class Setter extends JPanel implements ActionListener {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 		
 	public static Timer timer;	// erzeugt eine Variable timer des Typs Timer
@@ -36,19 +37,15 @@ public class Setter extends JPanel implements ActionListener {
     private static JPanel jp;
     
     // Initialisieren der benötigten Bilder
-    //private Image wall = setImagePath("wall.png");
-    //private Image trap = setImagePath("mine.gif");
-    //private Image monster = setImagePath("enemy.gif");
-    //private Image heart = setImagePath("heart.png");
     private Image background = setImagePath("bg.png");
-    //private Image projectile = setImagePath("projectile.png");
-    //private Image menu = setImagePath("headmenu.png");
-    //private Image finalGoal = setImagePath("goal.png");
     private Image layer = setImagePath("transparentLayer.png");
     private Image youDiedMenu = setImagePath("youdied.png");
-    //private Image shield = setImagePath("shield.png");
     
-    
+    /**
+     * Konstruktor(1) der Klasse Setter 
+     * wird verwendet wenn ein Level mithilfe einer Levelnummer aufgerufen wird
+     * @param levelNumber Levelnummer
+     */
     public Setter(int levelNumber) {	// Konstruktor
         addKeyListener(new KAdapter());		// Fügt KeyListener hinzu und erstellt ein neues Objekt der Klasse TAdapter, welches die Methoden 'keyReleased' und 'keyPressed' überschreibt
         addMouseListener(new MAdapter());
@@ -63,9 +60,9 @@ public class Setter extends JPanel implements ActionListener {
         
         new LevelCaller();					// erzeugt Objekt der Klasse LevelCaller
         
-        Player.createPlayer();
-        //Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY());		// erzeugt Objekt der Klasse Player: Fügt einen Spieler in das Spielfeld ein, an der durch die Parameter festgelegte Stelle
-        //Player.createPlayer(LevelCaller.getPlayerDefaultPosX(), LevelCaller.getPlayerDefaultPosY()+16);	// (noch) zu Testzwecken wird ein zweiter Spieler erzeugt
+        for(int a=0; a<Settings.getPlayerCount(); a++) {
+        	Player.createPlayer();
+        }
         
         LevelCaller.setLevel(levelNumber);	// Leveldaten werden initialisiert; Parameter legt fest welches Level gestartet wird
         
@@ -75,10 +72,53 @@ public class Setter extends JPanel implements ActionListener {
         // JPanel
         jp = this;
         
+        if(Settings.isMultiplayer()) {
+        	NetClient.main(null);
+        }
         
     }
 
+    /**
+     * Konstruktor(2) der Klasse Setter
+     * Wird verwendet wenn ein Pfad des Levels angegeben wird
+     * @param path Pfad zur Leveldatei
+     */
+    public Setter(String path) {	// Konstruktor
+        addKeyListener(new KAdapter());		// Fügt KeyListener hinzu und erstellt ein neues Objekt der Klasse TAdapter, welches die Methoden 'keyReleased' und 'keyPressed' überschreibt
+        addMouseListener(new MAdapter());
+        addMouseMotionListener(new MAdapter());
 
+        setFocusable(true);					// Kann fokussiert werden; Relevant für den Keylistener
+        setBackground(Color.GRAY);			// Setzt Hintergrund auf Grau
+        setDoubleBuffered(true);			// verhindert mögliches Flackern
+        setOpaque(true);					// setzt ein JPanel undurchsichtig
+        
+        Controls.createControls();	// erstellt einen Controller (Für Steuerung zuständig)
+        
+        new LevelCaller();					// erzeugt Objekt der Klasse LevelCaller
+        
+        for(int a=0; a<Settings.getPlayerCount(); a++) {
+        	Player.createPlayer();
+        }
+        
+        LevelCaller.setLevel(path);	// Leveldaten werden initialisiert; Parameter legt fest welches Level gestartet wird
+        
+        timer = new Timer(8, this);	// erzeugt ein Objekt timer der Klasse Timer; Parameter: legt den Aktualisierungsintervall fest (in millisekunden)
+        timer.start();				// startet den timer
+        
+        // JPanel
+        jp = this;
+        
+        if(Settings.isMultiplayer()) {
+        	NetClient.main(null);
+        }
+        
+    }
+
+    /**
+     * Paintmethode des Spiels
+     * Verwaltet alles, was gezeichnet wird
+     */
     public void paint(Graphics g) {			// Erzeugt und platziert alle Grafiken
         super.paint(g);
         //long zeit = System.currentTimeMillis();
@@ -114,31 +154,44 @@ public class Setter extends JPanel implements ActionListener {
 		
         Toolkit.getDefaultToolkit().sync();
         g.dispose();
-        
-        //if(System.currentTimeMillis()-zeit>4)
-		//	System.out.println((System.currentTimeMillis()-zeit));
     }
     
+    /**
+     * Sorgt dafür, dass Bilder dargestellt werden können
+     * @param img Bild, das dargestellt werden soll
+     * @param posx x-Pos des Bildes
+     * @param posy y-Pos des Bildes
+     */
     public static void displayImage(Image img, int posx, int posy, int last) {	// TODO: Darstellung von endlischer Dauer
-    	//Image img = setImagePath(imgPath);
     	imageList.add(img);
     	positionList.add(posx);
     	positionList.add(posy);
     	timingList.add(System.currentTimeMillis());
     }
     
+    /**
+     * bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
+     * @param path Bildpfad
+     * @return Bild
+     */
     public Image setImagePath(String path) {	// bekommt Bildpfad und gibt eine Ausgabe vom Typ Image zurück
     	ii = new ImageIcon(this.getClass().getResource(path));
     	Image img = ii.getImage();
     	return img;
     }
     
+    /**
+     * Gibt das Panel zurück
+     * @return panel
+     */
     public static JPanel getJPanel() {
     	return jp;
     }
     
     
-
+	/**
+	 *  Positionsdaten der bewegbaren Objekte aktualisieren und im Anschluss neu zeichnen
+	 */
     public void actionPerformed(ActionEvent event) {	// Positionsdaten der bewegbaren Objekte aktualisieren und im Anschluss neu zeichnen
     	Enemy.move();
 	    Player.move();
@@ -152,13 +205,21 @@ public class Setter extends JPanel implements ActionListener {
     	repaint();		// neu zeichnen
     }
 
+    /**
+     * Verwaltet die Interaktionen mit der Tastatur
+     */
     public class KAdapter extends KeyAdapter {
+    	/**
+    	 * Wenn Taste losgelassen wird:
+    	 */
         public void keyReleased(KeyEvent event) {		// Wenn Taste losgelassen wird:
         	Controls.controls.keyReleased(event);	// ruft in der Klasse Player für den Spieler 0 die Methode 'keyReleased' auf und übergibt das event
         	//if(Player.playerList.size()>1)							// wenn mehr als 1 Spieler, dann WASD ebenfalls aktualisieren
         	//	Player.playerList.get(1).keyReleased_wasd(event);		// gleich wie oben, nur für die WASD Steuerung
         }
-
+        /**
+         * Wenn Taste gedrückt wird:
+         */
         public void keyPressed(KeyEvent event) {		// Wenn Taste gedrückt wird:
         	Controls.controls.keyPressed(event);		// ruft in der Klasse Player für den Spieler 0 die Methode 'keyPressed' auf und übergibt das event
         	//if(Player.playerList.size()>1)							// wenn mehr als 1 Spieler, dann WASD ebenfalls aktualisieren
@@ -166,6 +227,9 @@ public class Setter extends JPanel implements ActionListener {
         }
     }
     
+    /**
+     * Verwaltet die Interaktionen mit der Maus
+     */
     public class MAdapter implements MouseInputListener {
 
 		@Override

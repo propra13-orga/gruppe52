@@ -29,7 +29,7 @@ public class Controls {
 	
 	// Steuerungsmechanik
 	private Robot robot;
-	private boolean isMouseControlled = true;
+	public boolean isMouseControlled = true;
 	private double mx;
 	private double my;
 	private double px;
@@ -121,11 +121,11 @@ public class Controls {
     		} else if(event.getComponent().getIdentifier().equals(Identifier.Axis.POV)) { // FEUERN
     			double val = joystick.getComponent(Identifier.Axis.POV).getPollData();
     			if(val==0.25) {				// oben
-    				
+    				ManaManager.selectNext();
     			} else if(val==0.50) {		// rechts
     				Player.playerList.get(0).chooseNextWeapon();		// Nächste Waffe
     			} else if(val==0.75) {		// unten
-    				
+    				ManaManager.selectPrev();
     			} else if(val==1.00) {		// links
     				Player.playerList.get(0).choosePrevWeapon();		// Vorherige Waffe
     			}
@@ -133,17 +133,17 @@ public class Controls {
     		} else if(event.getComponent().getIdentifier().equals(Identifier.Button._2)) { // USE (Für NPC, YouDiedScreen, ...)
     			exeUse();
     		} else if(event.getComponent().getIdentifier().equals(Identifier.Button._7)) { // MANA
-    			ManaManager.useMana(0, 0);
+    			ManaManager.useCurrentSpell(0);
     		}
     		
     		//System.out.println(joystick.getComponent(Identifier.Button._5).getPollData());
-    		if(mx>-0.01 && mx<0.01)
+    		if(mx>-0.01 && mx<0.019)
     			mx = 0.0;
-    		if(my>-0.01 && my<0.01)
+    		if(my>-0.01 && my<0.019)
     			my = 0.0;
-    		if(px>-0.01 && px<0.01)
+    		if(px>-0.01 && px<0.019)
     			px = 0.0;
-    		if(py>-0.01 && py<0.01)
+    		if(py>-0.01 && py<0.019)
     			py = 0.0;
     		
     		//System.out.println(mx + "  und  "+ my);
@@ -153,7 +153,9 @@ public class Controls {
 		
     	captureDirection();
     	setAngle();
-    	Player.playerList.get(0).rotatePlayerImg();
+    	
+    	if(Runner.codeRunning)
+    		Player.playerList.get(0).rotatePlayerImg();
     	//System.out.println(angle);    	
     }
 
@@ -293,9 +295,12 @@ public class Controls {
     	if(key==KeyEvent.VK_ESCAPE) {
     		if(Shop.show) {				// Shop schließen
     			Shop.closeShop();
-    			setMouseIsController(true);	// Maus zentrieren und zur Spielersteuerung benutzen (an/aus)
+    			// TODO: Überarbeiten, wann maus zurückgesetzt wird und wann nicht
+    			setMouseIsController(isMouseControlled);	// Maus zentrieren und zur Spielersteuerung benutzen (an/aus)
     		} else
     			setMouseIsController(!isMouseControlled);	// Maus zentrieren und zur Spielersteuerung benutzen (an/aus)
+    	} else if(key==KeyEvent.VK_F1) {
+    		
     	} else if(key==KeyEvent.VK_ENTER) {
     		//System.out.println(NPC.npcPermission);
     		exeUse();
@@ -305,7 +310,11 @@ public class Controls {
     	} else if(key==KeyEvent.VK_B) {
     		Savegame.savegame();
     	} else if(key==KeyEvent.VK_G) {
-    		ManaManager.useMana(0, 0);
+    		ManaManager.useCurrentSpell(0);
+    	} else if(key==KeyEvent.VK_1) {
+    		ManaManager.selectPrev();
+    	} else if(key==KeyEvent.VK_2) {
+    		ManaManager.selectNext();
     	}
     }
     
@@ -328,16 +337,25 @@ public class Controls {
     	if(arg0) {
     		isMouseControlled = true;
     		Runner.setMouseVisibility(false);
+    		Settings.setControlsToMouse();
     	} else {
     		isMouseControlled = false;
     		Runner.setMouseVisibility(true);
+    		if(isJoystickAvailable)
+    			Settings.setControlsToGamePad();
     	}
     }
    
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		if(Shop.show)
+		if(Shop.show) {
 			Shop.receiveMouseKlick(e.getX(), e.getY());
+		} else {
+			int button = e.getButton();
+			if(button==MouseEvent.BUTTON3) {
+				ManaManager.useCurrentSpell(0);
+			}
+		}
 	}
 	
 	public void mouseEntered(MouseEvent e) {
